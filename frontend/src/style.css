@@ -1,0 +1,187 @@
+/* src/style.css */
+
+/* ================================== */
+/* 1. FONT FACE DECLARATIONS */
+/* Siguraduhin na ang mga files ay nasa: frontend/public/fonts/ */
+/* ================================== */
+
+/* --- Poppins Font Family --- */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-display: swap;
+}
+
+
+/* --- Open Sans Font Family --- */
+@font-face {
+  font-family: 'OpenSans';
+  src: url('/fonts/OpenSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OpenSans';
+  src: url('/fonts/OpenSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ================================== */
+/* 2. TAILWIND CSS v4 SETUP (@theme) */
+/* ================================== */
+
+@import "tailwindcss";
+
+@theme {
+  /* --- CUSTOM FONT FAMILIES --- */
+  --font-heading: "Poppins", sans-serif;
+  --font-body: "OpenSans", sans-serif;
+  --font-sans: "OpenSans", ui-sans-serif, system-ui, sans-serif;
+
+  /* --- CUSTOM COLORS --- */
+  --color-kaitoke-green-50: #eefff4;
+  --color-kaitoke-green-500: #0ed964;
+  --color-kaitoke-green-950: #004b23;
+
+  --color-electric-lime-500: #a7e600;
+  --color-sun-500: #ef8b11;
+  --color-woodsmoke-950: #100f10;
+
+  /* VAWC & GAD COLORS */
+  --color-advocacy-purple-500: #8b5cf6;
+  --color-vawc-orange-500: #f97316;
+  --color-safety-teal-500: #14b8a6;
+  --color-calm-lavender-500: #a855f7;
+
+  /* COLLAB ACCENTS */
+  --color-azure-blue-500: #3b82f6;
+  --color-neon-pink-500: #ec4899;
+
+  /* NEUTRALS */
+  --color-abyss-950: #010101;
+  --color-platinum-50: #fdfdfd;
+}
+
+/* --- External Plugins --- */
+@import "flowbite-vue/index.css";
+@plugin "flowbite/plugin";
+
+/* ================================== */
+/* 3. BASE STYLES & OVERRIDES */
+/* ================================== */
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    @apply transition-colors duration-200;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-body bg-abyss-950 text-white antialiased;
+  }
+}
+
+/* FullCalendar Dark Mode Readability */
+.dark .fc-col-header-cell-cushion,
+.dark .fc-daygrid-day-number,
+.dark .fc-toolbar-title {
+    color: #fdfdfd !important;
+}
+
+.dark .fc-scrollgrid-border-box,
+.dark .fc-theme-standard td,
+.dark .fc-theme-standard th {
+    border-color: #111012 !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: rgba(239, 139, 17, 0.5); /* sun-500 with opacity */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(239, 139, 17, 0.8);
+}
