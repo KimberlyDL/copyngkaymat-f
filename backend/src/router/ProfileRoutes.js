@@ -2,7 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const profileController = require('../controller/ProfileController');
-const guardianController = require('../controller/GuardianController');
 const settingsController = require('../controller/SettingsController');
 const { authenticate, optionalAuth } = require('../middleware/AuthMiddleware');
 const multer = require('multer');
@@ -132,6 +131,9 @@ const profileUpdateLimiter = rateLimit({
 
 // ==================== PUBLIC ROUTES ====================
 
+// GET /api/v1/users/profile - Get OWN profile (new convenient route)
+router.get('/profile', authenticate, profileController.getProfile);
+
 // GET /api/v1/users/:id/profile - View profile (public or own)
 router.get('/:id/profile', optionalAuth, profileController.getProfile);
 
@@ -158,12 +160,6 @@ router.delete(
     '/avatar',
     profileController.deleteAvatar
 );
-
-// ===== Guardian Management =====
-router.get('/guardians', guardianController.getGuardians);
-router.post('/guardians', guardianController.addGuardian);
-router.put('/guardians/:id', guardianController.updateGuardian);
-router.delete('/guardians/:id', guardianController.deleteGuardian);
 
 // ===== Privacy Settings =====
 router.get('/settings/privacy', settingsController.getPrivacySettings);

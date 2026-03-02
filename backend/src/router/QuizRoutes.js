@@ -30,6 +30,7 @@ router.get('/gamification/leaderboard', QuizController.getLeaderboard);
 
 // Lahat ng authenticated users (Player, Educator, Admin) ay pwedeng makita ang quiz info
 router.get('/module/:moduleId', QuizController.getByModule);
+router.get('/:id/check-attempt', QuizController.checkUserAttempt);
 router.get('/:id', QuizController.getQuizById);
 
 // ===== Student Specific Routes =====

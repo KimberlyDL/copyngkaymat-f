@@ -1,157 +1,175 @@
 <template>
-    <div class="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 font-['Poppins'] text-white">
+    <div class="max-w-4xl mx-auto space-y-10">
+
+        <!-- Deletion Pending Alert -->
+        <div v-if="deletionStatus?.has_pending_deletion" class="p-5 rounded-2xl bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div class="flex items-start gap-3">
+                <AlertTriangle class="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5" />
+                <div>
+                    <h3 class="text-xs font-black uppercase tracking-wider text-orange-800 dark:text-orange-200">Account Deletion Scheduled</h3>
+                    <p class="text-[11px] text-orange-700 dark:text-orange-300 mt-1">
+                        Your account will be permanently deleted on <strong>{{ formatDate(deletionStatus.scheduled_deletion_date) }}</strong>.
+                    </p>
+                </div>
+            </div>
+            <button @click="cancelDeletion" :disabled="isCancelling"
+                class="px-4 py-2.5 bg-orange-100 dark:bg-orange-500/20 text-orange-800 dark:text-orange-200 text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-orange-200 dark:hover:bg-orange-500/30 transition-colors shrink-0">
+                {{ isCancelling ? 'Processing...' : 'Cancel Deletion' }}
+            </button>
+        </div>
         
-        <section v-if="deletionStatus?.has_pending_deletion"
-            class="bg-yellow-500/5 border border-yellow-500/20 p-8 rounded-[2.5rem] relative overflow-hidden group">
-            <div class="absolute -top-10 -right-10 w-40 h-40 bg-yellow-500/5 rounded-full blur-[80px]"></div>
-            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="flex items-start gap-4">
-                    <div class="p-3 rounded-2xl bg-yellow-500/20 text-yellow-500 shadow-lg">
-                        <AlertTriangleIcon class="h-6 w-6" />
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-black uppercase tracking-tighter text-yellow-500">Account Deletion Pending</h3>
-                        <p class="mt-1 text-xs text-yellow-500/70 font-medium">
-                            Your account is scheduled for permanent deletion on <strong>{{ formatDate(deletionStatus.scheduled_deletion_date) }}</strong>.
-                        </p>
-                        <p class="text-[9px] font-black uppercase tracking-widest text-yellow-600/50 mt-2">Days remaining: {{ deletionStatus.days_remaining }}</p>
-                    </div>
-                </div>
-                <button @click="cancelDeletion" :disabled="isCancelling"
-                    class="px-8 py-3 bg-yellow-500 text-black text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-yellow-400 transition-all disabled:opacity-50">
-                    {{ isCancelling ? 'Cancelling...' : 'Cancel Deletion' }}
-                </button>
-            </div>
-        </section>
-
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12 border-b border-white/5">
-            <div class="lg:col-span-1 space-y-2">
-                <h3 class="text-2xl font-black uppercase tracking-tighter text-white">Change <span class="text-blue-500">Password</span></h3>
-                <p class="text-xs text-gray-500 font-medium leading-relaxed italic">
-                    Update your password regularly to keep your account secure. All sessions will be logged out after password change.
-                </p>
+        <!-- Password Change -->
+        <section class="space-y-6">
+            <div>
+                <h3 class="text-sm font-black uppercase tracking-wider text-black dark:text-white">Change Password</h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Update your password to keep your account secure.</p>
             </div>
 
-            <div class="lg:col-span-2 space-y-6">
-                <div class="grid grid-cols-1 gap-6">
-                    <div class="space-y-2 group">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1 group-focus-within:text-blue-500 transition-colors">Current Password *</label>
-                        <input v-model="passwordData.current_password" type="password" required
-                            class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all shadow-sm" />
+            <div class="grid gap-6">
+                <div class="grid gap-2">
+                    <label class="text-[10px] font-black uppercase tracking-wider text-slate-500">Current Password</label>
+                    <input v-model="passwordData.current_password" type="password" 
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid gap-2">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-500">New Password</label>
+                        <input v-model="passwordData.password" type="password" 
+                            class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
+                        <p class="text-[10px] text-slate-500">Minimum 8 characters</p>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-2 group">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1 group-focus-within:text-pink-500 transition-colors">New Password *</label>
-                            <input v-model="passwordData.password" type="password" required minlength="8"
-                                class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-pink-500/50 outline-none transition-all shadow-sm" />
-                            <p class="text-[8px] font-black uppercase text-gray-600 ml-1 tracking-widest italic">Minimum 8 characters</p>
-                        </div>
-                        <div class="space-y-2 group">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1 group-focus-within:text-pink-500 transition-colors">Confirm New Password *</label>
-                            <input v-model="passwordData.password_confirmation" type="password" required
-                                class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-pink-500/50 outline-none transition-all shadow-sm" />
-                        </div>
+                    <div class="grid gap-2">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-500">Confirm New Password</label>
+                        <input v-model="passwordData.password_confirmation" type="password" 
+                            class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                     </div>
                 </div>
-                <div class="flex justify-end pt-2">
+
+                <div class="flex justify-end">
                     <button @click="changePassword" :disabled="!isPasswordFormValid || isChangingPassword"
-                        class="px-10 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-pink-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-blue-900/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-500 disabled:opacity-30">
-                        <span v-if="!isChangingPassword">Update Password</span>
-                        <span v-else class="flex items-center gap-2">
-                            <svg class="animate-spin h-3 w-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            Updating...
-                        </span>
+                        class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2">
+                        <div v-if="isChangingPassword" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        {{ isChangingPassword ? 'Updating...' : 'Update Password' }}
                     </button>
                 </div>
             </div>
         </section>
 
-        <section class="space-y-8 pb-12 border-b border-white/5">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div class="space-y-1">
-                    <h3 class="text-2xl font-black uppercase tracking-tighter text-white">Active <span class="text-pink-500">Sessions</span></h3>
-                    <p class="text-xs text-gray-500 font-medium italic">Manage devices where you're currently logged in.</p>
+        <!-- Active Sessions -->
+        <section class="space-y-6 pt-8 border-t border-slate-200 dark:border-white/5">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-sm font-black uppercase tracking-wider text-black dark:text-white">Active Sessions</h3>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Manage devices where you're currently logged in.</p>
                 </div>
                 <button @click="logoutAllDevices" :disabled="isLoggingOut"
-                    class="px-6 py-3 bg-white/5 border border-white/10 text-red-500 text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-red-500 hover:text-white transition-all">
-                    <LogOutIcon class="h-3 w-3 inline-block mr-1" /> Logout All Devices
+                    class="text-[10px] font-black uppercase tracking-wider text-red-600 hover:text-red-700 transition-colors flex items-center gap-2">
+                    <LogOut class="w-4 h-4" />
+                    Sign out all
                 </button>
             </div>
 
-            <div v-if="isLoadingSessions" class="py-12 text-center">
-                <div class="inline-block animate-spin h-8 w-8 border-2 border-pink-500 border-t-transparent rounded-full mb-2"></div>
+            <div v-if="isLoadingSessions" class="flex justify-center py-8">
+                <div class="w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
 
-            <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                <div v-for="session in sessions" :key="session.id"
-                    class="group relative bg-white/[0.02] border border-white/5 rounded-[2.2rem] p-6 transition-all duration-500 hover:bg-white/[0.05] hover:border-pink-500/20">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 rounded-2xl bg-gradient-to-tr from-gray-800 to-gray-900 border border-white/5 text-gray-400 group-hover:text-blue-400 transition-colors shadow-lg">
-                            <MonitorIcon class="w-5 h-5" />
+            <div v-else class="space-y-3">
+                <div v-for="session in sessions" :key="session.id" 
+                    class="flex items-center justify-between p-5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl">
+                    <div class="flex items-center gap-4">
+                        <div class="p-2.5 bg-slate-100 dark:bg-white/5 rounded-xl">
+                            <Monitor class="w-5 h-5 text-slate-600 dark:text-slate-300" />
                         </div>
-                        <span v-if="session.is_current" class="px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[8px] font-black uppercase tracking-widest rounded-full italic shadow-lg shadow-blue-900/20">Current Session</span>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-black dark:text-white">{{ session.device_name || 'Unknown Device' }}</span>
+                                <span v-if="session.is_current" class="px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 text-[10px] font-black uppercase tracking-wider">Current</span>
+                            </div>
+                            <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{{ session.ip_address }} • Last active {{ formatDateTime(session.last_activity) }}</p>
+                        </div>
                     </div>
-                    <h4 class="text-xs font-black uppercase tracking-widest mb-1">{{ session.device_name || 'Unknown Device' }}</h4>
-                    <p class="text-[9px] font-mono text-gray-500 uppercase tracking-tighter italic">{{ session.ip_address }}</p>
-                    <p class="text-[8px] font-black text-gray-600 uppercase tracking-widest mt-4 italic">Last active: {{ formatDateTime(session.last_activity) }}</p>
                 </div>
             </div>
         </section>
 
-        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-            <div class="bg-orange-950/10 border border-orange-500/20 p-8 rounded-[2.8rem] space-y-4 group">
-                <div class="flex items-center gap-3">
-                    <PauseCircleIcon class="h-5 w-5 text-orange-500" />
-                    <h3 class="text-lg font-black uppercase tracking-tighter text-white">Deactivate Account</h3>
-                </div>
-                <p class="text-xs text-gray-500 leading-relaxed font-medium italic">Temporarily disable your account. Your profile will be hidden until you log back in (within 30 days).</p>
-                <button @click="confirmDeactivation" :disabled="isDeactivating"
-                    class="w-full py-4 bg-white/5 border border-white/10 text-orange-500 text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-orange-500 hover:text-white transition-all shadow-sm">
-                    {{ isDeactivating ? 'Deactivating...' : 'Deactivate Account' }}
-                </button>
+        <!-- Danger Zone -->
+        <section class="space-y-6 pt-8 border-t border-slate-200 dark:border-white/5">
+            <div>
+                <h3 class="text-sm font-black uppercase tracking-wider text-red-600">Danger Zone</h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Irreversible actions for your account.</p>
             </div>
 
-            <div class="bg-red-950/10 border border-red-500/20 p-8 rounded-[2.8rem] space-y-4 group">
-                <div class="flex items-center gap-3">
-                    <Trash2Icon class="h-5 w-5 text-red-500" />
-                    <h3 class="text-lg font-black uppercase tracking-tighter text-red-500">Permanent Account Deletion</h3>
-                </div>
-                <p class="text-xs text-gray-500 leading-relaxed font-medium italic">This will schedule your account for permanent deletion after 30 days. All data, progress, and personal info will be permanently lost.</p>
-                <button v-if="!showDeleteForm" @click="showDeleteForm = true"
-                    class="w-full py-4 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-red-900/20 hover:scale-[1.02] transition-all">
-                    Request Account Deletion
-                </button>
-            </div>
-        </section>
-
-        <transition name="fade">
-            <div v-if="showDeleteForm" class="p-10 bg-[#0d0d12] border border-red-500/30 rounded-[3rem] space-y-8 animate-in zoom-in duration-500">
-                <div class="space-y-6">
-                    <div class="space-y-2 group">
-                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-1 group-focus-within:text-red-400 transition-colors">Confirm Password *</label>
-                        <input v-model="deleteForm.password" type="password" required
-                            class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-red-500/50 outline-none transition-all shadow-sm" />
+            <div class="space-y-4">
+                <!-- Deactivate -->
+                <div class="p-5 border border-slate-200 dark:border-white/5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h4 class="text-xs font-black uppercase tracking-wider text-black dark:text-white">Deactivate Account</h4>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Temporarily hide your profile and activity.</p>
                     </div>
-                    <div class="space-y-2 group">
-                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-red-400 ml-1">Type <span class="font-bold text-red-600">DELETE MY ACCOUNT</span> to confirm *</label>
-                        <input v-model="deleteForm.confirm_text" type="text" placeholder="DELETE MY ACCOUNT" required
-                            class="w-full px-6 py-4 rounded-2xl bg-red-500/5 border border-red-500/20 text-white placeholder-red-900/40 outline-none focus:ring-2 focus:ring-red-500/50 transition-all shadow-sm" />
-                    </div>
-                    <div class="space-y-2 group">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Reason (Optional - helps us improve)</label>
-                        <textarea v-model="deleteForm.reason" rows="3" placeholder="Help us improve by sharing why you're leaving"
-                            class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-red-500/50 outline-none resize-none transition-all shadow-sm"></textarea>
-                    </div>
-                </div>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <button @click="requestDeletion" :disabled="!isDeleteFormValid || isDeleting"
-                        class="flex-1 py-4 bg-red-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-red-900/20 disabled:opacity-30 transition-all">
-                        {{ isDeleting ? 'Processing...' : 'Confirm & Schedule Deletion' }}
+                    <button @click="confirmDeactivation" :disabled="isDeactivating"
+                        class="px-4 py-2.5 border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 text-[10px] font-black uppercase tracking-wider rounded-xl transition-colors whitespace-nowrap">
+                        Deactivate
                     </button>
-                    <button @click="cancelDeleteForm" class="px-10 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-all">Cancel</button>
+                </div>
+
+                <!-- Delete -->
+                <div class="p-5 border border-red-200 dark:border-red-500/20 bg-red-50 dark:bg-red-500/10 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h4 class="text-xs font-black uppercase tracking-wider text-red-900 dark:text-red-200">Delete Account</h4>
+                        <p class="text-[11px] text-red-700 dark:text-red-300/80 mt-1">Permanently delete your account and all data.</p>
+                    </div>
+                    <button @click="showDeleteForm = true"
+                        class="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-colors whitespace-nowrap shadow-lg shadow-red-500/25">
+                        Delete Account
+                    </button>
                 </div>
             </div>
-        </transition>
+        </section>
+
+        <!-- Delete Modal -->
+        <div v-if="showDeleteForm" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div class="bg-white dark:bg-[#0d0d12] border border-slate-200 dark:border-white/5 rounded-2xl shadow-xl max-w-md w-full p-6 space-y-6">
+                <div class="space-y-2 text-center">
+                    <div class="mx-auto w-12 h-12 bg-red-100 dark:bg-red-500/20 rounded-full flex items-center justify-center mb-4">
+                        <AlertTriangle class="w-6 h-6 text-red-600 dark:text-red-400" />
+                    </div>
+                    <h3 class="text-sm font-black uppercase tracking-wider text-black dark:text-white">Delete Account?</h3>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                        This action cannot be undone. All your data will be permanently removed.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-500">Enter Password</label>
+                        <input v-model="deleteForm.password" type="password" 
+                            class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-black dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500 text-sm px-4 py-3" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-500">Type <span class="font-mono text-red-600 font-bold">DELETE MY ACCOUNT</span></label>
+                        <input v-model="deleteForm.confirm_text" type="text" placeholder="DELETE MY ACCOUNT"
+                            class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-black dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500 text-sm px-4 py-3" />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-500">Reason (Optional)</label>
+                        <textarea v-model="deleteForm.reason" rows="3"
+                            class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-black dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500 text-sm px-4 py-3 resize-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button @click="cancelDeleteForm" class="flex-1 px-4 py-3 bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-wider rounded-xl hover:bg-slate-50 dark:hover:bg-white/10 transition-colors">
+                        Cancel
+                    </button>
+                    <button @click="requestDeletion" :disabled="!isDeleteFormValid || isDeleting"
+                        class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white text-[10px] font-black uppercase tracking-wider rounded-xl shadow-lg shadow-red-500/25 disabled:opacity-50 transition-colors">
+                        {{ isDeleting ? 'Deleting...' : 'Confirm Delete' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -159,11 +177,11 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import {
-    AlertTriangleIcon,
-    MonitorIcon,
-    LogOutIcon,
-    PauseCircleIcon,
-    Trash2Icon
+    AlertTriangle,
+    Monitor,
+    LogOut,
+    PauseCircle, // Keep imports if needed, though PauseCircle wasn't used in template
+    Trash2 // Keep imports if needed, though Trash2 wasn't used in template
 } from 'lucide-vue-next';
 import { useAuthStore } from '@/stores/auth';
 import { useProfileStore } from '@/stores/profile';
@@ -369,10 +387,5 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(10px); }
-
-input, select, textarea {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* Removed custom transitions for simpler Tailwind classes */
 </style>

@@ -75,6 +75,38 @@ exports.authenticate = async (req, res, next) => {
             });
         }
 
+        // Check account status
+        if (user.account_status === 'banned') {
+            return res.status(403).json({
+                message: 'Your account has been banned.',
+                code: 'ACCOUNT_BANNED'
+            });
+        }
+
+        if (user.account_status === 'suspended') {
+            if (user.suspended_until && new Date(user.suspended_until) > new Date()) {
+                return res.status(403).json({
+                    message: 'Your account is suspended.',
+                    code: 'ACCOUNT_SUSPENDED',
+                    suspended_until: user.suspended_until
+                });
+            } else {
+                // Auto-reactivate if suspension has expired
+                await user.update({ 
+                    account_status: 'active', 
+                    suspended_until: null, 
+                    suspension_reason: null 
+                });
+            }
+        }
+
+        if (user.account_status === 'deactivated') {
+            return res.status(403).json({
+                message: 'Your account has been deactivated.',
+                code: 'ACCOUNT_DEACTIVATED'
+            });
+        }
+
         if (user.tokenIssuedBeforePasswordChange(decoded.iat)) {
             return res.status(401).json({
                 message: 'Token invalidated due to password change.',

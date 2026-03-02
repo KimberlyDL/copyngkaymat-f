@@ -1,34 +1,25 @@
-// backend/src/model/UserGamification.js
-const { Model, DataTypes } = require('sequelize');
-
-module.exports = (sequelize) => {
-    class UserGamification extends Model {}
-
-    UserGamification.init({
+module.exports = (sequelize, DataTypes) => {
+    const UserGamification = sequelize.define('UserGamification', {
         user_id: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
             allowNull: false,
-            references: { model: 'Users', key: 'id' }
+            unique: true
         },
         experience_points: {
             type: DataTypes.INTEGER,
             defaultValue: 0
         },
-        level: {
-            type: DataTypes.INTEGER,
-            defaultValue: 1
+        current_title: {
+            type: DataTypes.STRING,
+            defaultValue: 'Novice'
         },
-        streak: {
+        total_points: {
             type: DataTypes.INTEGER,
             defaultValue: 0
         }
     }, {
-        sequelize,
-        modelName: 'UserGamification',
-        tableName: 'usergamification', // FIX: Ito ang itutugma natin sa database mo
-        underscored: true,
-        timestamps: true
+        tableName: 'user_gamifications',
+        underscored: true
     });
 
     return UserGamification;

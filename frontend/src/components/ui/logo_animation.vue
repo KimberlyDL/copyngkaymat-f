@@ -1,8 +1,8 @@
 <template>
-    <div class="flex flex-col items-center justify-center">
-        <div class="logo-container mb-4 transform transition duration-500" :class="[animationClass, pulseClass]">
-            <svg class="w-12 h-12 md:w-16 md:h-16" viewBox="0 0 500 416" xmlns="http://www.w3.org/2000/svg">
-                <g>
+    <div class="flex flex-col items-center justify-center custom-font-poppins">
+        <div class="logo-container mb-6 transform transition-all duration-700" :class="[animationClass, statusColorClass]">
+            <svg class="w-16 h-16 md:w-20 md:h-20 drop-shadow-2xl" viewBox="0 0 500 416" xmlns="http://www.w3.org/2000/svg">
+                <g class="transition-all duration-500">
                     <path
                         d="m0,0h159.81l91.66,295.44L340.78,0h159.22l-115.77,415.98h-14.08l35.15-337.61-99.19,337.61h-111.63L91.8,74.3l38.63,341.68h-12.33L0,0Z"
                         fill="currentColor" />
@@ -14,7 +14,16 @@
                 </g>
             </svg>
         </div>
-        <span class="font-heading text-xl md:text-2xl font-bold text-gray-800 dark:text-platinum-100">ProtectED</span>
+        
+        <div class="flex flex-col items-center gap-1">
+            <span class="text-2xl md:text-3xl font-[900] uppercase italic tracking-tighter text-slate-900 dark:text-white leading-none">
+                Protect<span class="text-purple-600 dark:text-purple-500">Ed</span>
+            </span>
+            <div class="h-1 w-8 bg-gradient-to-r from-purple-600 to-fuchsia-600 rounded-full shadow-[0_2px_10px_rgba(139,92,246,0.4)]"></div>
+            <p v-if="status === 'loading'" class="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-gray-600 mt-3 animate-pulse italic">
+                Synchronizing Registry...
+            </p>
+        </div>
     </div>
 </template>
 
@@ -29,44 +38,47 @@ const props = defineProps({
 });
 
 const animationClass = computed(() => {
-    return props.status === 'loading' ? 'animate-heartbeat-glow' : 'opacity-100';
+    return props.status === 'loading' ? 'animate-neural-pulse' : 'scale-100 opacity-100';
 });
 
-const pulseClass = computed(() => {
-    // Apply the primary green color consistently
+const statusColorClass = computed(() => {
     if (props.status === 'error') {
-        return 'text-red-500';
+        return 'text-rose-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.4)]';
     }
-    return 'text-kaitoke-green-600 dark:text-kaitoke-green-400';
+    if (props.status === 'success') {
+        return 'text-violet-500 drop-shadow-[0_0_15px_rgba(139,92,246,0.4)]';
+    }
+    // Default Institutional Purple
+    return 'text-purple-600 dark:text-purple-500';
 });
 </script>
 
 <style scoped>
-/* Define the keyframes for the combined Heartbeat and Glow effect */
-@keyframes heartbeat-glow {
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700;1,900&display=swap');
 
-    0%,
-    100% {
+.custom-font-poppins {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* Institutional Neural Pulse Animation */
+@keyframes neural-pulse {
+    0%, 100% {
         transform: scale(1);
-        filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.4));
-        /* Subtle green glow */
+        filter: drop-shadow(0 0 5px rgba(124, 58, 237, 0.3));
     }
-
     50% {
-        transform: scale(1.05);
-        /* Slight enlargement */
-        filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.8)) drop-shadow(0 0 2px rgba(16, 185, 129, 0.9));
-        /* Stronger glow */
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.6)) drop-shadow(0 0 40px rgba(139, 92, 246, 0.2));
     }
 }
 
-/* Tailwind-compatible utility class for the animation */
-.animate-heartbeat-glow {
-    animation: heartbeat-glow 1.5s ease-in-out infinite;
+.animate-neural-pulse {
+    animation: neural-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Ensure SVG uses currentColor for adaptive theme switching */
-.logo-container svg {
+/* SVG currentColor ensures it works with tailwind text colors */
+svg {
     fill: currentColor;
+    transition: all 0.5s ease-in-out;
 }
 </style>

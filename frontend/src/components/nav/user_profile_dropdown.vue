@@ -2,15 +2,15 @@
     <div class="relative profile-node font-['Poppins']">
         <!-- TRIGGER BUTTON -->
         <button @click.stop="open = !open" type="button" :aria-expanded="open" 
-            class="flex items-center gap-2 p-1 pr-3 rounded-2xl bg-white/5 border border-white/5 hover:border-blue-500/30 transition-all active:scale-95 group">
+            class="flex items-center gap-2 p-1 pr-3 rounded-2xl bg-white/5 border border-white/5 hover:border-purple-500/30 transition-all active:scale-95 group">
             <div class="relative w-8 h-8 rounded-xl overflow-hidden border border-white/10 shadow-lg group-hover:scale-105 transition-transform">
                 <img :src="avatar" :alt="name" class="w-full h-full object-cover" />
-                <div class="absolute inset-0 bg-gradient-to-tr from-blue-600/20 to-pink-600/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="absolute inset-0 bg-gradient-to-tr from-purple-600/20 to-fuchsia-600/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </div>
             <span class="hidden md:inline text-[10px] font-black uppercase tracking-widest text-gray-300 group-hover:text-white transition-colors">
                 {{ name.split(' ')[0] }}
             </span>
-            <ChevronDown :class="['w-3 h-3 text-gray-500 transition-transform duration-300', open ? 'rotate-180 text-blue-400' : '']" />
+            <ChevronDown :class="['w-3 h-3 text-gray-500 transition-transform duration-300', open ? 'rotate-180 text-purple-400' : '']" />
         </button>
 
         <!-- DROPDOWN MENU -->
@@ -20,21 +20,21 @@
                 <div class="px-5 py-4 bg-white/[0.02] border-b border-white/5">
                     <p class="text-[8px] font-black text-gray-600 uppercase tracking-[0.3em]">Account Access</p>
                     <p class="text-[11px] font-black text-white truncate mt-1.5 uppercase tracking-tight">{{ name }}</p>
-                    <p class="text-[9px] font-bold text-blue-400/70 truncate tracking-wide">{{ email }}</p>
+                    <p class="text-[9px] font-bold text-fuchsia-400/70 truncate tracking-wide">{{ email }}</p>
                 </div>
                 
                 <!-- Menu Actions -->
                 <div class="p-2 space-y-1">
                     <button @click="goProfile" class="menu-item group/m">
-                        <div class="p-2 rounded-lg bg-blue-500/5 border border-blue-500/10 group-hover/m:bg-blue-500/10 transition-colors">
-                            <UserIcon class="w-3.5 h-3.5 text-blue-400" />
+                        <div class="p-2 rounded-lg bg-purple-500/5 border border-purple-500/10 group-hover/m:bg-purple-500/10 transition-colors">
+                            <UserIcon class="w-3.5 h-3.5 text-purple-400" />
                         </div>
                         <span class="flex-1 text-left">Profile Settings</span>
                     </button>
                     
                     <button @click="goSettings" class="menu-item group/m">
-                        <div class="p-2 rounded-lg bg-pink-500/5 border border-pink-500/10 group-hover/m:bg-pink-500/10 transition-colors">
-                            <SettingsIcon class="w-3.5 h-3.5 text-pink-400" />
+                        <div class="p-2 rounded-lg bg-fuchsia-500/5 border border-fuchsia-500/10 group-hover/m:bg-fuchsia-500/10 transition-colors">
+                            <SettingsIcon class="w-3.5 h-3.5 text-fuchsia-400" />
                         </div>
                         <span class="flex-1 text-left">App Settings</span>
                     </button>

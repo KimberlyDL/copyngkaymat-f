@@ -1,124 +1,112 @@
 <template>
-    <div :class="['relative p-10 rounded-[3rem] border transition-all duration-700 font-[\'Poppins\'] overflow-hidden group', bgClass, borderClass]">
-        
-        <div class="absolute -top-16 -right-16 w-48 h-48 bg-gradient-to-br from-blue-600/20 to-pink-600/20 rounded-full blur-[60px] group-hover:scale-150 transition-transform duration-1000"></div>
-        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-tr from-pink-500/10 to-blue-500/10 rounded-full blur-[40px] animate-pulse"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-white/[0.02] dark:bg-white/[0.01] pointer-events-none"></div>
+  <div :class="['relative p-10 rounded-[3rem] border transition-all duration-700 font-[\'Poppins\'] overflow-hidden group hover:-translate-y-4', 
+    'bg-white/40 dark:bg-white/[0.03] backdrop-blur-2xl border-white dark:border-white/10 shadow-2xl']">
+    
+    <div class="absolute -top-16 -right-16 w-48 h-48 bg-purple-600/20 rounded-full blur-[60px] group-hover:scale-150 transition-transform duration-1000"></div>
+    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-fuchsia-500/10 rounded-full blur-[40px] animate-pulse"></div>
 
-        <div class="relative z-10 space-y-8">
-            <div class="space-y-2">
-                <h3 :class="['text-3xl font-black uppercase tracking-tighter leading-none transition-colors duration-500', titleClass]">
-                    {{ title }}
-                </h3>
-                <div :class="['h-1.5 w-16 rounded-full transition-all duration-500 group-hover:w-24', lineClass]"></div>
-            </div>
-            
-            <ul class="space-y-5">
-                <li v-for="(item, index) in items" :key="index" 
-                    class="flex items-start gap-4 text-gray-700 dark:text-gray-200 font-semibold group/item transition-all duration-300 hover:translate-x-3">
-                    <span :class="['flex-shrink-0 w-7 h-7 rounded-2xl flex items-center justify-center text-white text-xs font-black mt-0.5 shadow-lg group-hover/item:rotate-12 transition-all duration-300', badgeBgClass]">
-                        ✓
-                    </span>
-                    <span class="leading-snug opacity-90 group-hover:opacity-100 transition-opacity">{{ item }}</span>
-                </li>
-            </ul>
-        </div>
-
-        <div :class="['absolute bottom-0 left-0 h-1.5 w-0 group-hover:w-full transition-all duration-700', lineClass]"></div>
+    <div class="relative z-10 space-y-8">
+      <div class="space-y-3">
+        <h3 :class="['text-3xl font-[900] uppercase tracking-tighter leading-none transition-colors duration-500 italic', titleClass]">
+          {{ title }}
+        </h3>
+        <div :class="['h-2 w-16 rounded-full transition-all duration-700 group-hover:w-28 shadow-lg', lineClass]"></div>
+      </div>
+      
+      <ul class="space-y-6">
+        <li v-for="(item, index) in items" :key="index" 
+          class="flex items-start gap-4 text-slate-600 dark:text-slate-300 font-semibold group/item transition-all duration-300 hover:translate-x-3">
+          
+          <span :class="['flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-white text-[10px] font-black mt-0.5 shadow-xl transition-all duration-500 group-hover/item:rotate-12 group-hover/item:scale-110 relative overflow-hidden', badgeClass]">
+            <svg class="w-4 h-4 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            </svg>
+            <div class="absolute top-1 left-1 w-2 h-2 bg-white/40 blur-[1px] rounded-full z-20"></div>
+          </span>
+          
+          <span class="leading-snug opacity-90 group-hover:opacity-100 italic transition-opacity">{{ item }}</span>
+        </li>
+      </ul>
     </div>
+
+    <div :class="['absolute bottom-0 left-0 h-1.5 w-0 group-hover:w-full transition-all duration-700', lineClass]"></div>
+  </div>
 </template>
 
 <script setup>
 import { computed } from 'vue';
 
 const props = defineProps({
-  title: {
-    type: String,
-    required: true
+  title: { type: String, required: true },
+  variant: { 
+    type: String, 
+    default: 'purple',
+    validator: (v) => ['purple', 'fuchsia', 'fuchsia'].includes(v)
   },
-  variant: {
-    type: String,
-    default: 'blue',
-    validator: (value) => {
-      return ['blue', 'purple', 'pink', 'indigo', 'green', 'orange'].includes(value)
-    }
-  },
-  items: {
-    type: Array,
-    required: true
-  }
+  items: { type: Array, required: true }
 });
 
-// Mapping ng styles base sa variant prop
-const bgClass = computed(() => {
-  const bgs = {
-    blue: 'bg-blue-50/50 dark:bg-blue-900/10',
-    purple: 'bg-purple-50/50 dark:bg-purple-900/10',
-    pink: 'bg-pink-50/50 dark:bg-pink-900/10',
-    green: 'bg-emerald-50/50 dark:bg-emerald-900/10',
-    orange: 'bg-orange-50/50 dark:bg-orange-900/10'
-  };
-  return bgs[props.variant] || bgs.blue;
-});
-
-const borderClass = computed(() => {
-  const borders = {
-    blue: 'border-blue-100 dark:border-blue-500/20 group-hover:border-blue-400',
-    purple: 'border-purple-100 dark:border-purple-500/20 group-hover:border-purple-400',
-    pink: 'border-pink-100 dark:border-pink-500/20 group-hover:border-pink-400',
-    green: 'border-emerald-100 dark:border-emerald-500/20 group-hover:border-emerald-400',
-    orange: 'border-orange-100 dark:border-orange-500/20 group-hover:border-orange-400'
-  };
-  return borders[props.variant] || borders.blue;
-});
-
+// Dynamic Title Shades
 const titleClass = computed(() => {
   const titles = {
-    blue: 'text-blue-600 dark:text-blue-400',
-    purple: 'text-purple-600 dark:text-purple-400',
-    pink: 'text-pink-600 dark:text-pink-400',
-    green: 'text-emerald-600 dark:text-emerald-400',
-    orange: 'text-orange-600 dark:text-orange-400'
+    purple: 'text-purple-600 dark:text-purple-300',
+    fuchsia: 'text-fuchsia-600 dark:text-fuchsia-300',
+    fuchsia: 'text-fuchsia-600 dark:text-fuchsia-300'
   };
-  return titles[props.variant] || titles.blue;
+  return titles[props.variant] || titles.purple;
 });
 
+// 3D Liquid Line Style
 const lineClass = computed(() => {
   const lines = {
-    blue: 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]',
-    purple: 'bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.5)]',
-    pink: 'bg-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.5)]',
-    green: 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]',
-    orange: 'bg-orange-500 shadow-[0_0_15px_rgba(245,158,11,0.5)]'
+    purple: 'bg-gradient-to-r from-purple-500 to-fuchsia-500 shadow-[0_0_20px_rgba(168,85,247,0.4)]',
+    fuchsia: 'bg-gradient-to-r from-fuchsia-500 to-violet-500 shadow-[0_0_20px_rgba(232,121,249,0.4)]',
+    fuchsia: 'bg-gradient-to-r from-fuchsia-500 to-purple-500 shadow-[0_0_20px_rgba(99,102,241,0.4)]'
   };
-  return lines[props.variant] || lines.blue;
+  return lines[props.variant] || lines.purple;
 });
 
-const badgeBgClass = computed(() => {
+// 3D Liquid Gem Badge Style
+const badgeClass = computed(() => {
   const badges = {
-    blue: 'bg-blue-600',
-    purple: 'bg-purple-600',
-    pink: 'bg-pink-600',
-    green: 'bg-emerald-600',
-    orange: 'bg-orange-600'
+    purple: 'liquid-purple-gem',
+    fuchsia: 'liquid-fuchsia-gem',
+    fuchsia: 'liquid-fuchsia-gem'
   };
-  return badges[props.variant] || badges.blue;
+  return badges[props.variant] || badges.purple;
 });
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;900&display=swap');
 
-div {
-    transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+/* --- LIQUID GEM TEXTURES (3D Physics) --- */
+.liquid-purple-gem {
+  background: radial-gradient(circle at 35% 35%, #a855f7 0%, #6b21a8 55%, #2e1065 100%);
+  box-shadow: inset -3px -3px 8px rgba(0,0,0,0.5), inset 3px 3px 6px rgba(255,255,255,0.3);
+}
+
+.liquid-fuchsia-gem {
+  background: radial-gradient(circle at 35% 35%, #d946ef 0%, #a21caf 55%, #701a75 100%);
+  box-shadow: inset -3px -3px 8px rgba(0,0,0,0.5), inset 3px 3px 6px rgba(255,255,255,0.3);
+}
+
+.liquid-fuchsia-gem {
+  background: radial-gradient(circle at 35% 35%, #6366f1 0%, #4338ca 55%, #312e81 100%);
+  box-shadow: inset -3px -3px 8px rgba(0,0,0,0.5), inset 3px 3px 6px rgba(255,255,255,0.3);
+}
+
+/* Physics & Motion */
+div, li, span, h3 {
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .animate-pulse {
-    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: pulse-glow 5s ease-in-out infinite;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 0.1; }
-    50% { opacity: 0.3; }
+@keyframes pulse-glow {
+    0%, 100% { transform: scale(1); opacity: 0.1; }
+    50% { transform: scale(1.1); opacity: 0.2; }
 }
 </style>

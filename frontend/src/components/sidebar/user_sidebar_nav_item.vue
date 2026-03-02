@@ -15,7 +15,7 @@ const { isActive, isExactActive } = useLink({ to: props.to })
 
 const activeClass = computed(() =>
     (props.exact ? isExactActive.value : isActive.value)
-        ? 'border border-0 border-l-4 dark:border-platinum-300 border-abyss-900 dark:text-platinum-300 bg-kaitoke-green-300 dark:bg-kaitoke-green-800 text-abyss-900 text-sm font-heading font-normal hover:bg-sun-100 dark:hover:bg-electric-lime-600'
+        ? 'border border-0 border-l-4 dark:border-platinum-300 border-abyss-900 dark:text-platinum-300 bg-purple-300 dark:bg-purple-800 text-abyss-900 text-sm font-heading font-normal hover:bg-purple-100 dark:hover:bg-purple-600'
         : 'dark:text-platinum-300 text-abyss-900 text-sm font-heading font-normal'
 )
 const ariaCurrent = computed(() =>

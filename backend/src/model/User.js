@@ -78,9 +78,19 @@ module.exports = (sequelize, DataTypes) => {
             comment: 'Whether profile is visible to other users'
         },
         account_status: {
-            type: DataTypes.ENUM('active', 'deactivated', 'pending_deletion', 'deleted'),
+            type: DataTypes.ENUM('active', 'deactivated', 'suspended', 'banned', 'pending_deletion', 'deleted'),
             defaultValue: 'active',
             allowNull: false
+        },
+        suspended_until: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            comment: 'End date for temporary suspension'
+        },
+        suspension_reason: {
+            type: DataTypes.STRING(500),
+            allowNull: true,
+            comment: 'Reason for suspension or ban'
         },
         deactivated_at: {
             type: DataTypes.DATE,
@@ -153,13 +163,6 @@ module.exports = (sequelize, DataTypes) => {
         User.hasOne(models.UserNotificationPreferences, {
             foreignKey: 'user_id',
             as: 'notificationPreferences',
-            onDelete: 'CASCADE'
-        });
-
-        // Guardians
-        User.hasMany(models.UserGuardian, {
-            foreignKey: 'user_id',
-            as: 'guardians',
             onDelete: 'CASCADE'
         });
 

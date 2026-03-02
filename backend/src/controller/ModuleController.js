@@ -105,7 +105,7 @@ class ModuleController {
      */
     async getModules(req, res, next) {
     try {
-        const { classroom_id } = req.query;
+        const { classroom_id, all_accessible } = req.query;
         const userId = req.user.id;
 
         // Kunin ang accessible IDs para sa security check (para sa classroom-specific modules)
@@ -119,6 +119,8 @@ class ModuleController {
 
         const filters = {
             ...req.query,
+            // Support all_accessible flag to get both public and classroom modules
+            all_accessible: all_accessible === 'true',
             // Siguraduhing napapasa ang 'null' nang tama
             classroom_id: (classroom_id === undefined || classroom_id === 'null') ? null : classroom_id,
             accessibleClassroomIds: [...new Set(accessibleIds)],

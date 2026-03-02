@@ -36,7 +36,7 @@ module.exports = (sequelize) => {
     }, {
         sequelize,
         modelName: 'QuizAttempt',
-        tableName: 'QuizAttempts',
+        tableName: 'quiz_attempts',
         underscored: true, // Sinisiguro nito na 'created_at' ang gagamitin
         timestamps: true   // Naka-enable ang auto-timestamps para sa created_at/updated_at
     });

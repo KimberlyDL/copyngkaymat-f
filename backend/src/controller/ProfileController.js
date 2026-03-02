@@ -1,5 +1,5 @@
 // controllers/ProfileController.js
-const { User, UserProfile, UserGuardian, UserPrivacySettings, sequelize } = require('../model');
+const { User, UserProfile, UserPrivacySettings, UserGamification, sequelize } = require('../model');
 const fileStorageService = require('../services/FileStorageService');
 
 /**
@@ -7,8 +7,16 @@ const fileStorageService = require('../services/FileStorageService');
  */
 exports.getProfile = async (req, res, next) => {
     try {
-        const targetUserId = req.params.id;
+        // If route is /users/profile (no ID), assume it's the logged-in user
+        // Otherwise, use the ID from params
+        const targetUserId = req.params.id || req.user?.id;
         const requesterId = req.user?.id;
+
+        if (!targetUserId) {
+             return res.status(400).json({
+                message: 'No user ID specified'
+            });
+        }
 
         // Find target user
         const targetUser = await User.findByPk(targetUserId, {
@@ -20,6 +28,10 @@ exports.getProfile = async (req, res, next) => {
                 {
                     model: UserPrivacySettings,
                     as: 'privacySettings'
+                },
+                {
+                    model: UserGamification,
+                    as: 'gamification'
                 }
             ]
         });
@@ -39,11 +51,6 @@ exports.getProfile = async (req, res, next) => {
 
         // Viewing own profile - return full info
         if (targetUserId == requesterId) {
-            const guardians = await UserGuardian.findAll({
-                where: { user_id: targetUserId },
-                order: [['is_primary', 'DESC'], ['created_at', 'ASC']]
-            });
-
             return res.json({
                 id: targetUser.id,
                 email: targetUser.email,
@@ -53,6 +60,11 @@ exports.getProfile = async (req, res, next) => {
                 is_profile_public: targetUser.is_profile_public,
                 account_status: targetUser.account_status,
                 created_at: targetUser.created_at,
+                gamification: targetUser.gamification ? {
+                    experience_points: targetUser.gamification.experience_points,
+                    current_title: targetUser.gamification.current_title,
+                    total_points: targetUser.gamification.total_points
+                } : null,
                 profile: targetUser.profile ? {
                     display_name: targetUser.profile.display_name,
                     bio: targetUser.profile.bio,
@@ -74,17 +86,6 @@ exports.getProfile = async (req, res, next) => {
                         phone: targetUser.profile.emergency_contact_phone
                     }
                 } : null,
-                guardians: guardians.map(g => ({
-                    id: g.id,
-                    guardian_type: g.guardian_type,
-                    full_name: g.full_name,
-                    relationship: g.relationship,
-                    phone_number: g.phone_number,
-                    email: g.email,
-                    address: g.address,
-                    is_primary: g.is_primary,
-                    created_at: g.created_at
-                })),
                 privacy_settings: targetUser.privacySettings || null
             });
         }
@@ -120,6 +121,7 @@ exports.updateProfile = async (req, res, next) => {
     try {
         const userId = req.user.id;
         const {
+            username, // Map from frontend 'username' to backend 'name'
             display_name,
             bio,
             date_of_birth,
@@ -130,70 +132,108 @@ exports.updateProfile = async (req, res, next) => {
             emergency_contact
         } = req.body;
 
-        // Find or create profile
-        let profile = await UserProfile.findOne({ where: { user_id: userId } });
+        // Transaction for atomicity
+        const transaction = await sequelize.transaction();
 
-        if (!profile) {
-            profile = await UserProfile.create({ user_id: userId });
-        }
+        try {
+            // Find user and profile
+            const user = await User.findByPk(userId, { transaction });
+            let profile = await UserProfile.findOne({ where: { user_id: userId }, transaction });
 
-        // Update profile fields
-        if (display_name !== undefined) profile.display_name = display_name;
-        if (bio !== undefined) profile.bio = bio;
-        if (date_of_birth !== undefined) profile.date_of_birth = date_of_birth;
-        if (sex !== undefined) profile.sex = sex;
-        if (gender_identity !== undefined) profile.gender_identity = gender_identity;
-        if (phone_number !== undefined) profile.phone_number = phone_number;
-
-        // Update address fields
-        if (address) {
-            if (address.line1 !== undefined) profile.address_line1 = address.line1;
-            if (address.line2 !== undefined) profile.address_line2 = address.line2;
-            if (address.city !== undefined) profile.city = address.city;
-            if (address.province !== undefined) profile.province = address.province;
-            if (address.postal_code !== undefined) profile.postal_code = address.postal_code;
-            if (address.country !== undefined) profile.country = address.country;
-        }
-
-        // Update emergency contact
-        if (emergency_contact) {
-            if (emergency_contact.name !== undefined) {
-                profile.emergency_contact_name = emergency_contact.name;
+            if (!user) {
+                await transaction.rollback();
+                return res.status(404).json({ message: 'User not found' });
             }
-            if (emergency_contact.relationship !== undefined) {
-                profile.emergency_contact_relationship = emergency_contact.relationship;
-            }
-            if (emergency_contact.phone !== undefined) {
-                profile.emergency_contact_phone = emergency_contact.phone;
-            }
-        }
 
-        await profile.save();
+            // Handle Username Change
+            if (username && username !== user.name) {
+                // Check if username is taken
+                const existingUser = await User.findOne({ 
+                    where: { name: username },
+                    transaction 
+                });
 
-        res.json({
-            message: 'Profile updated successfully',
-            profile: {
-                display_name: profile.display_name,
-                bio: profile.bio,
-                date_of_birth: profile.date_of_birth,
-                sex: profile.sex,
-                gender_identity: profile.gender_identity,
-                phone_number: profile.phone_number,
-                address: {
-                    line1: profile.address_line1,
-                    line2: profile.address_line2,
-                    city: profile.city,
-                    province: profile.province,
-                    postal_code: profile.postal_code,
-                    country: profile.country
-                },
-                emergency_contact: {
-                    name: profile.emergency_contact_name,
-                    relationship: profile.emergency_contact_relationship,
-                    phone: profile.emergency_contact_phone
+                if (existingUser) {
+                    await transaction.rollback();
+                    return res.status(400).json({ 
+                        message: 'Username is already taken' 
+                    });
+                }
+
+                user.name = username;
+                await user.save({ transaction });
+            }
+
+            if (!profile) {
+                profile = await UserProfile.create({ user_id: userId }, { transaction });
+            }
+
+            // Update profile fields
+            if (display_name !== undefined) profile.display_name = display_name;
+            if (bio !== undefined) profile.bio = bio;
+            if (date_of_birth !== undefined) profile.date_of_birth = date_of_birth;
+            if (sex !== undefined) profile.sex = sex;
+            if (gender_identity !== undefined) profile.gender_identity = gender_identity;
+            if (phone_number !== undefined) profile.phone_number = phone_number;
+
+            // Update address fields
+            if (address) {
+                if (address.line1 !== undefined) profile.address_line1 = address.line1;
+                if (address.line2 !== undefined) profile.address_line2 = address.line2;
+                if (address.city !== undefined) profile.city = address.city;
+                if (address.province !== undefined) profile.province = address.province;
+                if (address.postal_code !== undefined) profile.postal_code = address.postal_code;
+                if (address.country !== undefined) profile.country = address.country;
+            }
+
+            // Update emergency contact
+            if (emergency_contact) {
+                if (emergency_contact.name !== undefined) {
+                    profile.emergency_contact_name = emergency_contact.name;
+                }
+                if (emergency_contact.relationship !== undefined) {
+                    profile.emergency_contact_relationship = emergency_contact.relationship;
+                }
+                if (emergency_contact.phone !== undefined) {
+                    profile.emergency_contact_phone = emergency_contact.phone;
                 }
             }
-        });
+
+            await profile.save({ transaction });
+            await transaction.commit();
+
+            res.json({
+                message: 'Profile updated successfully',
+                user: {
+                    name: user.name,
+                    email: user.email
+                },
+                profile: {
+                    display_name: profile.display_name,
+                    bio: profile.bio,
+                    date_of_birth: profile.date_of_birth,
+                    sex: profile.sex,
+                    gender_identity: profile.gender_identity,
+                    phone_number: profile.phone_number,
+                    address: {
+                        line1: profile.address_line1,
+                        line2: profile.address_line2,
+                        city: profile.city,
+                        province: profile.province,
+                        postal_code: profile.postal_code,
+                        country: profile.country
+                    },
+                    emergency_contact: {
+                        name: profile.emergency_contact_name,
+                        relationship: profile.emergency_contact_relationship,
+                        phone: profile.emergency_contact_phone
+                    }
+                }
+            });
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
     } catch (error) {
         next(error);
     }

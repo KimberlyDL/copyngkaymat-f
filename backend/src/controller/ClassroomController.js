@@ -216,3 +216,206 @@ exports.getClassroomProgress = async (req, res, next) => {
         next(error);
     }
 };
+
+/**
+ * Facilitator: Create a classroom announcement
+ */
+exports.createClassroomAnnouncement = async (req, res, next) => {
+    try {
+        const { id } = req.params; // classroom_id
+        const { title, content, priority } = req.body;
+
+        // Verify classroom exists and user is the facilitator
+        const classroom = await Classroom.findByPk(id);
+        if (!classroom) {
+            return res.status(404).json({ message: 'Classroom not found.' });
+        }
+
+        const allowedRoles = ['admin', 'educator', 'moderator'];
+        if (classroom.created_by !== req.user.id && !allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({ 
+                message: 'Only the classroom facilitator can create announcements.' 
+            });
+        }
+
+        if (!title || !content) {
+            return res.status(422).json({
+                message: 'Title and content are required.'
+            });
+        }
+
+        // Import Announcement model
+        const { Announcement } = require('../model');
+
+        const announcement = await Announcement.create({
+            title: title.trim(),
+            content: content.trim(),
+            type: 'classroom',
+            classroom_id: parseInt(id),
+            created_by: req.user.id,
+            priority: priority || 'normal',
+            status: 'active'
+        });
+
+        res.status(201).json({
+            message: 'Announcement created successfully.',
+            announcement
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Get announcements for a classroom
+ */
+exports.getClassroomAnnouncements = async (req, res, next) => {
+    try {
+        const { id } = req.params; // classroom_id
+        const { page = 1, limit = 10 } = req.query;
+        const offset = (page - 1) * limit;
+
+        // Verify classroom exists
+        const classroom = await Classroom.findByPk(id);
+        if (!classroom) {
+            return res.status(404).json({ message: 'Classroom not found.' });
+        }
+
+        // Check if user is facilitator or member
+        const isFacilitator = classroom.created_by === req.user.id;
+        const isMember = await ClassroomMember.findOne({
+            where: { classroom_id: id, user_id: req.user.id }
+        });
+
+        if (!isFacilitator && !isMember && req.user.role !== 'admin') {
+            return res.status(403).json({ 
+                message: 'You must be a member of this classroom to view announcements.' 
+            });
+        }
+
+        const { Announcement } = require('../model');
+        const { Op } = require('sequelize');
+
+        const whereClause = { 
+            classroom_id: id, 
+            type: 'classroom',
+            status: 'active',
+            [Op.or]: [
+                { expires_at: null },
+                { expires_at: { [Op.gt]: new Date() } }
+            ]
+        };
+
+        const { count, rows: announcements } = await Announcement.findAndCountAll({
+            where: whereClause,
+            include: [{
+                model: User,
+                as: 'author',
+                attributes: ['id', 'name']
+            }],
+            order: [
+                ['priority', 'DESC'],
+                ['created_at', 'DESC']
+            ],
+            limit: parseInt(limit),
+            offset: parseInt(offset)
+        });
+
+        res.json({
+            announcements,
+            pagination: {
+                total: count,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                totalPages: Math.ceil(count / limit)
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Facilitator: Update a classroom announcement
+ */
+exports.updateClassroomAnnouncement = async (req, res, next) => {
+    try {
+        const { id, announcementId } = req.params;
+        const { title, content, priority, status } = req.body;
+
+        // Verify classroom exists and user is the facilitator
+        const classroom = await Classroom.findByPk(id);
+        if (!classroom) {
+            return res.status(404).json({ message: 'Classroom not found.' });
+        }
+
+        if (classroom.created_by !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({ 
+                message: 'Only the classroom facilitator can update announcements.' 
+            });
+        }
+
+        const { Announcement } = require('../model');
+
+        const announcement = await Announcement.findOne({
+            where: { id: announcementId, classroom_id: id, type: 'classroom' }
+        });
+
+        if (!announcement) {
+            return res.status(404).json({ message: 'Announcement not found.' });
+        }
+
+        await announcement.update({
+            title: title !== undefined ? title.trim() : announcement.title,
+            content: content !== undefined ? content.trim() : announcement.content,
+            priority: priority !== undefined ? priority : announcement.priority,
+            status: status !== undefined ? status : announcement.status
+        });
+
+        res.json({
+            message: 'Announcement updated successfully.',
+            announcement
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Facilitator: Delete a classroom announcement
+ */
+exports.deleteClassroomAnnouncement = async (req, res, next) => {
+    try {
+        const { id, announcementId } = req.params;
+
+        // Verify classroom exists and user is the facilitator
+        const classroom = await Classroom.findByPk(id);
+        if (!classroom) {
+            return res.status(404).json({ message: 'Classroom not found.' });
+        }
+
+        if (classroom.created_by !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({ 
+                message: 'Only the classroom facilitator can delete announcements.' 
+            });
+        }
+
+        const { Announcement } = require('../model');
+
+        const announcement = await Announcement.findOne({
+            where: { id: announcementId, classroom_id: id, type: 'classroom' }
+        });
+
+        if (!announcement) {
+            return res.status(404).json({ message: 'Announcement not found.' });
+        }
+
+        await announcement.destroy();
+
+        res.json({
+            message: 'Announcement deleted successfully.'
+        });
+    } catch (error) {
+        next(error);
+    }
+};

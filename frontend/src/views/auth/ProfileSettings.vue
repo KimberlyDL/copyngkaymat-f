@@ -2,22 +2,22 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useAuthStore } from '@stores/auth'
 import {
-    User, Mail, Phone, MapPin, Save, Upload, X, Lock, Eye, EyeOff, Settings, Camera, Lightbulb
+    User, Mail, Phone, MapPin, Save, Upload, X, Lock, Eye, EyeOff, Settings, Camera, Lightbulb, ShieldCheck
 } from 'lucide-vue-next'
 import { useToast } from '@/utils/useToast';
 
-// --- Component: ToggleSwitch (Vibrant Theme) ---
+// --- Component: ToggleSwitch ---
 const ToggleSwitch = {
     props: ['modelValue', 'label'],
     emits: ['update:modelValue'],
     template: `
         <div class="flex items-center justify-between py-3 group">
-            <label v-if="label" class="text-gray-400 font-black uppercase tracking-widest text-[10px] cursor-pointer group-hover:text-white transition-colors">{{ label }}</label>
+            <label v-if="label" class="text-slate-500 dark:text-slate-400 font-semibold text-xs cursor-pointer group-hover:text-purple-500 transition-colors">{{ label }}</label>
             <button @click="$emit('update:modelValue', !modelValue)"
-                :class="modelValue ? 'bg-gradient-to-r from-blue-600 to-pink-600' : 'bg-white/10'"
-                class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-all duration-300 focus:outline-none ring-offset-black">
-                <span :class="modelValue ? 'translate-x-5' : 'translate-x-0'"
-                    class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg transform transition duration-300">
+                :class="modelValue ? 'bg-gradient-to-r from-purple-600 to-fuchsia-600 shadow-lg shadow-purple-500/20' : 'bg-slate-200 dark:bg-white/10'"
+                class="relative inline-flex flex-shrink-0 h-6 w-11 rounded-full cursor-pointer transition-all duration-300 focus:outline-none">
+                <span :class="modelValue ? 'translate-x-5' : 'translate-x-1'"
+                    class="mt-1 pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition-transform duration-300">
                 </span>
             </button>
         </div>
@@ -34,9 +34,6 @@ const form = reactive({
     name: '',
     email: '',
     phone: '',
-    address: '',
-    city: '',
-    country: '',
     bio: '',
     avatar_url: '',
 })
@@ -55,9 +52,6 @@ onMounted(async () => {
         name: u.name || '',
         email: u.email || '',
         phone: u.phone || '',
-        address: u.address || '',
-        city: u.city || '',
-        country: u.country || '',
         bio: u.bio || '',
         avatar_url: u.avatar_url || ''
     })
@@ -83,10 +77,10 @@ async function onUploadAvatar() {
     isSaving.value = true
     try {
         await auth.uploadAvatar(avatarFile.value)
-        toast.success('Visual identity updated!');
+        toast.success('Photo updated!');
         initialForm.value.avatar_url = form.avatar_url
     } catch (e) {
-        toast.error('Identity update failed.');
+        toast.error('Could not update photo');
     } finally {
         isSaving.value = false
     }
@@ -97,9 +91,9 @@ async function onSaveProfile() {
     try {
         await auth.updateProfile({ ...form })
         initialForm.value = JSON.parse(JSON.stringify(form))
-        toast.success('Profile Synced Successfully! 🚀');
+        toast.success('Profile saved!');
     } catch (e) {
-        toast.error('Sync failed.');
+        toast.error('Could not save profile');
     } finally {
         isSaving.value = false
     }
@@ -117,18 +111,28 @@ const pwdHints = computed(() => ({
     match: !!pwd.password && pwd.password === pwd.password_confirmation,
 }))
 
+const strengthWidth = computed(() => {
+    const count = Object.values(pwdHints.value).filter(Boolean).length
+    return ['0%', '25%', '50%', '75%', '100%'][count]
+})
+
+const strengthColor = computed(() => {
+    const count = Object.values(pwdHints.value).filter(Boolean).length
+    return ['bg-slate-500', 'bg-rose-500', 'bg-fuchsia-500', 'bg-violet-500', 'bg-purple-500'][count]
+})
+
 async function onChangePassword() {
     if (!Object.values(pwdHints.value).every(Boolean)) {
-        toast.error('Fulfill all security protocols.');
+        toast.error('Please fix all password rules');
         return
     }
     pwdSaving.value = true
     try {
         await auth.changePassword({ ...pwd })
-        toast.success('Security Protocol Updated. 🎉');
+        toast.success('Password changed!');
         Object.assign(pwd, { current_password: '', password: '', password_confirmation: '' })
     } catch (e) {
-        toast.error('Security update failed.');
+        toast.error('Could not change password');
     } finally {
         pwdSaving.value = false
     }
@@ -136,122 +140,175 @@ async function onChangePassword() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-[#060606] font-['Poppins'] relative overflow-hidden pb-20">
+    <div class="space-y-8 custom-font-poppins animate-in fade-in duration-700 text-black dark:text-white transition-all selection:bg-purple-500/30 pb-20">
         
-        <div class="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] animate-pulse pointer-events-none"></div>
-        <div class="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-pink-600/10 rounded-full blur-[120px] animate-pulse delay-1000 pointer-events-none"></div>
-
-        <header class="relative z-10 pt-12 pb-8 px-6 max-w-6xl mx-auto">
-            <div class="flex items-center gap-4 mb-2">
-                <div class="p-3 rounded-2xl bg-gradient-to-tr from-blue-600 to-pink-600 shadow-lg">
-                    <Settings class="w-6 h-6 text-white animate-spin-slow" />
+        <!-- Header -->
+        <header class="border-b border-slate-200 dark:border-white/5 pb-8">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="p-3 rounded-2xl bg-gradient-to-tr from-purple-600 to-fuchsia-600 shadow-lg shadow-purple-500/20">
+                    <Settings class="w-6 h-6 text-white" />
                 </div>
-                <h1 class="text-4xl font-black text-white uppercase tracking-tighter">System <span class="bg-gradient-to-r from-blue-400 to-pink-500 bg-clip-text text-transparent">Settings</span></h1>
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <div class="h-1 w-8 bg-gradient-to-r from-purple-600 to-fuchsia-600 rounded-full"></div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-[0.3em] text-purple-600 dark:text-purple-400">Account</span>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-[900] text-black dark:text-white uppercase tracking-tighter leading-tight">
+                        My <span class="bg-gradient-to-r from-purple-600 via-fuchsia-500 to-purple-500 bg-clip-text text-transparent">Settings</span>
+                    </h1>
+                </div>
             </div>
-            <p class="text-gray-500 font-medium tracking-tight ml-16 uppercase text-xs tracking-[0.2em]">Manage your digital footprint and security protocols</p>
+            <p class="text-xs font-medium text-black/50 dark:text-slate-400 tracking-tight">Change your profile, photo, and password here.</p>
         </header>
 
-        <main class="relative z-10 max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <div class="lg:col-span-2 space-y-8">
+            <!-- Left Column - Main Forms -->
+            <div class="lg:col-span-8 space-y-8">
                 
-                <section class="bg-white/5 backdrop-blur-2xl border border-white/10 p-8 rounded-[2.5rem] shadow-2xl group transition-all duration-500 hover:border-blue-500/30">
-                    <h2 class="text-xs font-black uppercase tracking-[0.3em] text-gray-500 mb-8 flex items-center gap-3">
-                        <Camera class="w-4 h-4 text-blue-500" /> Identity Image
-                    </h2>
-                    <div class="flex flex-col sm:flex-row items-center gap-10">
-                        <div class="relative group/avatar">
-                            <img :src="form.avatar_url || '/placeholder.svg'" class="w-32 h-32 rounded-[2rem] object-cover border-2 border-white/10 shadow-2xl transition-transform duration-500 group-hover/avatar:scale-105" />
-                            <div class="absolute inset-0 rounded-[2rem] bg-gradient-to-tr from-blue-600/20 to-pink-600/20 opacity-0 group-hover/avatar:opacity-100 transition-opacity"></div>
-                        </div>
-                        <div class="flex-1 space-y-4 w-full">
-                            <div @click="$refs.avatarInput?.click()" class="border-2 border-dashed border-white/10 rounded-2xl p-6 text-center cursor-pointer hover:bg-white/5 hover:border-blue-500/50 transition-all group/upload">
-                                <Upload class="w-6 h-6 text-gray-500 group-hover/upload:text-blue-400 mx-auto mb-2 transition-colors" />
-                                <p class="text-white text-xs font-black uppercase tracking-widest">Deploy New Visual</p>
+                <!-- Profile Photo Section -->
+                <section class="bg-white/90 dark:bg-[#0d0d15]/40 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2.5rem] shadow-xl overflow-hidden">
+                    <div class="h-12 border-b border-slate-200 dark:border-white/5 flex items-center px-8 bg-slate-50/50 dark:bg-white/[0.02]">
+                        <Camera class="w-4 h-4 text-purple-500 mr-3" />
+                        <span class="text-[10px] font-[900] text-purple-600 dark:text-purple-400 uppercase tracking-widest">Profile Photo</span>
+                    </div>
+                    
+                    <div class="p-8">
+                        <div class="flex flex-col sm:flex-row items-center gap-8">
+                            <div class="relative group">
+                                <div class="w-28 h-28 rounded-2xl overflow-hidden border-2 border-slate-200 dark:border-white/10 shadow-xl">
+                                    <img :src="form.avatar_url || '/placeholder.svg'" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                                </div>
+                                <div class="absolute -inset-2 bg-purple-500/10 blur-xl rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             </div>
-                            <input ref="avatarInput" type="file" accept="image/*" class="hidden" @change="handleAvatarInput" />
-                            <div class="flex gap-3">
-                                <button :disabled="!avatarFile || isSaving" @click="onUploadAvatar" class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-pink-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:shadow-[0_10px_20px_rgba(37,99,235,0.3)] disabled:opacity-30 transition-all">Upload Avatar</button>
-                                <button @click="removeAvatar" class="px-5 py-3 bg-white/5 text-gray-400 text-[10px] font-black uppercase tracking-widest rounded-xl hover:text-pink-500 transition-all">Remove</button>
+
+                            <div class="flex-1 space-y-4 w-full text-center sm:text-left">
+                                <div @click="$refs.avatarInput?.click()" class="border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl p-6 cursor-pointer hover:bg-purple-500/5 hover:border-purple-500/50 transition-all group/upload">
+                                    <Upload class="w-6 h-6 text-slate-400 group-hover/upload:text-purple-500 mx-auto mb-2 transition-all group-hover/upload:-translate-y-1" />
+                                    <p class="text-slate-600 dark:text-white text-xs font-semibold">Click to upload new photo</p>
+                                </div>
+                                <input ref="avatarInput" type="file" accept="image/*" class="hidden" @change="handleAvatarInput" />
+                                
+                                <div class="flex flex-wrap gap-3 justify-center sm:justify-start">
+                                    <button :disabled="!avatarFile || isSaving" @click="onUploadAvatar" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-[10px] font-[900] uppercase tracking-widest rounded-xl shadow-lg shadow-purple-500/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-30">
+                                        Save Photo
+                                    </button>
+                                    <button @click="removeAvatar" class="px-6 py-3 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 text-[10px] font-[900] uppercase tracking-widest rounded-xl hover:text-red-500 transition-all border border-transparent hover:border-red-500/20">Remove</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <section class="bg-white/5 backdrop-blur-2xl border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
-                    <h2 class="text-xs font-black uppercase tracking-[0.3em] text-gray-500 mb-8 flex items-center gap-3">
-                        <User class="w-4 h-4 text-blue-500" /> Bio-Data Components
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Full Designation</label>
-                            <input v-model="form.name" type="text" class="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-blue-500/50 transition-all outline-none" />
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Secure Email (Locked)</label>
-                            <div class="relative">
-                                <input :value="form.email" disabled class="w-full px-5 py-4 rounded-2xl bg-white/[0.02] border border-white/5 text-gray-600 cursor-not-allowed outline-none" />
-                                <Lock class="absolute right-5 top-4 w-4 h-4 text-gray-700" />
+                <!-- Profile Info Section -->
+                <section class="bg-white/90 dark:bg-[#0d0d15]/40 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2.5rem] shadow-xl overflow-hidden">
+                    <div class="h-12 border-b border-slate-200 dark:border-white/5 flex items-center px-8 bg-slate-50/50 dark:bg-white/[0.02]">
+                        <User class="w-4 h-4 text-purple-500 mr-3" />
+                        <span class="text-[10px] font-[900] text-purple-600 dark:text-purple-400 uppercase tracking-widest">My Info</span>
+                    </div>
+                    
+                    <div class="p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-[900] uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
+                                <input v-model="form.name" type="text" class="w-full px-5 py-3.5 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all outline-none text-sm" />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-[900] uppercase tracking-widest text-slate-400 ml-1">Email (cannot change)</label>
+                                <div class="relative">
+                                    <input :value="form.email" disabled class="w-full px-5 py-3.5 rounded-xl bg-slate-100/50 dark:bg-white/[0.01] border border-slate-200 dark:border-white/5 text-slate-400 cursor-not-allowed outline-none text-sm" />
+                                    <Lock class="absolute right-4 top-3.5 w-4 h-4 text-slate-300 dark:text-slate-700" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="space-y-2 mb-8">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Personal Narrative</label>
-                        <textarea v-model="form.bio" rows="4" class="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-blue-500/50 transition-all outline-none resize-none"></textarea>
-                    </div>
-                    <div class="flex justify-end gap-4">
-                        <button @click="() => Object.assign(form, initialForm)" :disabled="!hasChanges || isSaving" class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-all">Revert</button>
-                        <button @click="onSaveProfile" :disabled="!hasChanges || isSaving" class="px-10 py-4 bg-gradient-to-r from-blue-600 to-pink-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:shadow-[0_15px_30px_rgba(37,99,235,0.3)] transition-all">Sync Changes</button>
+                        <div class="space-y-2 mb-8">
+                            <label class="text-[10px] font-[900] uppercase tracking-widest text-slate-400 ml-1">About Me</label>
+                            <textarea v-model="form.bio" rows="3" class="w-full px-5 py-4 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500 transition-all outline-none resize-none text-sm font-medium"></textarea>
+                        </div>
+                        <div class="flex justify-end gap-4 border-t border-slate-100 dark:border-white/5 pt-6">
+                            <button @click="() => Object.assign(form, initialForm)" :disabled="!hasChanges || isSaving" class="text-xs font-semibold text-slate-400 hover:text-purple-600 transition-all">Undo Changes</button>
+                            <button @click="onSaveProfile" :disabled="!hasChanges || isSaving" class="px-8 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-[10px] font-[900] uppercase tracking-widest rounded-xl shadow-lg shadow-purple-500/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-30">Save</button>
+                        </div>
                     </div>
                 </section>
             </div>
 
-            <div class="space-y-8">
-                <section class="bg-white/5 backdrop-blur-2xl border border-white/10 p-8 rounded-[2.5rem] shadow-2xl lg:sticky lg:top-8">
-                    <h2 class="text-xs font-black uppercase tracking-[0.3em] text-gray-500 mb-6 flex items-center gap-3">
-                        <Lightbulb class="w-4 h-4 text-pink-500" /> Interface
-                    </h2>
-                    <div class="space-y-2">
-                        <ToggleSwitch v-model="preferences.emailNotifications" label="Data Alerts" />
-                        <ToggleSwitch v-model="preferences.darkMode" label="Abyss Mode" />
-                        <ToggleSwitch v-model="preferences.publicProfile" label="Signal Broadcast" />
+            <!-- Right Column - Sidebar -->
+            <div class="lg:col-span-4 space-y-6">
+                
+                <!-- Preferences Section -->
+                <section class="bg-white/90 dark:bg-[#0d0d15]/40 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2rem] p-6 shadow-xl lg:sticky lg:top-8">
+                    <div class="flex items-center gap-3 mb-6">
+                        <Lightbulb class="w-4 h-4 text-fuchsia-500" />
+                        <span class="text-[10px] font-[900] text-fuchsia-600 dark:text-fuchsia-400 uppercase tracking-widest">Preferences</span>
+                    </div>
+                    <div class="space-y-2 border-b border-slate-100 dark:border-white/5 pb-4">
+                        <ToggleSwitch v-model="preferences.emailNotifications" label="Email Alerts" />
+                        <ToggleSwitch v-model="preferences.darkMode" label="Dark Mode" />
+                        <ToggleSwitch v-model="preferences.publicProfile" label="Public Profile" />
                     </div>
                 </section>
 
-                <section class="bg-white/5 backdrop-blur-2xl border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
-                    <h2 class="text-xs font-black uppercase tracking-[0.3em] text-gray-500 mb-8 flex items-center gap-3">
-                        <Lock class="w-4 h-4 text-pink-500" /> Crypto Update
-                    </h2>
+                <!-- Password Section -->
+                <section class="bg-white/90 dark:bg-[#0d0d15]/40 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2rem] p-6 shadow-xl">
+                    <div class="flex items-center gap-3 mb-6">
+                        <ShieldCheck class="w-4 h-4 text-fuchsia-500" />
+                        <span class="text-[10px] font-[900] text-fuchsia-600 dark:text-fuchsia-400 uppercase tracking-widest">Password</span>
+                    </div>
                     <div class="space-y-4">
                         <div class="relative">
-                            <input :type="show.current ? 'text' : 'password'" v-model="pwd.current_password" placeholder="Current Password" class="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-blue-500/50" />
-                            <button @click="show.current = !show.current" class="absolute right-4 top-4 text-gray-600 hover:text-white"><Eye v-if="!show.current" class="w-4 h-4"/><EyeOff v-else class="w-4 h-4"/></button>
+                            <input :type="show.current ? 'text' : 'password'" v-model="pwd.current_password" placeholder="Current password" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-xs outline-none focus:border-purple-500/50 transition-all" />
+                            <button @click="show.current = !show.current" class="absolute right-4 top-3 text-slate-400 hover:text-purple-500"><Eye v-if="!show.current" class="w-4 h-4"/><EyeOff v-else class="w-4 h-4"/></button>
                         </div>
                         <div class="relative">
-                            <input :type="show.new ? 'text' : 'password'" v-model="pwd.password" placeholder="New Password" class="w-full px-5 py-4 rounded-2xl bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-blue-500/50" />
-                            <button @click="show.new = !show.new" class="absolute right-4 top-4 text-gray-600 hover:text-white"><Eye v-if="!show.new" class="w-4 h-4"/><EyeOff v-else class="w-4 h-4"/></button>
+                            <input :type="show.new ? 'text' : 'password'" v-model="pwd.password" placeholder="New password" class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-xs outline-none focus:border-purple-500/50 transition-all" />
+                            <button @click="show.new = !show.new" class="absolute right-4 top-3 text-slate-400 hover:text-purple-500"><Eye v-if="!show.new" class="w-4 h-4"/><EyeOff v-else class="w-4 h-4"/></button>
                         </div>
-                        
-                        <div class="grid grid-cols-2 gap-2 px-1">
-                            <div v-for="(hint, key) in { min8: '8+ Char', mixed: 'Aa Case', num: 'Number', match: 'Match' }" :key="key" 
-                                :class="pwdHints[key] ? 'text-blue-400' : 'text-gray-700'" class="text-[9px] font-black uppercase tracking-tighter flex items-center gap-1 transition-colors">
-                                <div class="w-1 h-1 rounded-full bg-current"></div> {{ hint }}
+
+                        <div v-if="pwd.password" class="space-y-2 px-1 animate-in fade-in">
+                            <div class="w-full bg-slate-100 dark:bg-white/5 rounded-full h-1 overflow-hidden">
+                                <div class="h-full transition-all duration-500" :class="strengthColor" :style="{ width: strengthWidth }"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <div v-for="(hint, key) in { min8: '8+ letters', mixed: 'Upper & lower', num: 'Has number', match: 'Match' }" :key="key" 
+                                    :class="pwdHints[key] ? 'text-purple-500' : 'text-slate-300 dark:text-slate-600'" class="text-[9px] font-semibold flex items-center gap-1.5 transition-colors">
+                                    <div class="w-1 h-1 rounded-full bg-current"></div> {{ hint }}
+                                </div>
                             </div>
                         </div>
 
-                        <button @click="onChangePassword" :disabled="pwdSaving" class="w-full py-4 bg-white/5 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-all mt-4">Auth Password Update</button>
+                        <button @click="onChangePassword" :disabled="pwdSaving" class="w-full py-3.5 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-[10px] font-[900] uppercase tracking-widest rounded-xl shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all mt-2">
+                           Change Password
+                        </button>
                     </div>
                 </section>
             </div>
-        </main>
+        </div>
     </div>
 </template>
 
 <style scoped>
-.animate-spin-slow { animation: spin 8s linear infinite; }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700;1,900&display=swap');
+
+.custom-font-poppins {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+.animate-in {
+    animation: fadeSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 input, textarea {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus {
+    transform: scale(1.01);
 }
 </style>

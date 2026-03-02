@@ -1,7 +1,11 @@
 // backend/src/services/QuizService.js
 const { Quiz, Module, QuizAttempt, UserGamification } = require('../model');
+const gamificationService = require('./GamificationService'); // Import ang automated EXP/Title logic
 
 class QuizService {
+    /**
+     * Creates a new gamified quiz linked to a specific module
+     */
     async createQuiz(quizData, userId) {
         const moduleRecord = await Module.findByPk(quizData.module_id);
         if (!moduleRecord) throw new Error('Reference module not found');
@@ -19,7 +23,7 @@ class QuizService {
     }
 
     /**
-     * Submission Logic: Inauupdate ang points, level, at progress tracking
+     * Submission Logic: Nag-o-automate ng pag-save ng attempt at pag-update ng EXP/Title
      */
     async submitAttempt(userId, quizId, results) {
         // 1. Siguraduhing Number ang values para hindi mag-error ang Sequelize
@@ -28,42 +32,35 @@ class QuizService {
         const total = parseInt(results.totalQuestions) || 0;
         const time = parseInt(results.timeTaken) || 0;
 
-        // 2. I-save ang attempt sa QuizAttempts table
+        // 2. I-save ang attempt sa quiz_attempts table (Tugma sa model at bagong migration)
         const attempt = await QuizAttempt.create({
             user_id: userId,
             quiz_id: quizId,
-            score: points,
-            correct_answers: correct,
+            score: points, // Dito sine-save ang total points earned
+            correct_answers: correct, // New column based sa fixed migration
             total_questions: total,
             time_taken: time
         });
 
-        // 3. XP at Gamification Update gamit ang tamang column names
-        // Gagamit tayo ng findOrCreate para siguradong may record ang user sa usergamification table
-        const [stats] = await UserGamification.findOrCreate({
-            where: { user_id: userId },
-            defaults: { 
-                experience_points: 0, 
-                level: 1,
-                streak: 0
-            }
-        });
-
-        // Update ang experience points base sa nakuha sa quiz
-        stats.experience_points += points;
+        // 3. EXP at Automated Title Update
+        // Base sa logic natin, ang correct answers ang multiplier para sa EXP (e.g., 20 EXP per correct answer)
+        const expGained = correct * 20;
         
-        // Simpleng logic para sa leveling (halimbawa: every 500 XP ay 1 level)
-        stats.level = Math.floor(stats.experience_points / 500) + 1;
-        
-        await stats.save();
+        // Tinatawag ang gamificationService para sa automatic Title threshold checking
+        const updatedStats = await gamificationService.addExperience(userId, expGained);
 
         return { 
+            success: true,
             attempt, 
-            experiencePoints: stats.experience_points, 
-            level: stats.level 
+            experienceGained: expGained,
+            currentTotalExp: updatedStats.experience_points, 
+            currentTitle: updatedStats.current_title // Ibinabalik ang bagong title kung nag-level up
         };
     }
 
+    /**
+     * Fetches all quizzes associated with a specific module ID
+     */
     async getQuizzesByModule(moduleId) {
         return await Quiz.findAll({
             where: { module_id: moduleId },
@@ -71,6 +68,9 @@ class QuizService {
         });
     }
 
+    /**
+     * Fetches a single quiz detail by its primary ID
+     */
     async getQuizById(quizId) {
         const quiz = await Quiz.findByPk(quizId, {
             include: [{

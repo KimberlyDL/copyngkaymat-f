@@ -1,89 +1,86 @@
 <template>
-    <div class="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 font-['Poppins']">
+    <div class="max-w-4xl mx-auto space-y-10">
         
-        <div class="flex flex-col xl:flex-row gap-12 items-start border-b border-white/5 pb-12">
-            <div class="flex flex-col items-center gap-4 w-full xl:w-auto shrink-0">
-                <div class="relative group">
-                    <div class="absolute -inset-1 bg-gradient-to-tr from-blue-600 to-pink-600 rounded-[3rem] blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-                    <div class="relative w-44 h-44 rounded-[2.8rem] overflow-hidden bg-[#0d0d12] border border-white/10 shadow-2xl">
-                        <img :src="avatarPreview || profileStore.avatarUrl(200)" alt="Profile Avatar"
-                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-
-                        <div v-if="profileStore.isUploading"
-                            class="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 text-center">
-                            <div class="space-y-3 w-full">
-                                <div class="text-white text-[10px] font-black uppercase tracking-widest">{{ profileStore.uploadProgress }}%</div>
-                                <div class="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                                    <div class="h-full bg-gradient-to-r from-blue-500 to-pink-500 transition-all duration-300"
-                                        :style="{ width: profileStore.uploadProgress + '%' }"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <label v-if="!pendingFile"
-                            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-all duration-300">
-                            <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20">
-                                <CameraIcon class="h-6 w-6 text-white" />
-                            </div>
-                            <input type="file" class="hidden" accept="image/jpeg,image/png,image/webp"
-                                @change="handleFileSelect" :disabled="profileStore.isUploading" />
-                        </label>
+        <!-- Avatar Section -->
+        <section class="flex flex-col sm:flex-row items-center sm:items-start gap-8 pb-10 border-b border-slate-200 dark:border-white/5">
+            <div class="relative shrink-0">
+                <div class="w-32 h-32 rounded-full overflow-hidden bg-slate-100 dark:bg-[#0d0d12] border-4 border-white dark:border-white/10 shadow-sm">
+                    <img :src="avatarPreview || profileStore.avatarUrl(128)" alt="Profile Avatar" class="w-full h-full object-cover" />
+                    
+                    <div v-if="profileStore.isUploading" class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <div class="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 </div>
 
-                <div v-if="pendingFile" class="flex gap-2 w-full">
-                    <button @click="confirmAvatarUpload" class="flex-1 py-2 text-[9px] font-black text-white bg-blue-600 rounded-xl uppercase tracking-widest shadow-lg shadow-blue-900/20">Confirm</button>
-                    <button @click="cancelAvatarSelection" class="flex-1 py-2 text-[9px] font-black text-gray-400 bg-white/5 border border-white/10 rounded-xl hover:text-white transition-all uppercase tracking-widest">Cancel</button>
-                </div>
-                <button v-else-if="hasCustomAvatar" @click="handleDeleteAvatar" class="text-[9px] font-black text-gray-600 hover:text-pink-500 uppercase tracking-widest transition-colors">Remove Avatar</button>
+                <label v-if="!pendingFile" class="absolute bottom-0 right-0 p-2.5 bg-purple-600 text-white rounded-full shadow-lg cursor-pointer hover:bg-purple-700 transition-colors">
+                    <CameraIcon class="w-5 h-5" />
+                    <input type="file" class="hidden" accept="image/jpeg,image/png,image/webp" @change="handleFileSelect" :disabled="profileStore.isUploading" />
+                </label>
             </div>
 
-            <div class="flex-1 space-y-8 w-full">
-                <div class="space-y-1">
-                    <h3 class="text-2xl font-black text-white uppercase tracking-tighter">Public <span class="bg-gradient-to-r from-blue-400 to-pink-500 bg-clip-text text-transparent">Profile</span></h3>
-                    <p class="text-xs text-gray-500 font-medium italic">This information will be displayed publicly if your profile visibility is set to public.</p>
+            <div class="flex-1 space-y-4 text-center sm:text-left w-full">
+                <div>
+                    <h3 class="text-sm font-black uppercase tracking-wider text-black dark:text-white">Profile Picture</h3>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Upload a picture to make your profile stand out.</p>
+                </div>
+
+                <div v-if="pendingFile" class="flex flex-col sm:flex-row gap-3">
+                    <button @click="confirmAvatarUpload" class="btn-3d-purple px-4 py-2 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all">
+                        Save New Avatar
+                    </button>
+                    <button @click="cancelAvatarSelection" class="px-4 py-2 bg-white dark:bg-[#0d0d12] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+                <div v-else-if="hasCustomAvatar">
+                    <button @click="handleDeleteAvatar" class="text-[10px] font-black uppercase tracking-widest text-red-600 hover:text-red-700 transition-colors">
+                        Remove current avatar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Public Profile Form -->
+        <section class="space-y-6">
+            <div>
+                <h3 class="text-sm font-black uppercase tracking-wider text-black dark:text-white">Public Profile</h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">This information will be displayed on your public profile.</p>
+            </div>
+            
+            <div class="grid gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Display Name</label>
+                    <input v-model="profileData.display_name" type="text" maxlength="100"
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                 </div>
                 
-                <div class="grid grid-cols-1 gap-6">
-                    <div class="space-y-2 group">
-                        <div class="flex justify-between items-end px-1">
-                            <label class="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500">Display Name</label>
-                            <span class="text-[9px] font-mono text-gray-700">{{ profileData.display_name?.length || 0 }}/100</span>
-                        </div>
-                        <input v-model="profileData.display_name" type="text" placeholder="How others see you" maxlength="100"
-                            class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-blue-500/50 transition-all outline-none" />
-                    </div>
-                    
-                    <div class="space-y-2 group">
-                        <div class="flex justify-between items-end px-1">
-                            <label class="text-[10px] font-black uppercase tracking-[0.3em] text-pink-500">Bio</label>
-                            <span class="text-[9px] font-mono text-gray-700">{{ profileData.bio?.length || 0 }}/500</span>
-                        </div>
-                        <textarea v-model="profileData.bio" rows="3" placeholder="Tell us about yourself (max 500 characters)" maxlength="500"
-                            class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-pink-500/50 transition-all outline-none resize-none"></textarea>
-                    </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Bio</label>
+                    <textarea v-model="profileData.bio" rows="4" maxlength="500"
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3 resize-none"></textarea>
+                    <p class="text-[10px] text-slate-400 text-right">{{ profileData.bio?.length || 0 }}/500</p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="space-y-10">
-            <div class="flex flex-col gap-2">
-                <h3 class="text-xl font-black text-white uppercase tracking-tighter">Personal <span class="text-blue-500">Information</span></h3>
-                <p class="text-xs text-gray-500 font-medium">This data is private and only used for platform safety and verification.</p>
+        <!-- Personal Info Form -->
+        <section class="space-y-6 pt-6 border-t border-slate-200 dark:border-white/5">
+            <div>
+                <h3 class="text-sm font-black uppercase tracking-wider text-black dark:text-white">Personal Information</h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Private details used for verification and recovery.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-                <div class="space-y-2 group">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1 group-focus-within:text-blue-400 transition-colors">Date of Birth</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Date of Birth</label>
                     <input v-model="profileData.date_of_birth" type="date" :max="maxBirthDate"
-                        class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" />
-                    <p v-if="profileData.date_of_birth" class="text-[9px] font-mono text-gray-600 uppercase mt-1 ml-1">Age: {{ calculateAge(profileData.date_of_birth) }} years</p>
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                 </div>
 
-                <div class="space-y-2 group">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1 group-focus-within:text-pink-400 transition-colors">Sex</label>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Sex</label>
                     <select v-model="profileData.sex" 
-                        class="w-full px-6 py-4 rounded-2xl bg-[#0d0d12] border border-white/10 text-white text-xs outline-none focus:ring-2 focus:ring-pink-500/50 appearance-none transition-all">
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3">
                         <option value="">Select...</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
@@ -91,65 +88,66 @@
                     </select>
                 </div>
 
-                <div class="space-y-2 group">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1 group-focus-within:text-blue-400 transition-colors">Gender Identity (Optional)</label>
-                    <input v-model="profileData.gender_identity" type="text" placeholder="How you identify"
-                        class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" />
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Gender Identity (Optional)</label>
+                    <input v-model="profileData.gender_identity" type="text"
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                 </div>
 
-                <div class="space-y-2 group">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1 group-focus-within:text-pink-400 transition-colors">Phone Number</label>
-                    <input v-model="profileData.phone_number" type="text" placeholder="+639XXXXXXXXX"
-                        class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-pink-500/50 outline-none transition-all" />
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Phone Number</label>
+                    <input v-model="profileData.phone_number" type="tel" placeholder="+639XXXXXXXXX"
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="space-y-10 pt-4">
-            <div class="flex flex-col gap-2">
-                <h3 class="text-xl font-black text-white uppercase tracking-tighter">Address</h3>
-                <p class="text-xs text-gray-500 font-medium">Optional - For emergency contact purposes only.</p>
+        <!-- Address Info Form -->
+        <section class="space-y-6 pt-6 border-t border-slate-200 dark:border-white/5">
+            <div>
+                <h3 class="text-sm font-black uppercase tracking-wider text-black dark:text-white">Address</h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Used for emergency contact purposes.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-6 gap-6">
-                <div class="md:col-span-3 space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Address Line 1</label>
+                <div class="md:col-span-6 space-y-2">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Address Line 1</label>
                     <input v-model="profileData.address_line1" type="text"
-                        class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" />
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                 </div>
-                <div class="md:col-span-3 space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Address Line 2</label>
+                <div class="md:col-span-6 space-y-2">
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Address Line 2</label>
                     <input v-model="profileData.address_line2" type="text"
-                        class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" />
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                 </div>
                 <div class="md:col-span-2 space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">City</label>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">City</label>
                     <input v-model="profileData.city" type="text"
-                        class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" />
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                 </div>
                 <div class="md:col-span-2 space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Province</label>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Province</label>
                     <input v-model="profileData.province" type="text"
-                        class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" />
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                 </div>
                 <div class="md:col-span-2 space-y-2">
-                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1">Postal Code</label>
+                    <label class="block text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Postal Code</label>
                     <input v-model="profileData.postal_code" type="text"
-                        class="w-full px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/10 text-white focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" />
+                        class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="pt-10 flex flex-col sm:flex-row justify-end gap-4 border-t border-white/5">
+        <!-- Action Buttons -->
+        <div class="pt-6 border-t border-slate-200 dark:border-white/5 flex justify-end gap-3">
             <button type="button" @click="resetForm" 
-                class="px-10 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition-all">Reset</button>
+                class="px-5 py-3 text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 bg-white dark:bg-[#0d0d12] border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                Reset
+            </button>
             <button @click="saveProfile" :disabled="isSaving"
-                class="px-12 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-pink-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-900/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-500 disabled:opacity-50">
-                <span v-if="!isSaving">Save Changes</span>
-                <span v-else class="flex items-center gap-2">
-                    <svg class="animate-spin h-3 w-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    Saving...
-                </span>
+                class="btn-3d-purple px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2">
+                <div v-if="isSaving" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                {{ isSaving ? 'Saving...' : 'Save Changes' }}
             </button>
         </div>
     </div>
@@ -157,7 +155,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { CameraIcon } from 'lucide-vue-next';
+import { Camera as CameraIcon } from 'lucide-vue-next'; // Fixed import name
 import { useProfileStore } from '@/stores/profile';
 import { useAuthStore } from '@/stores/auth';
 import { useToast } from '@/utils/useToast';
@@ -255,7 +253,5 @@ watch(() => profileStore.profile, (newP) => { if (newP) fillProfileData(newP); }
 </script>
 
 <style scoped>
-input, select, textarea {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* No Custom CSS needed, using pure Tailwind */
 </style>

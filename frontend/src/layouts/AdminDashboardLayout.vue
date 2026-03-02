@@ -11,7 +11,7 @@
         <AdminSidebar />
 
         <!-- Main Content Area -->
-        <div class="transition-all duration-300 ease-in-out" :class="sidebarStore.isExpanded ? 'lg:pl-64' : 'lg:pl-20'">
+        <div class="transition-all duration-300 ease-in-out" :class="sidebarStore.isExpanded ? 'lg:pl-72' : 'lg:pl-22'">
             <!-- Header -->
             <AdminHeader />
 

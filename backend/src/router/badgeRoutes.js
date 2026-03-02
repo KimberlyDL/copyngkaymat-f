@@ -1,19 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const badgeController = require('../controller/badgeController');
-// Use the middleware you already created
-const upload = require('../middleware/upload'); 
+const { authenticate } = require('../middleware/AuthMiddleware');
 
-// GET all badges
-router.get('/', badgeController.getAllBadges);
+// Lahat ng routes dito ay kailangan ng login
+router.use(authenticate);
 
-// POST a new badge - 'badge' is the field name for the frontend FormData
-router.post('/', upload.single('badge'), badgeController.createBadge);
+// 1. Para sa Student: Kunin ang sariling inventory (mga na-claim na)
+router.get('/my-inventory', badgeController.getMyInventory);
 
-// PUT (Update) a badge
-router.put('/:id', upload.single('badge'), badgeController.updateBadge);
+// 2. Para sa Student/Lahat: Kunin ang listahan ng available rewards sa store
+router.get('/store', badgeController.getAllRewards);
 
-// DELETE a badge
-router.delete('/:id', badgeController.deleteBadge);
+// 3. Para sa Student: I-claim ang isang reward slot (Trade XP)
+router.post('/claim', badgeController.claimReward);
+
+// 4. Facilitator CRUD
+router.post('/', badgeController.createReward);
+router.put('/:id', badgeController.toggleRewardSlot);
+router.delete('/:id', badgeController.deleteReward);
 
 module.exports = router;

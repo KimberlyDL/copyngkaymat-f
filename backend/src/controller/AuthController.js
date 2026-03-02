@@ -1,4 +1,4 @@
-const { User } = require('../model');
+const { User, UserGamification } = require('../model');
 const jwt = require('jsonwebtoken');
 const jwtService = require('../services/JwtService');
 const { getDeviceInfo } = require('../middleware/AuthMiddleware');
@@ -106,6 +106,42 @@ exports.login = async (req, res, next) => {
             return res.status(401).json({
                 message: 'Invalid email or password.',
                 code: 'INVALID_CREDENTIALS' // Nagdagdag ng code para sa frontend handling
+            });
+        }
+
+        // Check account status
+        if (user.account_status === 'banned') {
+            return res.status(403).json({
+                message: 'Your account has been banned. Please contact support for more information.',
+                code: 'ACCOUNT_BANNED',
+                reason: user.suspension_reason
+            });
+        }
+
+        if (user.account_status === 'suspended') {
+            // Check if suspension has expired
+            if (user.suspended_until && new Date(user.suspended_until) > new Date()) {
+                const suspendedUntil = new Date(user.suspended_until).toLocaleDateString();
+                return res.status(403).json({
+                    message: `Your account is suspended until ${suspendedUntil}.`,
+                    code: 'ACCOUNT_SUSPENDED',
+                    suspended_until: user.suspended_until,
+                    reason: user.suspension_reason
+                });
+            } else {
+                // Auto-reactivate if suspension has expired
+                await user.update({ 
+                    account_status: 'active', 
+                    suspended_until: null, 
+                    suspension_reason: null 
+                });
+            }
+        }
+
+        if (user.account_status === 'deactivated') {
+            return res.status(403).json({
+                message: 'Your account has been deactivated. Please contact support to reactivate.',
+                code: 'ACCOUNT_DEACTIVATED'
             });
         }
 
@@ -256,7 +292,7 @@ exports.logoutAll = async (req, res, next) => {
 };
 
 /**
- * Get current user
+ * Get current user with gamification data
  */
 exports.me = async (req, res, next) => {
     try {
@@ -266,7 +302,28 @@ exports.me = async (req, res, next) => {
             });
         }
 
-        res.json(req.user.toJSON());
+        // Fetch gamification data for the user
+        let gamification = await UserGamification.findOne({
+            where: { user_id: req.user.id }
+        });
+
+        // If no gamification record exists, create a default one
+        if (!gamification) {
+            gamification = {
+                experience_points: 0,
+                total_points: 0,
+                current_title: 'Novice'
+            };
+        }
+
+        const userData = req.user.toJSON();
+        userData.gamification = {
+            experience_points: gamification.experience_points || 0,
+            total_points: gamification.total_points || 0,
+            current_title: gamification.current_title || 'Novice'
+        };
+
+        res.json(userData);
     } catch (error) {
         next(error);
     }

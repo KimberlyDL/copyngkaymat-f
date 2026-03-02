@@ -1,6 +1,6 @@
 // jobs/AccountDeletionJob.js
 const cron = require('node-cron');
-const { User, UserProfile, UserGuardian, UserPrivacySettings, UserNotificationPreferences, AccountDeletionRequest, Session, TokenBlacklist } = require('../model');
+const { User, UserProfile, UserPrivacySettings, UserNotificationPreferences, AccountDeletionRequest, Session, TokenBlacklist } = require('../model');
 const sequelize = require('../config/db');
 const AvatarService = require('../services/AvatarService');
 const emailService = require('../services/EmailService');
@@ -64,12 +64,6 @@ class AccountDeletionJob {
             }
 
             // 2. Delete related records (cascade will handle some, but we do it explicitly for logging)
-
-            // Delete guardians
-            await UserGuardian.destroy({
-                where: { user_id: userId },
-                transaction
-            });
 
             // Delete profile
             await UserProfile.destroy({

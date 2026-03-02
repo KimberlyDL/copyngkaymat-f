@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-[#020203] font-['Poppins'] text-white antialiased relative">
     
-    <AIChatbot v-if="isLoggedIn" />
+    <AIChatbot />
 
     <router-view v-slot="{ Component }">
       <transition name="page" mode="out-in">

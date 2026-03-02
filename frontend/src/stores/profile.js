@@ -10,7 +10,6 @@ export const useProfileStore = defineStore('profile', {
         profile: null,
         privacySettings: null,
         notificationSettings: null,
-        guardians: [],
         isLoading: false,
         isUploading: false,
         uploadProgress: 0,
@@ -79,29 +78,49 @@ export const useProfileStore = defineStore('profile', {
             this.error = null;
 
             try {
-                const response = await api.get(`/api/v1/users/${userId}/profile`);
-                this.profile = response.data;
+                // Determine endpoint: if no ID or ID is 'me', use the dedicated profile endpoint
+                const endpoint = (!userId || userId === 'me') 
+                    ? '/api/v1/users/profile' 
+                    : `/api/v1/users/${userId}/profile`;
 
-                // If profile has nested structure, flatten it
-                if (response.data.profile) {
-                    this.profile = {
-                        ...response.data,
-                        ...response.data.profile,
-                        // Flatten address
-                        address_line1: response.data.profile.address?.line1,
-                        address_line2: response.data.profile.address?.line2,
-                        city: response.data.profile.address?.city,
-                        province: response.data.profile.address?.province,
-                        postal_code: response.data.profile.address?.postal_code,
-                        country: response.data.profile.address?.country,
-                        // Flatten emergency contact
-                        emergency_contact_name: response.data.profile.emergency_contact?.name,
-                        emergency_contact_relationship: response.data.profile.emergency_contact?.relationship,
-                        emergency_contact_phone: response.data.profile.emergency_contact?.phone
+                const response = await api.get(endpoint);
+                
+                // Base profile data from API
+                let profileData = response.data;
+
+                // Flatten nested profile structure if it exists
+                if (profileData.profile) {
+                    profileData = {
+                        ...profileData, // Keep top-level User fields (id, email, role, etc)
+                        ...profileData.profile, // Merge Profile fields (bio, sex, etc)
+                        
+                        // Flatten address explicitly
+                        address_line1: profileData.profile.address?.line1,
+                        address_line2: profileData.profile.address?.line2,
+                        city: profileData.profile.address?.city,
+                        province: profileData.profile.address?.province,
+                        postal_code: profileData.profile.address?.postal_code,
+                        country: profileData.profile.address?.country,
+                        
+                        // Flatten emergency contact explicitly
+                        emergency_contact_name: profileData.profile.emergency_contact?.name,
+                        emergency_contact_relationship: profileData.profile.emergency_contact?.relationship,
+                        emergency_contact_phone: profileData.profile.emergency_contact?.phone,
                     };
                 }
 
+                // Ensure gamification defaults if missing
+                if (!profileData.gamification) {
+                    profileData.gamification = {
+                        experience_points: 0,
+                        current_title: 'Novice',
+                        total_points: 0
+                    };
+                }
+
+                this.profile = profileData;
                 return this.profile;
+
             } catch (err) {
                 this.error = err.response?.data?.message || 'Failed to load profile';
                 console.error('Profile fetch error:', err);
@@ -116,10 +135,12 @@ export const useProfileStore = defineStore('profile', {
          */
         async updateProfile(profileData) {
             const toast = useToast();
+            const authStore = useAuthStore();
 
             try {
                 // Transform flat data to nested structure expected by backend
                 const payload = {
+                    username: profileData.username, // Add username update
                     display_name: profileData.display_name,
                     bio: profileData.bio,
                     date_of_birth: profileData.date_of_birth,
@@ -146,6 +167,13 @@ export const useProfileStore = defineStore('profile', {
                 // Update local state
                 if (response.data.profile) {
                     Object.assign(this.profile, profileData);
+                }
+                
+                // Update auth user if username changed
+                if (response.data.user && response.data.user.name) {
+                    if (authStore.user) {
+                        authStore.user.name = response.data.user.name;
+                    }
                 }
 
                 toast.success('Profile updated successfully');
@@ -317,73 +345,7 @@ export const useProfileStore = defineStore('profile', {
             }
         },
 
-        /**
-         * Fetch guardians
-         */
-        async fetchGuardians() {
-            try {
-                const response = await api.get('/api/v1/users/guardians');
-                this.guardians = response.data.guardians || [];
-                return this.guardians;
-            } catch (err) {
-                console.error('Guardians fetch failed:', err);
-                throw err;
-            }
-        },
 
-        /**
-         * Add guardian
-         */
-        async addGuardian(guardianData) {
-            const toast = useToast();
-
-            try {
-                const response = await api.post('/api/v1/users/guardians', guardianData);
-                this.guardians.push(response.data.guardian);
-                toast.success('Guardian added successfully');
-                return true;
-            } catch (err) {
-                toast.error('Failed to add guardian');
-                return false;
-            }
-        },
-
-        /**
-         * Update guardian
-         */
-        async updateGuardian(guardianId, guardianData) {
-            const toast = useToast();
-
-            try {
-                const response = await api.put(`/api/v1/users/guardians/${guardianId}`, guardianData);
-                const index = this.guardians.findIndex(g => g.id === guardianId);
-                if (index !== -1) {
-                    this.guardians[index] = response.data.guardian;
-                }
-                toast.success('Guardian updated successfully');
-                return true;
-            } catch (err) {
-                toast.error('Failed to update guardian');
-                return false;
-            }
-        },
-
-        /**
-         * Delete guardian
-         */
-        async deleteGuardian(guardianId) {
-            const toast = useToast();
-
-            try {
-                await api.delete(`/api/v1/users/guardians/${guardianId}`);
-                this.guardians = this.guardians.filter(g => g.id !== guardianId);
-                toast.success('Guardian removed successfully');
-                return true;
-            } catch (err) {
-                toast.error('Failed to remove guardian');
-                return false;
-            }
-        },
 
         /**
          * Deactivate account

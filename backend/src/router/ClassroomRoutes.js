@@ -28,6 +28,12 @@ router.post('/join', requireRole('player'), classroomController.joinClassroom);
 // URL: /api/classrooms/1/progress
 router.get('/:id/progress', requireRole(['educator', 'moderator', 'admin']), classroomController.getClassroomProgress);
 
+// Classroom Announcements Routes
+router.post('/:id/announcements', requireRole(['educator', 'moderator', 'admin']), classroomController.createClassroomAnnouncement);
+router.get('/:id/announcements', classroomController.getClassroomAnnouncements);
+router.put('/:id/announcements/:announcementId', requireRole(['educator', 'moderator', 'admin']), classroomController.updateClassroomAnnouncement);
+router.delete('/:id/announcements/:announcementId', requireRole(['educator', 'moderator', 'admin']), classroomController.deleteClassroomAnnouncement);
+
 
 /**
  * 3. General Dynamic Parameter Routes (Dapat laging huli)

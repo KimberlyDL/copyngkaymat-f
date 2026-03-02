@@ -1,157 +1,153 @@
 <template>
-  <section class="relative min-h-screen w-full flex items-center overflow-hidden bg-[#0d0221] font-['Poppins',_sans-serif] text-white">
+  <section class="relative min-h-screen w-full flex flex-col items-center justify-start overflow-x-hidden transition-all duration-700 
+    bg-[#fdfcff] dark:bg-[#04020a] font-['Poppins',_sans-serif] text-slate-900 dark:text-white selection:bg-fuchsia-500/30 py-24">
     
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#1a0b2e_0%,#0a051a_100%)]"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(124,58,237,0.06)_0%,transparent_100%)] dark:bg-[radial-gradient(circle_at_50%_50%,#0f0524_0%,#04020a_100%)]"></div>
     
-    <nav class="absolute top-0 w-full flex items-center justify-between px-12 py-10 z-50">
-      <div class="flex flex-col border-l-4 border-fuchsia-500 pl-4">
-        <span class="font-black text-xl tracking-tighter leading-none italic uppercase">Protect</span>
-        <span class="font-bold text-xs tracking-[0.4em] text-fuchsia-500/80 leading-none mt-1 uppercase">GAD Portal</span>
-      </div>
-      <div class="hidden md:flex items-center gap-10 text-[10px] font-bold uppercase tracking-[0.2em]">
-        <div class="flex items-center bg-white/5 border border-white/10 backdrop-blur-md px-6 py-2 rounded-full cursor-pointer hover:bg-white/10 transition-all">
-          <svg class="w-3 h-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-          <span class="text-[9px] font-black">Curriculum Resources</span>
-        </div>
-      </div>
-    </nav>
-
-    <div class="absolute inset-0 pointer-events-none">
-       <div v-for="n in 12" :key="'line-'+n" 
-            class="absolute bg-gradient-to-b from-transparent via-fuchsia-500/20 to-transparent w-[1px] h-[700px] rotate-[65deg]"
-            :style="{ 
-              left: (-10 + (n * 10)) + '%', 
-              top: '-20%',
-              opacity: 0.05 + (n * 0.02)
-            }">
-       </div>
+    <div v-for="(orb, i) in orbs" :key="i"
+      class="absolute rounded-full liquid-sphere animate-float pointer-events-none"
+      :style="{
+        width: orb.size + 'px',
+        height: orb.size + 'px',
+        left: orb.left + '%',
+        top: orb.top + '%',
+        animationDelay: orb.delay + 's',
+        opacity: orb.opacity,
+        filter: `blur(${orb.blur}px)`,
+        zIndex: 5
+      }">
+      <div class="absolute top-[12%] left-[12%] w-[30%] h-[30%] rounded-full bg-gradient-to-br from-white/30 to-transparent blur-[6px]"></div>
     </div>
 
-    <div v-for="(obj, index) in elements" :key="index"
-      @mousedown="startDrag($event, index)"
-      @touchstart.passive="startDrag($event, index)"
-      :style="{ 
-        left: obj.x + 'px', 
-        top: obj.y + 'px', 
-        width: obj.size + 'px',
-        height: obj.size + 'px',
-        transform: `rotate(${obj.rotation}deg) scale(${obj.isDragging ? 1.1 : 1})`,
-        zIndex: obj.isDragging ? 60 : 10,
-        opacity: obj.opacity
-      }"
-      class="absolute cursor-grab active:cursor-grabbing transition-transform duration-500 ease-out rounded-full liquid-sphere"
-      :class="[!obj.isDragging ? 'animate-float' : '']">
+    <div class="relative z-30 w-full max-w-5xl mx-auto px-6 flex flex-col items-center text-center mt-12 mb-24">
+      <h1 class="text-6xl md:text-8xl font-extrabold tracking-tight leading-[1.05] mb-8">
+        Learn. Grow. <br />
+        <span class="text-transparent bg-clip-text bg-gradient-to-br from-purple-600 via-fuchsia-500 to-fuchsia-600 
+          dark:from-fuchsia-400 dark:via-purple-400 dark:to-fuchsia-300">
+          Be Yourself.
+        </span>
+      </h1>
       
-      <div class="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 to-transparent opacity-40"></div>
-    </div>
+      <p class="text-base md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed font-medium italic">
+        A safe space for students to lead with respect. Explore interactive lessons and build a world where everyone wins.
+      </p>
 
-    <div class="relative z-30 w-full max-w-7xl mx-auto px-16 pointer-events-none">
-      <div class="max-w-2xl space-y-6 pointer-events-auto">
-        
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/20">
-          <div class="w-1.5 h-1.5 rounded-full bg-fuchsia-500 animate-pulse"></div>
-          <span class="text-[9px] font-black uppercase tracking-[0.3em] text-fuchsia-400">Inclusive Learning Active</span>
-        </div>
-        
-        <h1 class="text-6xl md:text-[85px] font-black leading-[0.9] tracking-tighter uppercase italic">
-          Empower <br />
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-purple-600">Equality.</span>
-        </h1>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-10 w-full">
+        <router-link :to="{ name: 'signup' }" 
+          class="btn-3d-pink group relative w-full sm:w-auto px-16 py-6 text-white font-black uppercase tracking-widest rounded-full transition-all duration-300 hover:scale-110 active:scale-95 text-[11px] overflow-hidden">
+          <span class="relative z-10 drop-shadow-md">Join the Journey</span>
+          <div class="absolute inset-0 bg-gradient-to-tr from-white/30 to-transparent opacity-40"></div>
+        </router-link>
 
-        <p class="text-base md:text-lg max-w-md text-white/50 leading-relaxed italic font-medium">
-          A dedicated space for teachers and students to explore Gender and Development. 
-          Learn to break stereotypes and build a safer, more inclusive school environment for everyone.
-        </p>
-
-        <div class="flex flex-col sm:flex-row items-center gap-6 pt-6">
-          <button class="w-full sm:w-auto px-12 py-5 text-[11px] font-black uppercase tracking-widest rounded-xl transition-all
-            bg-purple-700 text-white shadow-[0_8px_0_#46178f] hover:translate-y-1 hover:shadow-[0_4px_0_#46178f] active:translate-y-2 active:shadow-none">
-            Teacher Access
-          </button>
-          
-          <button class="w-full sm:w-auto px-12 py-5 text-[11px] font-black uppercase tracking-widest rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 transition-all">
-            Student Module
-          </button>
-        </div>
+        <button class="btn-3d-fuchsia group relative w-full sm:w-auto px-16 py-6 text-white font-black uppercase tracking-widest rounded-full transition-all duration-300 hover:scale-110 active:scale-95 text-[11px] overflow-hidden">
+          <span class="relative z-10 drop-shadow-md">Explore Hub</span>
+          <div class="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-20"></div>
+        </button>
       </div>
     </div>
 
-    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" 
-      style="background-image: radial-gradient(#d810ff 1.2px, transparent 1.2px); background-size: 40px 40px;">
+    <div class="relative z-30 w-full max-w-4xl mx-auto px-6 space-y-32">
+      
+      <div v-for="(step, idx) in steps" :key="idx" 
+        class="flex flex-col md:flex-row items-center gap-12 group"
+        :class="idx % 2 !== 0 ? 'md:flex-row-reverse' : ''">
+        
+        <div class="relative w-40 h-40 flex-shrink-0">
+          <div class="absolute inset-0 rounded-full liquid-sphere opacity-20 blur-xl group-hover:scale-150 transition-transform duration-700"></div>
+          <div class="absolute inset-0 rounded-full liquid-sphere flex items-center justify-center border border-white/20 shadow-2xl transition-transform duration-500 group-hover:rotate-12">
+            <span class="text-4xl font-black italic">{{ idx + 1 }}</span>
+          </div>
+        </div>
+
+        <div class="flex-1 text-center md:text-left" :class="idx % 2 !== 0 ? 'md:text-right' : ''">
+          <h3 class="text-3xl font-black mb-4 uppercase tracking-tighter text-purple-600 dark:text-fuchsia-400 group-hover:translate-x-2 transition-transform duration-500">
+            {{ step.title }}
+          </h3>
+          <p class="text-lg text-slate-500 dark:text-slate-400 leading-relaxed max-w-md" :class="idx % 2 !== 0 ? 'mr-0 ml-auto' : ''">
+            {{ step.desc }}
+          </p>
+          <div class="mt-6 flex gap-3 justify-center" :class="idx % 2 !== 0 ? 'md:justify-end' : 'md:justify-start'">
+             <span v-for="tag in step.tags" :key="tag" class="text-[10px] font-bold uppercase py-1 px-3 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-500">
+              #{{ tag }}
+             </span>
+          </div>
+        </div>
+      </div>
+
     </div>
+
+    <div v-for="n in 30" :key="'p-'+n"
+      class="absolute bg-purple-400/30 dark:bg-white/10 rounded-full animate-pulse pointer-events-none"
+      :style="{
+        width: Math.random() * 4 + 'px',
+        height: Math.random() * 4 + 'px',
+        left: Math.random() * 100 + '%',
+        top: Math.random() * 100 + '%',
+        animationDuration: (Math.random() * 4 + 2) + 's'
+      }">
+    </div>
+
   </section>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 
-const elements = ref([
-  { x: 850, y: 150, size: 380, rotation: 0, opacity: 1, isDragging: false }, 
-  { x: 800, y: 500, size: 140, rotation: 45, opacity: 1, isDragging: false },
-  { x: 300, y: 650, size: 220, rotation: -15, opacity: 0.8, isDragging: false },
-  ...Array.from({ length: 6 }).map(() => ({
-    x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-    y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
-    size: Math.random() * 60 + 20,
-    rotation: Math.random() * 360,
-    opacity: 0.4,
-    isDragging: false
-  }))
+const orbs = ref([
+  { size: 500, left: -5, top: 10, delay: 0, opacity: 0.6, blur: 0 },
+  { size: 400, left: 80, top: 20, delay: 2, opacity: 0.5, blur: 0 },
+  { size: 300, left: 70, top: 60, delay: 4, opacity: 0.4, blur: 15 },
+  { size: 150, left: 10, top: 80, delay: 1, opacity: 0.6, blur: 0 },
 ]);
 
-let currentElementIndex = null;
-let offset = { x: 0, y: 0 };
-
-const startDrag = (event, index) => {
-  currentElementIndex = index;
-  elements.value[index].isDragging = true;
-  const e = event.touches ? event.touches[0] : event;
-  offset.x = e.clientX - elements.value[index].x;
-  offset.y = e.clientY - elements.value[index].y;
-  window.addEventListener('mousemove', onDrag);
-  window.addEventListener('mouseup', stopDrag);
-  window.addEventListener('touchmove', onDrag, { passive: false });
-  window.addEventListener('touchend', stopDrag);
-};
-
-const onDrag = (event) => {
-  if (currentElementIndex === null) return;
-  const e = event.touches ? event.touches[0] : event;
-  elements.value[currentElementIndex].x = e.clientX - offset.x;
-  elements.value[currentElementIndex].y = e.clientY - offset.y;
-};
-
-const stopDrag = () => {
-  if (currentElementIndex !== null) elements.value[currentElementIndex].isDragging = false;
-  currentElementIndex = null;
-  window.removeEventListener('mousemove', onDrag);
-  window.removeEventListener('mouseup', stopDrag);
-};
+const steps = [
+  { 
+    title: "The Foundation", 
+    desc: "Uncover the core principles of rights and equality. Explore guided modules that break down the laws protecting every student on campus.",
+    tags: ["Knowledge", "Rights"]
+  },
+  { 
+    title: "Scenario Mastery", 
+    desc: "Test your judgment in gamified simulations. Navigate complex campus situations by applying legal standards to reach the best outcome.",
+    tags: ["Gamified", "Scenarios"]
+  },
+  { 
+    title: "Empowered Action", 
+    desc: "Turn your knowledge into impact. Earn leadership badges as you champion a safer, more inclusive environment for your community.",
+    tags: ["Advocacy", "Leadership"]
+  }
+];
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,800;1,500&display=swap');
 
 .liquid-sphere {
-  background: radial-gradient(circle at 35% 35%, #ff47ff 0%, #7d12ff 45%, #1a0240 100%);
-  box-shadow: 
-    inset -15px -15px 40px rgba(0,0,0,0.7),
-    inset 10px 10px 20px rgba(255,255,255,0.15),
-    0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  background: radial-gradient(circle at 35% 35%, #f3e8ff 0%, #a855f7 50%, #6b21a8 100%);
+  box-shadow: inset -10px -10px 30px rgba(0,0,0,0.1), inset 10px 10px 20px rgba(255,255,255,0.7), 0 30px 60px rgba(168,85,247,0.15);
+}
+
+:where(.dark) .liquid-sphere {
+  background: radial-gradient(circle at 35% 35%, #ff5eff 0%, #6e21ff 55%, #080518 100%);
+  box-shadow: inset -15px -15px 50px rgba(0,0,0,0.8), inset 15px 15px 30px rgba(255,255,255,0.15), 0 40px 80px rgba(0,0,0,0.5);
+}
+
+.btn-3d-pink {
+  background: radial-gradient(circle at 30% 30%, #f472b6 0%, #db2777 55%, #831843 100%);
+  box-shadow: inset -8px -8px 15px rgba(0,0,0,0.5), inset 8px 8px 15px rgba(255,255,255,0.3), 0 15px 30px rgba(219,39,119,0.3);
+}
+
+.btn-3d-fuchsia {
+  background: radial-gradient(circle at 30% 30%, #818cf8 0%, #4f46e5 55%, #312e81 100%);
+  box-shadow: inset -8px -8px 15px rgba(0,0,0,0.5), inset 8px 8px 15px rgba(255,255,255,0.2), 0 15px 30px rgba(79,70,229,0.3);
 }
 
 .animate-float {
-  animation: float 15s ease-in-out infinite;
+  animation: float 14s infinite ease-in-out;
 }
 
 @keyframes float {
   0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  33% { transform: translate(20px, -40px) rotate(5deg); }
-  66% { transform: translate(-10px, 20px) rotate(-3deg); }
+  50% { transform: translate(25px, -35px) rotate(4deg); }
 }
-
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #0d0221; }
-::-webkit-scrollbar-thumb { background: #46178f; border-radius: 10px; }
-::selection { background: #d810ff; color: white; }
 </style>

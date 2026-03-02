@@ -254,8 +254,18 @@ class ModuleService {
     try {
         const where = {};
         
-        // 1. TAMANG LOGIC PARA SA PUBLIC VS CLASSROOM
-        if (filters.classroom_id !== undefined) {
+        // 1. HANDLE all_accessible flag - return both public AND accessible classroom modules
+        if (filters.all_accessible === true) {
+            const allowedIds = Array.isArray(filters.accessibleClassroomIds) 
+                ? filters.accessibleClassroomIds.map(id => Number(id)) 
+                : [];
+            
+            // Return modules where classroom_id is NULL (public) OR in accessible classrooms
+            where[Op.or] = [
+                { classroom_id: null },
+                ...(allowedIds.length > 0 ? [{ classroom_id: { [Op.in]: allowedIds } }] : [])
+            ];
+        } else if (filters.classroom_id !== undefined) {
             // Kung ang pinasa ay 'null' na string o null na object, Public modules ang hanapin
             if (filters.classroom_id === 'null' || filters.classroom_id === null) {
                 where.classroom_id = null; 

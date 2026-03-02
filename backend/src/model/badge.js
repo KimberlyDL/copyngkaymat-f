@@ -15,10 +15,46 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Badge.init({
-    iconPath: DataTypes.STRING
+    name: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    description: DataTypes.TEXT,
+    iconPath: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: 'iconPath' // Keep original camelCase column name
+    },
+    cost_xp: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    total_slots: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    claimed_count: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      field: 'createdAt'
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      field: 'updatedAt'
+    }
   }, {
     sequelize,
     modelName: 'badge',
+    tableName: 'badges',
+    underscored: false, // Disable auto snake_case conversion
+    timestamps: true
   });
   return Badge;
 };

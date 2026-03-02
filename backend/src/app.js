@@ -8,9 +8,13 @@ const authRoutes = require('./router/authRoutes');
 const profileRoutes = require('./router/ProfileRoutes');
 const moduleRoutes = require('./router/ModuleRoutes');
 const badgeRoutes = require('./router/badgeRoutes');
+const rewardsRoutes = require('./router/RewardsRoutes');
 const facilitatorRoutes = require('./router/FacilitatorRoutes');
 const quizRoutes = require('./router/QuizRoutes');
 const classroomRoutes = require('./router/ClassroomRoutes');
+const notificationRoutes = require('./router/NotificationRoutes');
+const adminRoutes = require('./router/AdminRoutes');
+const chatbotRoutes = require('./router/ChatbotRoutes');
 
 const app = express();
 
@@ -18,7 +22,7 @@ const app = express();
 app.use(helmet());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://localhost:5000', // - Do NOT use '*' when withCredentials is true
+    origin: ['http://localhost:5000', 'http://127.0.0.1:5000'], // - Do NOT use '*' when withCredentials is true
     credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -39,11 +43,15 @@ app.get('/api/v1/health', async (req, res) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', profileRoutes);
 app.use('/api/v1/badges', badgeRoutes);
+app.use('/api/rewards', rewardsRoutes);
 app.use('/api/modules', moduleRoutes); // Ito ang gagamitin natin (walang v1)
 app.use('/api/v1/classrooms', classroomRoutes);
 app.use('/api/v1/facilitators', facilitatorRoutes);
 app.use('/api/v1/quizzes', quizRoutes);
 app.use('/api/v1/classrooms', classroomRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/chatbot', chatbotRoutes);
 
 // 404 Handler
 app.use((req, res) => {

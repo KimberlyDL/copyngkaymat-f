@@ -38,9 +38,9 @@ function toggleDropdown() {
 <template>
     <div class="relative">
         <a href="#" @click.prevent="toggleDropdown" class="flex items-center justify-between px-3 py-2 rounded-lg 
-             transition-colors duration-150 dark:text-platinum-300 text-abyss-900 text-sm font-heading font-normal hover:bg-sun-100 dark:hover:bg-abyss-800
+             transition-colors duration-150 dark:text-platinum-300 text-abyss-900 text-sm font-heading font-normal hover:bg-purple-100 dark:hover:bg-abyss-800
              group"
-            :class="{ 'text-kaitoke-green-800 dark:text-kaitoke-green-500 text-sm font-heading font-normal': isOpen || isCurrentRouteMatch }">
+            :class="{ 'text-purple-800 dark:text-purple-500 text-sm font-heading font-normal': isOpen || isCurrentRouteMatch }">
             <div class="flex items-center gap-3">
                 <slot name="icon" />
                 <span>{{ label }}</span>

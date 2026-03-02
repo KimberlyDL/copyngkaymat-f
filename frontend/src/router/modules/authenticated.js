@@ -66,7 +66,10 @@ const authenticatedRoutes = [
                 path: 'leaderboard',
                 name: 'user.leaderboard',
                 component: () => import('@/views/dashboard/Leaderboard.vue'),
-                meta: { title: 'Leaderboard' }
+                meta: { 
+                    title: 'Leaderboards',
+                    requiresRole: ['player', 'educator', 'moderator', 'admin']
+                }
             },
             {
                 path: 'settings',
@@ -75,10 +78,16 @@ const authenticatedRoutes = [
                 meta: { title: 'Settings' }
             },
             {
-                path: 'manage-badges',
-                name: 'user.managebadges',
-                component: () => import('@/views/dashboard/ManageBadges.vue'),
-                meta: { title: 'Manage Badges' }
+                path: 'rewards-shop',
+                name: 'user.rewards-shop',
+                component: () => import('@/views/dashboard/RewardsShop.vue'),
+                meta: { title: 'Rewards Shop' }
+            },
+            {
+                path: 'my-inventory',
+                name: 'user.my-inventory',
+                component: () => import('@/views/dashboard/MyInventory.vue'),
+                meta: { title: 'My Inventory' }
             }
         ]
     },
@@ -128,6 +137,12 @@ const authenticatedRoutes = [
                 name: 'facilitator.module-stats',
                 component: () => import('@/views/facilitator/ModuleStats.vue'),
                 meta: { title: 'Module Analytics' }
+            },
+            {
+                path: 'rewards',
+                name: 'facilitator.rewards',
+                component: () => import('@/views/facilitator/RewardsManager.vue'),
+                meta: { title: 'Rewards Manager' }
             }
         ]
     },
@@ -156,6 +171,18 @@ const authenticatedRoutes = [
                 name: 'admin.facilitators',
                 component: () => import('@/views/admin/FacilitatorManagement.vue'),
                 meta: { title: 'Facilitator Management' }
+            },
+            {
+                path: 'students',
+                name: 'admin.students',
+                component: () => import('@/views/admin/AdminStudents.vue'),
+                meta: { title: 'Student Directory' }
+            },
+            {
+                path: 'announcements',
+                name: 'admin.announcements',
+                component: () => import('@/views/admin/AdminAnnouncements.vue'),
+                meta: { title: 'Public Announcements' }
             }
         ]
     },

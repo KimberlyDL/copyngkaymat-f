@@ -1,121 +1,113 @@
 <template>
-    <div class="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 font-['Poppins']">
+    <div class="max-w-4xl mx-auto space-y-8">
         
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-8">
-            <div class="space-y-1">
-                <h3 class="text-2xl font-black text-white uppercase tracking-tighter">
-                    Privacy & <span class="bg-gradient-to-r from-blue-400 to-pink-500 bg-clip-text text-transparent">Visibility</span>
-                </h3>
-                <p class="text-xs text-gray-500 font-medium italic">Control how your data is shared with the ProtectEd community.</p>
-            </div>
+        <!-- Header -->
+        <div>
+            <h3 class="text-sm font-black uppercase tracking-wider text-black dark:text-white">Privacy & Visibility</h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Control who can see your profile and activity.</p>
         </div>
 
-        <div v-if="isLoading" class="py-20 text-center">
-            <div class="inline-block animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full mb-4"></div>
-            <p class="text-[10px] font-black uppercase tracking-widest text-gray-600 animate-pulse">Loading privacy settings...</p>
+        <div v-if="isLoading" class="flex justify-center py-12">
+            <div class="w-8 h-8 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div v-else class="space-y-6">
             
-            <div class="group relative bg-white/[0.02] backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-8 transition-all duration-500 hover:bg-white/[0.05] hover:border-blue-500/30">
-                <div class="flex justify-between items-start mb-6">
-                    <div class="h-12 w-12 rounded-2xl bg-gradient-to-tr from-gray-800 to-gray-900 border border-white/5 flex items-center justify-center text-blue-400">
-                        <GlobeIcon v-if="settings.profile_visibility === 'public'" class="h-6 w-6" />
-                        <LockIcon v-else class="h-6 w-6 opacity-50" />
+            <!-- Profile Visibility -->
+            <div class="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="space-y-1">
+                        <h4 class="text-xs font-black uppercase tracking-wider text-black dark:text-white flex items-center gap-2">
+                            <component :is="settings.profile_visibility === 'public' ? Globe : Lock" class="w-4 h-4 text-purple-600" />
+                            Profile Visibility
+                        </h4>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                            {{ settings.profile_visibility === 'public' 
+                               ? 'Your profile is visible to other ProtectEd users.' 
+                               : 'Your profile is hidden and only visible to you.' }}
+                        </p>
                     </div>
-                    <select v-model="settings.profile_visibility"
-                        class="bg-[#0d0d12] border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none transition-all">
+                    <select v-model="settings.profile_visibility" 
+                        class="block w-full sm:w-40 rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white text-xs font-bold shadow-sm focus:ring-purple-500 focus:border-purple-500 py-3 px-4">
                         <option value="private">Private</option>
                         <option value="public">Public</option>
                     </select>
                 </div>
-                <h4 class="text-sm font-black text-white uppercase tracking-widest mb-2">Profile Visibility</h4>
-                <p class="text-[11px] text-gray-500 font-medium leading-relaxed">
-                    {{ settings.profile_visibility === 'public'
-                        ? 'Your profile is visible to other ProtectEd users'
-                        : 'Your profile is private and only visible to you'
-                    }}
-                </p>
             </div>
 
-            <div class="group relative bg-white/[0.02] backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-8 transition-all duration-500 hover:bg-white/[0.05] hover:border-pink-500/30">
-                <div class="flex justify-between items-start mb-6">
-                    <div class="h-12 w-12 rounded-2xl bg-gradient-to-tr from-gray-800 to-gray-900 border border-white/5 flex items-center justify-center"
-                        :class="settings.allow_messages ? 'text-pink-500' : 'text-gray-600'">
-                        <MessageSquareIcon class="h-6 w-6" />
+            <!-- Toggles Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                
+                <!-- Messages Toggle -->
+                <div class="flex items-center justify-between p-5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl">
+                    <div class="space-y-1">
+                        <h4 class="text-xs font-black uppercase tracking-wider text-black dark:text-white flex items-center gap-2">
+                            <MessageSquare class="w-4 h-4 text-purple-600" />
+                            Direct Messages
+                        </h4>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Allow other users to send you messages.</p>
                     </div>
-                    <div class="relative inline-flex items-center cursor-pointer">
+                    <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" v-model="settings.allow_messages" class="sr-only peer">
-                        <div class="w-11 h-6 bg-white/10 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r from-blue-600 to-pink-600"></div>
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                    </label>
+                </div>
+
+                <!-- Achievements Toggle -->
+                <div class="flex items-center justify-between p-5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl"
+                    :class="{ 'opacity-50 pointer-events-none': settings.profile_visibility !== 'public' }">
+                    <div class="space-y-1">
+                        <h4 class="text-xs font-black uppercase tracking-wider text-black dark:text-white flex items-center gap-2">
+                            <Trophy class="w-4 h-4 text-purple-600" />
+                            Show Achievements
+                        </h4>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Display your badges on your public profile.</p>
                     </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" v-model="settings.show_achievements" :disabled="settings.profile_visibility !== 'public'" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                    </label>
                 </div>
-                <h4 class="text-sm font-black text-white uppercase tracking-widest mb-2">Allow Direct Messages</h4>
-                <p class="text-[11px] text-gray-500 font-medium leading-relaxed">Let other users send you messages through the platform.</p>
-            </div>
 
-            <div class="group relative bg-white/[0.02] border border-white/10 rounded-[2.5rem] p-8 transition-all duration-500"
-                :class="settings.profile_visibility === 'public' ? 'opacity-100 hover:bg-white/[0.05]' : 'opacity-30 cursor-not-allowed'">
-                <div class="flex justify-between items-start mb-6">
-                    <div class="h-12 w-12 rounded-2xl bg-gradient-to-tr from-gray-800 to-gray-900 border border-white/5 flex items-center justify-center"
-                        :class="settings.show_achievements ? 'text-yellow-500' : 'text-gray-600'">
-                        <TrophyIcon class="h-6 w-6" />
+                <!-- Learning Progress Toggle -->
+                <div class="flex items-center justify-between p-5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl"
+                    :class="{ 'opacity-50 pointer-events-none': settings.profile_visibility !== 'public' }">
+                    <div class="space-y-1">
+                        <h4 class="text-xs font-black uppercase tracking-wider text-black dark:text-white flex items-center gap-2">
+                            <Activity class="w-4 h-4 text-purple-600" />
+                            Show Learning Progress
+                        </h4>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Display your module completion stats.</p>
                     </div>
-                    <input type="checkbox" v-model="settings.show_achievements" :disabled="settings.profile_visibility !== 'public'"
-                        class="h-5 w-5 rounded-lg bg-white/5 border-white/10 text-blue-600 focus:ring-blue-500/40" />
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" v-model="settings.show_progress" :disabled="settings.profile_visibility !== 'public'" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                    </label>
                 </div>
-                <h4 class="text-sm font-black text-white uppercase tracking-widest mb-2">Show Achievements</h4>
-                <p class="text-[11px] text-gray-500 font-medium leading-relaxed">Display your badges and completed modules on your public profile.</p>
-                <p v-if="settings.profile_visibility !== 'public'" class="mt-4 text-[9px] font-black text-orange-500 uppercase tracking-widest">Public profile required</p>
             </div>
 
-            <div class="group relative bg-white/[0.02] border border-white/10 rounded-[2.5rem] p-8 transition-all duration-500"
-                :class="settings.profile_visibility === 'public' ? 'opacity-100 hover:bg-white/[0.05]' : 'opacity-30 cursor-not-allowed'">
-                <div class="flex justify-between items-start mb-6">
-                    <div class="h-12 w-12 rounded-2xl bg-gradient-to-tr from-gray-800 to-gray-900 border border-white/5 flex items-center justify-center"
-                        :class="settings.show_progress ? 'text-blue-500' : 'text-gray-600'">
-                        <ActivityIcon class="h-6 w-6" />
+            <!-- Info Box -->
+            <div class="rounded-2xl bg-purple-50 dark:bg-purple-500/10 p-5 border border-purple-100 dark:border-purple-500/20">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <ShieldCheck class="h-5 w-5 text-purple-600" aria-hidden="true" />
                     </div>
-                    <input type="checkbox" v-model="settings.show_progress" :disabled="settings.profile_visibility !== 'public'"
-                        class="h-5 w-5 rounded-lg bg-white/5 border-white/10 text-blue-600 focus:ring-blue-500/40" />
-                </div>
-                <h4 class="text-sm font-black text-white uppercase tracking-widest mb-2">Show Learning Progress</h4>
-                <p class="text-[11px] text-gray-500 font-medium leading-relaxed">Display your learning statistics and module completion status.</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-10 border-t border-white/5">
-            <div class="bg-blue-600/5 border border-blue-500/20 p-8 rounded-[2.5rem] flex gap-5">
-                <ShieldCheckIcon class="h-8 w-8 text-blue-500 shrink-0" />
-                <div>
-                    <h4 class="text-xs font-black text-white uppercase tracking-widest mb-2">Safety & Privacy Protection</h4>
-                    <p class="text-[10px] text-gray-500 leading-relaxed font-medium">Your personal information (address, phone number, emergency contacts) is always kept private and never shared publicly.</p>
-                </div>
-            </div>
-
-            <div class="bg-white/[0.02] border border-white/5 p-8 rounded-[2.5rem]">
-                <h4 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4">What's Visible When Public?</h4>
-                <div class="space-y-2">
-                    <div v-for="item in [
-                        { label: 'Always Visible', text: 'Display name, bio, profile picture', color: 'text-blue-400' },
-                        { label: 'Optional', text: 'Achievements and learning progress', color: 'text-pink-400' },
-                        { label: 'Never Visible', text: 'Email, phone, address, guardian information', color: 'text-red-400' }
-                    ]" :key="item.label" class="flex gap-4">
-                        <span :class="item.color" class="text-[9px] font-black uppercase tracking-widest w-24 shrink-0">{{ item.label }}</span>
-                        <span class="text-[10px] text-gray-400 font-medium">{{ item.text }}</span>
+                    <div class="ml-3">
+                        <h3 class="text-xs font-black uppercase tracking-wider text-purple-800 dark:text-purple-300">Privacy Information</h3>
+                        <div class="mt-2 text-[11px] text-purple-700 dark:text-purple-300/80">
+                            <p>Private personal information (like your exact address, phone number, and emergency contacts) is never shared publicly, regardless of your profile visibility settings.</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="pt-10 flex justify-end gap-4 border-t border-white/5">
-            <button @click="saveSettings" :disabled="isSaving || isLoading"
-                class="px-12 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-pink-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-blue-900/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-500 disabled:opacity-50">
-                <span v-if="!isSaving">Save Privacy Preferences</span>
-                <div v-else class="flex items-center gap-2">
-                    <div class="animate-spin h-3 w-3 border-2 border-white/30 border-t-white rounded-full"></div>
-                    Saving...
-                </div>
-            </button>
+            <div class="pt-6 border-t border-slate-200 dark:border-white/5 flex justify-end">
+                <button @click="saveSettings" :disabled="isSaving || isLoading"
+                    class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-purple-500/25 disabled:opacity-50 transition-all flex items-center gap-2">
+                    <div v-if="isSaving" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    {{ isSaving ? 'Saving...' : 'Save Preferences' }}
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -123,13 +115,12 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import {
-    ShieldCheckIcon,
-    GlobeIcon,
-    LockIcon,
-    TrophyIcon,
-    ActivityIcon,
-    MessageSquareIcon,
-    EyeIcon
+    ShieldCheck,
+    Globe,
+    Lock,
+    Trophy,
+    Activity,
+    MessageSquare
 } from 'lucide-vue-next';
 import { useProfileStore } from '@/stores/profile';
 import { useToast } from '@/utils/useToast';
@@ -184,9 +175,3 @@ watch(() => settings.value.profile_visibility, (newValue) => {
 
 onMounted(() => loadSettings());
 </script>
-
-<style scoped>
-input[type="checkbox"] {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-</style>
