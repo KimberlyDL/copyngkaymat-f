@@ -13,7 +13,7 @@
         </button>
 
         <nav class="hidden sm:flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest italic">
-          <router-link to="/facilitator/dashboard"
+          <router-link :to="{ name: 'facilitator.dashboard' }"
             class="text-slate-400 hover:text-purple-600 transition-colors"
           >
             Archive
@@ -79,7 +79,6 @@ const showLogoutModal = ref(false);
 
 const currentPageTitle = computed(() => route.meta.title || 'Overview');
 
-const createModule = () => router.push('/facilitator/modules/create');
 const handleLogout = async () => {
   try {
     await authStore.logout();

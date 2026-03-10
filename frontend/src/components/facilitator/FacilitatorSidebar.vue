@@ -216,7 +216,7 @@ onMounted(() => {
 
 <style scoped>
 /* Reference for Tailwind v4 engine */
-@reference "../../style.css";
+@reference "@/style.css";
 
 /* External Google Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700;1,900&display=swap');

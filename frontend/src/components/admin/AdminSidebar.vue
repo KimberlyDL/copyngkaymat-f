@@ -1,11 +1,8 @@
 <template>
-    <Transition 
-        enter-active-class="transition-opacity duration-300" 
-        leave-active-class="transition-opacity duration-200" 
-        enter-from-class="opacity-0" 
-        leave-to-class="opacity-0"
-    >
-        <div v-if="sidebarStore.isMobileOpen" class="fixed inset-0 z-40 md:hidden bg-black/40 backdrop-blur-sm" @click="sidebarStore.closeMobile()" />
+    <Transition enter-active-class="transition-opacity duration-300"
+        leave-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-to-class="opacity-0">
+        <div v-if="sidebarStore.isMobileOpen" class="fixed inset-0 z-40 md:hidden bg-black/40 backdrop-blur-sm"
+            @click="sidebarStore.closeMobile()" />
     </Transition>
 
     <aside :class="[
@@ -17,40 +14,53 @@
         isMobileShown && 'w-72 md:hidden shadow-purple-900/20'
     ]">
         <div class="h-full flex flex-col relative overflow-hidden">
-            <div class="absolute -top-10 -left-10 w-40 h-40 bg-purple-600/10 rounded-full blur-[80px] pointer-events-none"></div>
+            <div
+                class="absolute -top-10 -left-10 w-40 h-40 bg-purple-600/10 rounded-full blur-[80px] pointer-events-none">
+            </div>
 
-            <div :class="['flex items-center h-24 relative z-10 transition-all duration-500 border-b border-slate-100 dark:border-white/5', isFull ? 'px-6' : 'justify-center px-0']">
-                <router-link to="/admin/dashboard" class="flex items-center gap-3 group/logo">
+            <div
+                :class="['flex items-center h-24 relative z-10 transition-all duration-500 border-b border-slate-100 dark:border-white/5', isFull ? 'px-6' : 'justify-center px-0']">
+                <router-link :to="{ name: 'admin.dashboard' }" class="flex items-center gap-3 group/logo">
                     <div class="relative flex-shrink-0 transition-transform duration-500" :class="isIcon && 'scale-90'">
-                        <div class="relative w-12 h-12 bg-gradient-to-br from-purple-600 via-fuchsia-600 to-purple-700 rounded-2xl flex items-center justify-center shadow-[0_8px_20px_-4px_rgba(147,51,234,0.5),inset_0_2px_4px_rgba(255,255,255,0.3)] group-hover/logo:rotate-6 transition-all">
+                        <div
+                            class="relative w-12 h-12 bg-gradient-to-br from-purple-600 via-fuchsia-600 to-purple-700 rounded-2xl flex items-center justify-center shadow-[0_8px_20px_-4px_rgba(147,51,234,0.5),inset_0_2px_4px_rgba(255,255,255,0.3)] group-hover/logo:rotate-6 transition-all">
                             <ShieldCheckIcon class="w-7 h-7 text-white" />
                         </div>
                     </div>
-                    
+
                     <transition name="fade">
                         <div v-if="isFull" class="flex flex-col">
-                            <h1 class="text-xl font-black tracking-tighter text-black dark:text-white leading-none uppercase custom-font-poppins">
-                                Protect<span class="bg-gradient-to-r from-purple-600 to-fuchsia-500 dark:from-purple-400 dark:to-fuchsia-400 bg-clip-text text-transparent custom-font-poppins">Ed</span>
+                            <h1
+                                class="text-xl font-black tracking-tighter text-black dark:text-white leading-none uppercase custom-font-poppins">
+                                Protect<span
+                                    class="bg-gradient-to-r from-purple-600 to-fuchsia-500 dark:from-purple-400 dark:to-fuchsia-400 bg-clip-text text-transparent custom-font-poppins">Ed</span>
                             </h1>
-                            <span class="text-[9px] font-black text-black/60 dark:text-purple-300/40 uppercase tracking-[0.3em] mt-1 normal leading-none custom-font-poppins">Admin System</span>
+                            <span
+                                class="text-[9px] font-black text-black/60 dark:text-purple-300/40 uppercase tracking-[0.3em] mt-1 normal leading-none custom-font-poppins">Admin
+                                System</span>
                         </div>
                     </transition>
                 </router-link>
             </div>
 
-            <div :class="['flex items-center py-6 relative z-10', isFull ? 'justify-between px-8' : 'justify-center px-0']">
+            <div
+                :class="['flex items-center py-6 relative z-10', isFull ? 'justify-between px-8' : 'justify-center px-0']">
                 <transition name="fade">
-                    <span v-if="isFull" class="text-[10px] font-black uppercase tracking-[0.2em] text-black dark:text-slate-500 normal custom-font-poppins">Registry</span>
+                    <span v-if="isFull"
+                        class="text-[10px] font-black uppercase tracking-[0.2em] text-black dark:text-slate-500 normal custom-font-poppins">Registry</span>
                 </transition>
                 <button @click="sidebarStore.toggleExpanded()"
                     class="p-2 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-purple-500/50 shadow-sm transition-all group">
-                    <ChevronLeftIcon v-if="isFull" class="h-4 w-4 text-black dark:text-purple-400 group-hover:-translate-x-0.5 transition-transform" />
-                    <ChevronRightIcon v-else class="h-4 w-4 text-black dark:text-purple-400 group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronLeftIcon v-if="isFull"
+                        class="h-4 w-4 text-black dark:text-purple-400 group-hover:-translate-x-0.5 transition-transform" />
+                    <ChevronRightIcon v-else
+                        class="h-4 w-4 text-black dark:text-purple-400 group-hover:translate-x-0.5 transition-transform" />
                 </button>
             </div>
 
             <nav class="flex-1 px-4 space-y-3 overflow-y-auto custom-scrollbar relative z-10 py-2">
-                <button @click="router.push({ name: 'admin.dashboard' })" class="sidebar-btn group" :class="{ 'active-util': route.name === 'admin.dashboard' }">
+                <button @click="router.push({ name: 'admin.dashboard' })" class="sidebar-btn group"
+                    :class="{ 'active-util': route.name === 'admin.dashboard' }">
                     <div :class="['flex items-center gap-4 w-full', isIcon ? 'justify-center' : '']">
                         <div class="icon-container">
                             <LayoutDashboardIcon class="h-5 w-5" />
@@ -59,7 +69,8 @@
                     </div>
                 </button>
 
-                <button @click="router.push({ name: 'admin.facilitators' })" class="sidebar-btn group" :class="{ 'active-util': route.name === 'admin.facilitators' }">
+                <button @click="router.push({ name: 'admin.facilitators' })" class="sidebar-btn group"
+                    :class="{ 'active-util': route.name === 'admin.facilitators' }">
                     <div :class="['flex items-center gap-4 w-full', isIcon ? 'justify-center' : '']">
                         <div class="icon-container">
                             <UsersIcon class="h-5 w-5" />
@@ -68,7 +79,8 @@
                     </div>
                 </button>
 
-                <button @click="router.push({ name: 'admin.students' })" class="sidebar-btn group" :class="{ 'active-util': route.name === 'admin.students' }">
+                <button @click="router.push({ name: 'admin.students' })" class="sidebar-btn group"
+                    :class="{ 'active-util': route.name === 'admin.students' }">
                     <div :class="['flex items-center gap-4 w-full', isIcon ? 'justify-center' : '']">
                         <div class="icon-container">
                             <GraduationCapIcon class="h-5 w-5" />
@@ -77,7 +89,8 @@
                     </div>
                 </button>
 
-                <button @click="router.push({ name: 'admin.reports' })" class="sidebar-btn group" :class="{ 'active-util': route.name === 'admin.reports' }">
+                <button @click="router.push({ name: 'admin.reports' })" class="sidebar-btn group"
+                    :class="{ 'active-util': route.name === 'admin.reports' }">
                     <div :class="['flex items-center gap-4 w-full', isIcon ? 'justify-center' : '']">
                         <div class="icon-container">
                             <ClipboardListIcon class="h-5 w-5" />
@@ -86,7 +99,8 @@
                     </div>
                 </button>
 
-                <button @click="router.push({ name: 'admin.modules' })" class="sidebar-btn group" :class="{ 'active-util': route.name === 'admin.modules' }">
+                <button @click="router.push({ name: 'admin.modules' })" class="sidebar-btn group"
+                    :class="{ 'active-util': route.name === 'admin.modules' }">
                     <div :class="['flex items-center gap-4 w-full', isIcon ? 'justify-center' : '']">
                         <div class="icon-container">
                             <BookOpenIcon class="h-5 w-5" />
@@ -96,33 +110,47 @@
                 </button>
             </nav>
 
-            <div class="mt-auto p-4 relative border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
-                <div :class="['flex items-center bg-white dark:bg-[#151321] border border-slate-200 dark:border-white/10 p-2 rounded-[2rem] transition-all hover:border-purple-500/30 shadow-lg', isIcon ? 'w-14 h-14 justify-center p-0 mx-auto' : 'w-full justify-between gap-3']">
+            <div
+                class="mt-auto p-4 relative border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
+                <div
+                    :class="['flex items-center bg-white dark:bg-[#151321] border border-slate-200 dark:border-white/10 p-2 rounded-[2rem] transition-all hover:border-purple-500/30 shadow-lg', isIcon ? 'w-14 h-14 justify-center p-0 mx-auto' : 'w-full justify-between gap-3']">
                     <div class="flex items-center gap-3 min-w-0" v-if="!isIcon">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 via-fuchsia-600 to-purple-700 flex items-center justify-center text-[11px] font-black text-white shadow-md uppercase border border-white/20 custom-font-poppins">
+                        <div
+                            class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 via-fuchsia-600 to-purple-700 flex items-center justify-center text-[11px] font-black text-white shadow-md uppercase border border-white/20 custom-font-poppins">
                             {{ userInitials }}
                         </div>
                         <div class="flex-1 min-w-0 text-left">
-                            <p class="text-[12px] font-black text-black dark:text-white truncate uppercase tracking-tighter custom-font-poppins leading-none">{{ userName }}</p>
-                            <p class="text-[9px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest normal leading-none mt-1 custom-font-poppins">Administrator</p>
+                            <p
+                                class="text-[12px] font-black text-black dark:text-white truncate uppercase tracking-tighter custom-font-poppins leading-none">
+                                {{ userName }}</p>
+                            <p
+                                class="text-[9px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest normal leading-none mt-1 custom-font-poppins">
+                                Administrator</p>
                         </div>
                     </div>
-                    <button @click="isUserMenuOpen = !isUserMenuOpen" class="text-black dark:text-slate-400 hover:text-purple-600 transition-colors p-1 pr-2">
+                    <button @click="isUserMenuOpen = !isUserMenuOpen"
+                        class="text-black dark:text-slate-400 hover:text-purple-600 transition-colors p-1 pr-2">
                         <MoreVerticalIcon v-if="!isIcon" class="h-4 w-4" />
-                        <div v-else class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center text-[10px] font-black text-white uppercase shadow-md custom-font-poppins">{{ userInitials }}</div>
+                        <div v-else
+                            class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center text-[10px] font-black text-white uppercase shadow-md custom-font-poppins">
+                            {{ userInitials }}</div>
                     </button>
                 </div>
 
                 <Transition name="slide-up">
-                    <div v-if="isUserMenuOpen" :class="[isIcon ? 'absolute left-24 bottom-4' : 'absolute bottom-24 left-4 right-4']"
+                    <div v-if="isUserMenuOpen"
+                        :class="[isIcon ? 'absolute left-24 bottom-4' : 'absolute bottom-24 left-4 right-4']"
                         class="w-56 bg-white dark:bg-[#1a1729] border border-slate-200 dark:border-white/10 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden z-[70]">
-                        <button @click="navigate('/profile')" class="menu-item text-black dark:text-slate-300 custom-font-poppins">
+                        <button @click="navigate('profile')"
+                            class="menu-item text-black dark:text-slate-300 custom-font-poppins">
                             <UserIcon class="h-4 w-4 text-purple-600" /> Account
                         </button>
-                        <button @click="navigate('/settings')" class="menu-item text-black dark:text-slate-300 custom-font-poppins">
+                        <button @click="navigate('settings')"
+                            class="menu-item text-black dark:text-slate-300 custom-font-poppins">
                             <SettingsIcon class="h-4 w-4 text-purple-600" /> Settings
                         </button>
-                        <button @click="isLogoutModalOpen = true; isUserMenuOpen = false" class="menu-item text-red-600 border-none hover:bg-red-50 dark:hover:bg-red-500/5 custom-font-poppins">
+                        <button @click="isLogoutModalOpen = true; isUserMenuOpen = false"
+                            class="menu-item text-red-600 border-none hover:bg-red-50 dark:hover:bg-red-500/5 custom-font-poppins">
                             <LogOutIcon class="h-4 w-4" /> Sign Out
                         </button>
                     </div>
@@ -135,15 +163,23 @@
         <Transition name="fade">
             <div v-if="isLogoutModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
                 <div class="absolute inset-0 bg-black/60 backdrop-blur-md" @click="isLogoutModalOpen = false"></div>
-                <div class="relative bg-white dark:bg-[#12101c] border border-slate-200 dark:border-white/10 rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl flex flex-col items-center">
-                    <div class="w-20 h-20 bg-red-50 dark:bg-red-500/10 rounded-[2.5rem] flex items-center justify-center mb-6 transform -rotate-6 shadow-inner transition-transform hover:rotate-0 duration-500">
+                <div
+                    class="relative bg-white dark:bg-[#12101c] border border-slate-200 dark:border-white/10 rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl flex flex-col items-center">
+                    <div
+                        class="w-20 h-20 bg-red-50 dark:bg-red-500/10 rounded-[2.5rem] flex items-center justify-center mb-6 transform -rotate-6 shadow-inner transition-transform hover:rotate-0 duration-500">
                         <LogOutIcon class="w-10 h-10 text-red-600" />
                     </div>
-                    <h3 class="text-2xl font-black text-black dark:text-white uppercase normal tracking-tighter custom-font-poppins">Sign Out?</h3>
-                    <p class="text-[10px] text-black/70 dark:text-slate-400 mt-2 mb-10 uppercase tracking-[0.2em] font-black leading-relaxed custom-font-poppins text-center">Admin session will be terminated. <br/> Do you want to continue?</p>
+                    <h3
+                        class="text-2xl font-black text-black dark:text-white uppercase normal tracking-tighter custom-font-poppins">
+                        Sign Out?</h3>
+                    <p
+                        class="text-[10px] text-black/70 dark:text-slate-400 mt-2 mb-10 uppercase tracking-[0.2em] font-black leading-relaxed custom-font-poppins text-center">
+                        Admin session will be terminated. <br /> Do you want to continue?</p>
                     <div class="grid grid-cols-2 gap-4 w-full custom-font-poppins font-black">
-                        <button @click="isLogoutModalOpen = false" class="px-6 py-4 bg-slate-100 dark:bg-white/5 rounded-full text-[10px] uppercase text-black/60 hover:bg-slate-200 transition-all">Cancel</button>
-                        <button @click="handleLogout" :disabled="isLoggingOut" class="px-6 py-4 bg-red-600 rounded-full text-[10px] text-white uppercase shadow-lg shadow-red-900/40 hover:scale-105 transition-all">Confirm</button>
+                        <button @click="isLogoutModalOpen = false"
+                            class="px-6 py-4 bg-slate-100 dark:bg-white/5 rounded-full text-[10px] uppercase text-black/60 hover:bg-slate-200 transition-all">Cancel</button>
+                        <button @click="handleLogout" :disabled="isLoggingOut"
+                            class="px-6 py-4 bg-red-600 rounded-full text-[10px] text-white uppercase shadow-lg shadow-red-900/40 hover:scale-105 transition-all">Confirm</button>
                     </div>
                 </div>
             </div>
@@ -157,10 +193,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useSidebarStore } from '@/stores/stores'
 import {
-    ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, 
+    ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon,
     Users as UsersIcon, BookOpen as BookOpenIcon, GraduationCap as GraduationCapIcon,
-    ClipboardList as ClipboardListIcon, MoreVertical as MoreVerticalIcon, 
-    User as UserIcon, Settings as SettingsIcon, LogOut as LogOutIcon, 
+    ClipboardList as ClipboardListIcon, MoreVertical as MoreVerticalIcon,
+    User as UserIcon, Settings as SettingsIcon, LogOut as LogOutIcon,
     LayoutDashboard as LayoutDashboardIcon, ShieldCheck as ShieldCheckIcon
 } from 'lucide-vue-next'
 
@@ -181,9 +217,9 @@ const userInitials = computed(() => {
     return (f + l).toUpperCase();
 })
 
-const navigate = (path) => {
+const navigate = (routeName) => {
     isUserMenuOpen.value = false;
-    router.push(path);
+    router.push({ name: routeName });
 }
 
 const handleLogout = async () => {
@@ -224,15 +260,15 @@ onMounted(() => {
 }
 
 /* Sidebar Button base styles */
-.sidebar-btn { 
-    @apply w-full rounded-full transition-all duration-300 px-4 py-3 text-left flex items-center text-black/70 dark:text-slate-500 hover:bg-purple-500/5 hover:text-purple-600; 
+.sidebar-btn {
+    @apply w-full rounded-full transition-all duration-300 px-4 py-3 text-left flex items-center text-black/70 dark:text-slate-500 hover:bg-purple-500/5 hover:text-purple-600;
 }
 
 /* 3D Pill Active State */
-.active-util { 
+.active-util {
     @apply relative overflow-hidden scale-[1.03] !text-white;
     background: linear-gradient(135deg, #9333ea 0%, #c026d3 100%);
-    box-shadow: 
+    box-shadow:
         0 12px 24px -8px rgba(147, 51, 234, 0.6),
         inset 0 2px 4px rgba(255, 255, 255, 0.35),
         inset 0 -2px 4px rgba(0, 0, 0, 0.15);
@@ -242,15 +278,15 @@ onMounted(() => {
 .active-util::before {
     content: '';
     @apply absolute inset-0 opacity-30 pointer-events-none;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, transparent 60%);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7) 0%, transparent 60%);
 }
 
 .icon-container {
     @apply p-2 rounded-full bg-slate-100 dark:bg-white/5 transition-all duration-300;
 }
 
-.active-util .icon-container { 
-    @apply bg-white/20 shadow-none !text-white; 
+.active-util .icon-container {
+    @apply bg-white/20 shadow-none !text-white;
 }
 
 .nav-text {
@@ -258,23 +294,44 @@ onMounted(() => {
     font-family: 'Poppins', sans-serif !important;
 }
 
-.active-util .nav-text, 
-.active-util svg { 
-    @apply !text-white drop-shadow-md; 
+.active-util .nav-text,
+.active-util svg {
+    @apply !text-white drop-shadow-md;
 }
 
 /* Profile menu item styles */
-.menu-item { 
-    @apply w-full flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase hover:text-purple-600 hover:bg-purple-500/5 transition-all border-b border-slate-100 dark:border-white/5 last:border-none; 
+.menu-item {
+    @apply w-full flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase hover:text-purple-600 hover:bg-purple-500/5 transition-all border-b border-slate-100 dark:border-white/5 last:border-none;
     font-family: 'Poppins', sans-serif !important;
 }
 
-.custom-scrollbar::-webkit-scrollbar { width: 4px; }
-.custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-slate-200 dark:bg-white/10 rounded-full; }
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 dark:bg-white/10 rounded-full;
+}
 
 /* Transitions */
-.slide-up-enter-active, .slide-up-leave-active { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translateY(15px) scale(0.95); }
-.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.slide-up-enter-active,
+.slide-up-leave-active {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+    opacity: 0;
+    transform: translateY(15px) scale(0.95);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
 </style>
