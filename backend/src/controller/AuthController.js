@@ -3,13 +3,14 @@ const jwt = require('jsonwebtoken');
 const jwtService = require('../services/JwtService');
 const { getDeviceInfo } = require('../middleware/AuthMiddleware');
 const emailService = require('../services/EmailService');
+const isProd = process.env.NODE_ENV === 'production';
 
 const setRefreshCookie = (res, token) => {
     res.cookie('refresh_token', token, {
         httpOnly: true, // Invisible to frontend JS
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'None', // Allows cross-site/third-party integration
-        path: '/api/refresh', // Security: only send to the refresh route
+        sameSite: isProd ? 'None' : 'Lax', // Allows cross-site/third-party integration
+        path: '/api/v1/auth/refresh', // Security: only send to the refresh route
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 };
