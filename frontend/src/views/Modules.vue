@@ -66,7 +66,7 @@
       </div>
     </section>
 
-    <CreateModuleModal v-if="showCreateModal" @saved="handleModuleCreated" @cancel="showCreateModal = false" />
+    <Teleport to="body"><CreateModuleModal v-if="showCreateModal" @saved="handleModuleCreated" @cancel="showCreateModal = false" /></Teleport>
   </div>
 </template>
 

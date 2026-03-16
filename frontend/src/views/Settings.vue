@@ -19,7 +19,7 @@
             <aside class="w-full lg:w-56 shrink-0">
                 <nav class="card p-2 space-y-1">
                     <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id"
-                        class="settings-nav-btn w-full"
+                        class="settings-nav-btn group w-full"
                         :class="activeTab === tab.id ? 'settings-nav-active' : 'settings-nav-inactive'">
 
                         <!-- Icon wrapper -->
@@ -164,7 +164,7 @@ onMounted(async () => {
 }
 
 .settings-nav-btn {
-    @apply group flex items-center gap-3 px-3 py-2.5 text-xs font-semibold rounded-xl transition-all text-left;
+    @apply flex items-center gap-3 px-3 py-2.5 text-xs font-semibold rounded-xl transition-all text-left;
 }
 
 .settings-nav-active {
