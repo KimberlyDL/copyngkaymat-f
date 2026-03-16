@@ -64,13 +64,13 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("jwt"); // Ensure this key matches your setAuthToken key
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
+// api.interceptors.request.use((config) => {
+//     const token = localStorage.getItem("jwt"); // Ensure this key matches your setAuthToken key
+//     if (token) {
+//         config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+// });
 
 // Response Interceptor: Handle 401s via Silent Refresh
 api.interceptors.response.use(
