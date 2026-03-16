@@ -1,140 +1,250 @@
 <template>
-    <div class="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-        <div class="fixed inset-0 bg-slate-900/60 dark:bg-[#020203]/90 backdrop-blur-md transition-opacity" @click="$emit('cancel')"></div>
+    <!-- ── Overlay ──────────────────────────────────────────────────
+         Block scroll container — modal is never cropped on short screens
+    ─────────────────────────────────────────────────────────────── -->
+    <div
+        class="fixed inset-0 z-[150] bg-abyss-950/60 backdrop-blur-sm overflow-y-auto py-10 px-4"
+        @click.self="$emit('cancel')"
+    >
+        <!-- ── Modal shell ────────────────────────────────────────
+             L1 layer: platinum-100 / abyss-700
+             border-2 border-platinum-300 = stamped boundary
+        ─────────────────────────────────────────────────────── -->
+        <div class="modal-shell animate-modal font-poppins">
 
-        <div class="relative w-full max-w-3xl bg-white dark:bg-[#0d0d12] border border-slate-200 dark:border-white/10 rounded-[3rem] shadow-2xl overflow-hidden animate-in font-['Poppins'] text-black dark:text-white flex flex-col max-h-[95vh]">
-            
-            <header class="px-8 py-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-white/[0.01]">
-                <div class="flex items-center gap-5">
-                    <div class="h-10 w-1 bg-purple-600 rounded-full"></div>
-                    <div class="space-y-0.5">
-                        <h2 class="text-xl font-black uppercase tracking-tighter italic leading-none">
-                            New <span class="text-purple-600">Unit</span>
+            <!-- ── HEADER ────────────────────────────────────── -->
+            <header class="modal-header">
+                <div class="flex items-center gap-4">
+                    <!-- Accent stamp -->
+                    <div class="ds-icon-badge ds-icon-badge--lavender">
+                        <BookOpenIcon class="w-4 h-4" />
+                    </div>
+                    <div>
+                        <p class="section-eyebrow">Module Registry</p>
+                        <h2 class="font-madimione text-2xl text-abyss-800 dark:text-platinum-100 leading-tight">
+                            Create a <span class="brand-gradient-text">New Module</span>
                         </h2>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Initialize Registry Entry</p>
                     </div>
                 </div>
-                <button @click="$emit('cancel')" class="p-2 text-slate-400 hover:text-purple-600 transition-all text-2xl leading-none">&times;</button>
+                <button
+                    @click="$emit('cancel')"
+                    class="close-btn"
+                    aria-label="Close"
+                >
+                    <XIcon class="w-4 h-4" />
+                </button>
             </header>
 
-            <form @submit.prevent="handleSubmit" class="p-8 space-y-6 overflow-y-auto custom-scrollbar flex-1">
-                
-                <div class="grid grid-cols-1 gap-5">
-                    <div class="space-y-1.5">
-                        <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1 italic">Destination Hub</label>
-                        <div class="relative">
-                            <select v-model="form.classroom_id"
-                                class="w-full px-5 py-3.5 rounded-2xl bg-slate-100 dark:bg-[#0d0d12] border border-slate-200 dark:border-white/10 text-black dark:text-white text-xs font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-purple-500/30 appearance-none transition-all cursor-pointer shadow-inner">
-                                <option :value="null">🌍 Public Access</option>
-                                <option v-for="cls in classroomStore.classrooms" :key="cls.id" :value="cls.id">
-                                    🔒 {{ cls.name }}
-                                </option>
+            <!-- ── FORM ──────────────────────────────────────── -->
+            <form @submit.prevent="handleSubmit" class="modal-body custom-scrollbar space-y-5">
+
+                <!-- Classroom assignment -->
+                <div class="field-group">
+                    <label class="field-label">Classroom Assignment</label>
+                    <div class="ds-select-wrap">
+                        <select v-model="form.classroom_id" class="ds-select">
+                            <option :value="null">🌍 Public Access (All Students)</option>
+                            <option v-for="cls in classroomStore.classrooms" :key="cls.id" :value="cls.id">
+                                🔒 {{ cls.name }}
+                            </option>
+                        </select>
+                        <ChevronDownIcon class="ds-select-icon" />
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <div class="field-group">
+                    <label class="field-label">
+                        Module Title <span class="text-red-400">*</span>
+                    </label>
+                    <input
+                        v-model="form.title"
+                        type="text"
+                        required
+                        placeholder="e.g. Introduction to GAD Awareness"
+                        class="input-field placeholder:text-platinum-700 dark:placeholder:text-platinum-400"
+                    />
+                </div>
+
+                <!-- Category + Difficulty row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="field-group">
+                        <label class="field-label">Category <span class="text-red-400">*</span></label>
+                        <div class="ds-select-wrap">
+                            <select v-model="form.category" required class="ds-select">
+                                <option value="gad">Institutional</option>
+                                <option value="sexual_health">Health</option>
+                                <option value="vawc">Safety</option>
+                                <option value="general">Standard</option>
                             </select>
-                            <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-purple-600 text-[10px]">▼</div>
+                            <ChevronDownIcon class="ds-select-icon" />
                         </div>
                     </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Lesson Title</label>
-                        <input v-model="form.title" type="text" required placeholder="Unit Name"
-                            class="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-black dark:text-white text-sm outline-none focus:ring-2 focus:ring-purple-500/30 transition-all shadow-inner font-bold" />
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div class="space-y-1.5">
-                            <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Category Type</label>
-                            <div class="relative">
-                                <select v-model="form.category" required
-                                    class="w-full px-5 py-3.5 rounded-2xl bg-slate-100 dark:bg-[#0d0d12] border border-slate-200 dark:border-white/10 text-black dark:text-white text-xs font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-purple-500/30 appearance-none cursor-pointer">
-                                    <option value="gad">Institutional</option>
-                                    <option value="sexual_health">Health</option>
-                                    <option value="vawc">Safety</option>
-                                    <option value="general">Standard</option>
-                                </select>
-                                <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-purple-600 text-[10px]">▼</div>
-                            </div>
+                    <div class="field-group">
+                        <label class="field-label">Difficulty Level</label>
+                        <div class="ds-select-wrap">
+                            <select v-model="form.difficulty_level" class="ds-select">
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                            <ChevronDownIcon class="ds-select-icon" />
                         </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Asset Level</label>
-                            <div class="relative">
-                                <select v-model="form.difficulty_level"
-                                    class="w-full px-5 py-3.5 rounded-2xl bg-slate-100 dark:bg-[#0d0d12] border border-slate-200 dark:border-white/10 text-black dark:text-white text-xs font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-purple-500/30 appearance-none cursor-pointer">
-                                    <option value="beginner">Beginner</option>
-                                    <option value="intermediate">Intermediate</option>
-                                    <option value="advanced">Advanced</option>
-                                </select>
-                                <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-purple-600 text-[10px]">▼</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <label class="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Summary</label>
-                        <textarea v-model="form.description" rows="2" placeholder="Brief lesson overview"
-                            class="w-full px-6 py-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-black dark:text-white text-sm outline-none focus:ring-2 focus:ring-purple-500/30 transition-all resize-none shadow-inner font-bold"></textarea>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                    <div class="p-5 bg-slate-50 dark:bg-[#0b0b0f] border border-slate-100 dark:border-white/5 rounded-3xl space-y-3">
-                        <label class="text-[9px] font-black uppercase tracking-widest text-purple-600 flex items-center gap-2 italic">
-                            <FileIcon class="w-3.5 h-3.5" /> Payload File
+                <!-- Description -->
+                <div class="field-group">
+                    <label class="field-label">Description</label>
+                    <textarea
+                        v-model="form.description"
+                        rows="3"
+                        placeholder="Brief overview of this module's objectives…"
+                        class="input-field resize-none placeholder:text-platinum-700 dark:placeholder:text-platinum-400"
+                    ></textarea>
+                    <p class="field-subtext">Optional — visible to students on the module card.</p>
+                </div>
+
+                <!-- File uploads row ────────────────────────────
+                     L2 inset tiles: platinum-200 / abyss-600
+                ──────────────────────────────────────────────── -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    <!-- Module file -->
+                    <div class="upload-tile">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="ds-icon-badge ds-icon-badge--lavender !p-1.5">
+                                <FileIcon class="w-3.5 h-3.5" />
+                            </div>
+                            <span class="font-semibold text-sm text-abyss-800 dark:text-platinum-100">Module File</span>
+                        </div>
+                        <label class="upload-zone cursor-pointer">
+                            <input
+                                type="file"
+                                accept=".pdf,.doc,.docx"
+                                @change="handleFileSelect"
+                                class="absolute inset-0 opacity-0 cursor-pointer z-10"
+                            />
+                            <UploadIcon class="w-4 h-4 text-platinum-500 dark:text-platinum-400 shrink-0" />
+                            <span class="field-subtext truncate !text-sm">
+                                {{ moduleFile ? moduleFile.name : 'Select PDF or Word document' }}
+                            </span>
                         </label>
-                        <div class="relative cursor-pointer">
-                            <input type="file" accept=".pdf,.doc,.docx" @change="handleFileSelect" 
-                                class="absolute inset-0 opacity-0 cursor-pointer z-10" />
-                            <div class="flex items-center gap-3 p-3 bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 group-hover:border-purple-600 transition-all shadow-sm">
-                                <UploadIcon class="w-3.5 h-3.5 text-slate-400" />
-                                <span class="text-[9px] text-slate-500 font-bold truncate italic">{{ moduleFile ? moduleFile.name : 'Select PDF/Word' }}</span>
-                            </div>
-                        </div>
+                        <p class="field-subtext mt-2">PDF or .docx · max 25 MB</p>
                     </div>
 
-                    <div class="p-5 bg-slate-50 dark:bg-[#0b0b0f] border border-slate-100 dark:border-white/5 rounded-3xl space-y-3">
-                        <label class="text-[9px] font-black uppercase tracking-widest text-purple-600 flex items-center gap-2 italic">
-                            <ImageIcon class="w-3.5 h-3.5" /> Thumbnail
+                    <!-- Thumbnail -->
+                    <div class="upload-tile">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="ds-icon-badge ds-icon-badge--pink !p-1.5">
+                                <ImageIcon class="w-3.5 h-3.5" />
+                            </div>
+                            <span class="font-semibold text-sm text-abyss-800 dark:text-platinum-100">Cover Thumbnail</span>
+                        </div>
+                        <label class="upload-zone cursor-pointer">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                @change="handleThumbnailSelect"
+                                class="absolute inset-0 opacity-0 cursor-pointer z-10"
+                            />
+                            <ImageIcon class="w-4 h-4 text-platinum-500 dark:text-platinum-400 shrink-0" />
+                            <span class="field-subtext truncate !text-sm">
+                                {{ thumbnail ? thumbnail.name : 'Select cover image' }}
+                            </span>
                         </label>
-                        <div class="relative cursor-pointer">
-                            <input type="file" accept="image/*" @change="handleThumbnailSelect" 
-                                class="absolute inset-0 opacity-0 cursor-pointer z-10" />
-                            <div class="flex items-center gap-3 p-3 bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 group-hover:border-purple-600 transition-all shadow-sm">
-                                <ImageIcon class="w-3.5 h-3.5 text-slate-400" />
-                                <span class="text-[9px] text-slate-500 font-bold truncate italic">{{ thumbnail ? thumbnail.name : 'Select Cover' }}</span>
-                            </div>
-                        </div>
+                        <p class="field-subtext mt-2">Any image format · max 5 MB</p>
                     </div>
+
                 </div>
 
-                <div class="flex items-center gap-10 p-6 bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 rounded-[2.2rem]">
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input v-model="form.is_published" type="checkbox" class="h-5 w-5 rounded-lg border-slate-200 dark:border-white/10 text-purple-600 focus:ring-purple-500/30" />
-                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-purple-600 transition-colors italic">Online</span>
+                <!-- Visibility toggles ──────────────────────────
+                     L2 inset row: platinum-200 / abyss-600
+                ──────────────────────────────────────────────── -->
+                <div class="toggle-row">
+                    <label class="toggle-item group">
+                        <input
+                            v-model="form.is_published"
+                            type="checkbox"
+                            class="toggle-checkbox"
+                        />
+                        <div class="toggle-track">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-sm text-abyss-800 dark:text-platinum-100
+                                       group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400 transition-colors">
+                                Published
+                            </p>
+                            <p class="field-subtext">Visible to students immediately</p>
+                        </div>
                     </label>
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input v-model="form.is_featured" type="checkbox" class="h-5 w-5 rounded-lg border-slate-200 dark:border-white/10 text-purple-600 focus:ring-purple-500/30" />
-                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500 group-hover:text-purple-600 transition-colors italic">Priority</span>
+
+                    <div class="w-px self-stretch bg-platinum-300 dark:bg-abyss-500 hidden md:block"></div>
+
+                    <label class="toggle-item group">
+                        <input
+                            v-model="form.is_featured"
+                            type="checkbox"
+                            class="toggle-checkbox"
+                        />
+                        <div class="toggle-track">
+                            <div class="toggle-thumb"></div>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-sm text-abyss-800 dark:text-platinum-100
+                                       group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400 transition-colors">
+                                Featured
+                            </p>
+                            <p class="field-subtext">Highlighted in the module library</p>
+                        </div>
                     </label>
                 </div>
+
+                <!-- Inline error -->
+                <div v-if="error" class="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800/40">
+                    <AlertCircleIcon class="w-4 h-4 text-red-500 shrink-0" />
+                    <p class="text-sm font-medium text-red-600 dark:text-red-400">{{ error }}</p>
+                </div>
+
             </form>
 
-            <footer class="px-8 py-6 border-t border-slate-100 dark:border-white/5 flex items-center justify-end gap-5 bg-slate-50 dark:bg-white/[0.01]">
-                <button type="button" @click="$emit('cancel')" 
-                    class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-black dark:hover:text-white transition-all italic">
-                    Dismiss
+            <!-- ── FOOTER ─────────────────────────────────────── -->
+            <footer class="modal-footer">
+                <button
+                    type="button"
+                    @click="$emit('cancel')"
+                    class="btn-secondary btn-3d--secondary justify-center flex-1 max-w-[160px]"
+                >
+                    Cancel
                 </button>
-                <button type="button" @click="handleSubmit" :disabled="creating"
-                    class="btn-3d-purple flex-1 max-w-[240px] py-4 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
-                    <span v-if="!creating">Create Unit</span>
-                    <div v-else class="animate-spin h-3.5 w-3.5 border-2 border-white/30 border-t-white rounded-full"></div>
+                <button
+                    type="button"
+                    @click="handleSubmit"
+                    :disabled="creating"
+                    class="btn-primary btn-3d justify-center flex-1 max-w-[240px] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <span v-if="!creating">Create Module</span>
+                    <div v-else class="spinner !w-4 !h-4 !border-2 !border-white/30 !border-t-white"></div>
                 </button>
             </footer>
+
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import { X as XIcon, Upload as UploadIcon, Image as ImageIcon, AlertCircle as AlertCircleIcon, FileIcon } from 'lucide-vue-next';
+import {
+    X as XIcon,
+    Upload as UploadIcon,
+    Image as ImageIcon,
+    AlertCircle as AlertCircleIcon,
+    FileIcon,
+    ChevronDown as ChevronDownIcon,
+    BookOpen as BookOpenIcon
+} from 'lucide-vue-next';
 import { useModuleStore } from '@/stores/module';
 import { useClassroomStore } from '@/stores/classroom';
 
@@ -220,27 +330,192 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.btn-3d-purple {
-  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
-  box-shadow: 0 10px 20px -5px rgba(124, 58, 237, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+@reference "@/style.css";
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL SHELL  —  L1 layer
+   Light: platinum-100 on platinum-50 page / scrim
+   Dark:  abyss-700 on abyss-950 scrim
+═══════════════════════════════════════════════════════════ */
+.modal-shell {
+    @apply relative w-full max-w-3xl mx-auto flex flex-col;
+    @apply bg-platinum-100 dark:bg-abyss-700;
+    @apply border-2 border-platinum-300 dark:border-abyss-500;
+    @apply rounded-2xl overflow-hidden;
 }
 
-@keyframes zoomIn {
-    from { opacity: 0; transform: scale(0.97) translateY(20px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+/* ── Header ───────────────────────────────────────────────── */
+.modal-header {
+    @apply flex items-center justify-between shrink-0;
+    @apply px-7 py-5;
+    @apply bg-platinum-200 dark:bg-abyss-600;
+    @apply border-b-2 border-platinum-300 dark:border-abyss-500;
 }
-.animate-in { animation: zoomIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-.custom-scrollbar::-webkit-scrollbar { width: 4px; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.2); border-radius: 10px; }
+/* ── Body (scrollable form area) ──────────────────────────── */
+.modal-body {
+    @apply flex-1 overflow-y-auto px-7 py-6;
+}
 
-/* Fixed select option colors for Light Mode */
+/* ── Footer ───────────────────────────────────────────────── */
+.modal-footer {
+    @apply flex items-center justify-end gap-3 shrink-0;
+    @apply px-7 py-5;
+    @apply bg-platinum-200 dark:bg-abyss-600;
+    @apply border-t-2 border-platinum-300 dark:border-abyss-500;
+}
+
+/* ── Close button ─────────────────────────────────────────── */
+.close-btn {
+    @apply p-2 rounded-xl shrink-0 transition-all duration-150;
+    @apply bg-platinum-300 dark:bg-abyss-500;
+    @apply border-2 border-platinum-300 dark:border-abyss-400;
+    @apply text-platinum-600 dark:text-platinum-400;
+    @apply hover:bg-red-50 dark:hover:bg-red-900/20;
+    @apply hover:border-red-200 dark:hover:border-red-800/40;
+    @apply hover:text-red-500 dark:hover:text-red-400;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIELD GROUP
+═══════════════════════════════════════════════════════════ */
+.field-group {
+    @apply space-y-1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SELECT  —  L2 inset: platinum-200 / abyss-600
+═══════════════════════════════════════════════════════════ */
+.ds-select-wrap {
+    @apply relative;
+}
+
+.ds-select {
+    @apply w-full appearance-none cursor-pointer;
+    @apply bg-platinum-200 dark:bg-abyss-600;
+    @apply border-2 border-platinum-300 dark:border-abyss-500;
+    @apply hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700;
+    @apply text-abyss-800 dark:text-platinum-200;
+    @apply font-medium text-sm;
+    @apply rounded-xl px-4 py-3 pr-10;
+    @apply focus:outline-none focus:ring-2 focus:ring-calm-lavender-400/40 focus:border-calm-lavender-400;
+    @apply transition-all duration-150;
+}
+
+.ds-select-icon {
+    @apply absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none;
+    @apply w-4 h-4 text-platinum-500 dark:text-platinum-400;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ICON BADGE  —  bordered stamp (reused from dashboard)
+═══════════════════════════════════════════════════════════ */
+.ds-icon-badge {
+    @apply p-2.5 rounded-xl border-2 shrink-0 flex items-center justify-center;
+}
+
+.ds-icon-badge--lavender {
+    @apply bg-calm-lavender-50 dark:bg-calm-lavender-900/20;
+    @apply border-calm-lavender-200 dark:border-calm-lavender-800/40;
+    @apply text-calm-lavender-600 dark:text-calm-lavender-400;
+}
+
+.ds-icon-badge--pink {
+    @apply bg-neon-pink-50 dark:bg-neon-pink-900/20;
+    @apply border-neon-pink-200 dark:border-neon-pink-800/40;
+    @apply text-neon-pink-600 dark:text-neon-pink-400;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UPLOAD TILE  —  L2 inset: platinum-200 / abyss-600
+═══════════════════════════════════════════════════════════ */
+.upload-tile {
+    @apply p-4 rounded-xl;
+    @apply bg-platinum-200 dark:bg-abyss-600;
+    @apply border-2 border-platinum-300 dark:border-abyss-500;
+}
+
+.upload-zone {
+    @apply relative flex items-center gap-3 p-3 rounded-xl transition-all duration-150;
+    @apply bg-platinum-50 dark:bg-abyss-700;
+    @apply border-2 border-platinum-300 dark:border-abyss-500 border-dashed;
+    @apply hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700;
+    @apply hover:bg-calm-lavender-50/50 dark:hover:bg-calm-lavender-900/10;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOGGLE ROW  —  L2 inset: platinum-200 / abyss-600
+═══════════════════════════════════════════════════════════ */
+.toggle-row {
+    @apply flex flex-col md:flex-row items-start md:items-center gap-5 p-4 rounded-xl;
+    @apply bg-platinum-200 dark:bg-abyss-600;
+    @apply border-2 border-platinum-300 dark:border-abyss-500;
+}
+
+.toggle-item {
+    @apply flex items-center gap-3 cursor-pointer flex-1;
+}
+
+/* Hide the native checkbox — replaced by custom toggle */
+.toggle-checkbox {
+    @apply sr-only;
+}
+
+.toggle-track {
+    @apply relative w-10 h-6 rounded-full shrink-0 transition-colors duration-200;
+    @apply bg-platinum-300 dark:bg-abyss-500;
+    @apply border-2 border-platinum-400 dark:border-abyss-400;
+}
+
+/* Active state via peer — when checkbox is checked */
+.toggle-checkbox:checked ~ .toggle-track {
+    @apply bg-calm-lavender-500 border-calm-lavender-600;
+}
+
+.toggle-thumb {
+    @apply absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform duration-200;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-checkbox:checked ~ .toggle-track .toggle-thumb {
+    @apply translate-x-4;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FLAT-3D BUTTON MODIFIERS
+═══════════════════════════════════════════════════════════ */
+.btn-3d {
+    @apply border-b-4 border-black/10 active:border-b active:translate-y-px;
+}
+
+.btn-3d--secondary {
+    @apply border-b-4 border-platinum-400 dark:border-abyss-400 active:border-b active:translate-y-px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL ENTRY ANIMATION  —  no blur filter
+═══════════════════════════════════════════════════════════ */
+.animate-modal {
+    animation: modalEntry 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalEntry {
+    from { opacity: 0; transform: scale(0.97) translateY(16px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ── Scrollbar ──────────────────────────────────────────── */
+.custom-scrollbar::-webkit-scrollbar { width: 3px; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-platinum-300 dark:bg-abyss-500;
+}
+
+/* ── Select option colors (browser override) ────────────── */
 select option {
-    background-color: white;
-    color: black;
+    @apply bg-platinum-50 text-abyss-800;
 }
+
 .dark select option {
-    background-color: #0d0d12;
-    color: white;
+    @apply bg-abyss-600 text-platinum-100;
 }
 </style>
