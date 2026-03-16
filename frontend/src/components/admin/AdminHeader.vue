@@ -11,12 +11,12 @@
                 </button>
 
                 <nav
-                    class="hidden sm:flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest italic">
+                    class="hidden sm:flex items-center space-x-3 text-sm font-black uppercase tracking-widest italic">
                     <router-link :to="{ name: 'admin.dashboard' }"
                         class="text-slate-400 hover:text-purple-600 dark:hover:text-fuchsia-500 transition-colors">
-                        ADMIN
+                        HOME
                     </router-link>
-                    <ChevronRightIcon class="h-2.5 w-2.5 text-slate-300 dark:text-slate-700" />
+                    <ChevronRightIcon class="h-3.5 w-3.5 text-slate-300 dark:text-slate-700" />
                     <span class="text-purple-600 dark:text-fuchsia-400">
                         {{ currentPageTitle }}
                     </span>
