@@ -66,7 +66,8 @@
             </p>
         </div>
 
-        <CreateClassroomModal v-if="showCreateModal" @close="showCreateModal = false" @created="handleCreated" />
+        <Teleport to="body"><CreateClassroomModal v-if="showCreateModal" @close="showCreateModal = false" @created="handleCreated" /></Teleport>
+        
         <JoinClassroomModal v-if="showJoinModal" @close="showJoinModal = false" @join="handleJoin" />
     </div>
 </template>

@@ -127,7 +127,8 @@
                                 <CheckCircle v-if="reward.is_active" class="w-3.5 h-3.5" />
                                 <span v-else>On</span>
                             </button>
-                            <button @click="deleteReward(reward)"
+                            <!-- Delete — opens ConfirmModal instead of browser confirm() -->
+                            <button @click="promptDelete(reward)"
                                 class="flex items-center justify-center py-1.5 rounded-lg text-xs font-medium bg-red-50 dark:bg-red-900/20 hover:bg-red-500 hover:text-white text-red-500 border border-red-200 dark:border-red-800/40 transition-all"
                                 title="Delete">
                                 <Trash2 class="w-3.5 h-3.5" />
@@ -138,55 +139,12 @@
             </div>
 
             <!-- Pagination Bar -->
-            <div v-if="totalPages > 1"
-                class="flex items-center justify-between gap-4 pt-2 border-t border-platinum-200 dark:border-abyss-600">
-
-                <!-- Result count -->
-                <p class="field-subtext shrink-0">
-                    Showing
-                    <span class="font-medium text-slate-700 dark:text-platinum-200">
-                        {{ (currentPage - 1) * PAGE_SIZE + 1 }}–{{ Math.min(currentPage * PAGE_SIZE, sortedRewards.length) }}
-                    </span>
-                    of
-                    <span class="font-medium text-slate-700 dark:text-platinum-200">{{ sortedRewards.length }}</span>
-                    rewards
-                </p>
-
-                <!-- Page controls -->
-                <div class="flex items-center gap-1.5">
-
-                    <!-- Prev -->
-                    <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1"
-                        class="flex items-center justify-center w-9 h-9 rounded-xl border-2 text-sm font-medium transition-all
-                               border-platinum-200 dark:border-abyss-500 bg-white dark:bg-abyss-700
-                               text-slate-500 dark:text-platinum-400
-                               hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700 hover:text-calm-lavender-600 dark:hover:text-calm-lavender-400
-                               disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-platinum-200 dark:disabled:hover:border-abyss-500 disabled:hover:text-slate-500">
-                        <ChevronLeft class="w-4 h-4" />
-                    </button>
-
-                    <!-- Page numbers -->
-                    <button v-for="page in pageNumbers" :key="page"
-                        @click="goToPage(page)"
-                        :class="['flex items-center justify-center w-9 h-9 rounded-xl border-2 text-sm font-medium transition-all',
-                            page === currentPage
-                                ? 'bg-calm-lavender-600 dark:bg-calm-lavender-700 border-calm-lavender-700 dark:border-calm-lavender-600 text-white'
-                                : 'bg-white dark:bg-abyss-700 border-platinum-200 dark:border-abyss-500 text-slate-600 dark:text-platinum-300 hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700 hover:text-calm-lavender-600 dark:hover:text-calm-lavender-400']">
-                        {{ page }}
-                    </button>
-
-                    <!-- Next -->
-                    <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages"
-                        class="flex items-center justify-center w-9 h-9 rounded-xl border-2 text-sm font-medium transition-all
-                               border-platinum-200 dark:border-abyss-500 bg-white dark:bg-abyss-700
-                               text-slate-500 dark:text-platinum-400
-                               hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700 hover:text-calm-lavender-600 dark:hover:text-calm-lavender-400
-                               disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-platinum-200 dark:disabled:hover:border-abyss-500 disabled:hover:text-slate-500">
-                        <ChevronRight class="w-4 h-4" />
-                    </button>
-
-                </div>
-            </div>
+            <AppPagination
+                v-model="currentPage"
+                :total="sortedRewards.length"
+                :page-size="PAGE_SIZE"
+                item-label="rewards"
+            />
 
         </div>
 
@@ -212,7 +170,7 @@
             </button>
         </div>
 
-        <!-- Create / Edit Modal -->
+        <!-- ── Create / Edit Modal ─────────────────────────── -->
         <Teleport to="body">
             <Transition name="fade">
                 <div v-if="showModal" class="modal-overlay">
@@ -295,14 +253,34 @@
                 </div>
             </Transition>
         </Teleport>
+
+        <!-- ── Delete Confirmation Modal ──────────────────────
+             Global ConfirmModal from @/components/ui
+             Handles its own Teleport internally
+        ─────────────────────────────────────────────────────── -->
+        <ConfirmModal
+            :is-open="showDeleteModal"
+            variant="danger"
+            title="Delete Reward?"
+            :message="`You are about to permanently remove &quot;${rewardToDelete?.title || rewardToDelete?.name || 'this reward'}&quot;.`"
+            warning-text="This will also remove the reward from all student inventories and cannot be undone."
+            confirm-label="Delete Reward"
+            cancel-label="Cancel"
+            :loading="isDeleting"
+            @confirm="confirmDelete"
+            @cancel="cancelDelete"
+        />
+
     </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { Gift, Plus, Package, CheckCircle, Users, Trash2, Loader2, ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-vue-next';
+import { Gift, Plus, Package, CheckCircle, Users, Trash2, Loader2, ArrowUpDown } from 'lucide-vue-next';
 import { useToast } from '@/utils/useToast';
 import axios from '@/utils/api';
+import AppPagination from '@/components/ui/AppPagination.vue';
+import ConfirmModal from '@/components/ui/ConfirmModal.vue';
 
 const toast = useToast();
 const rewards = ref([]);
@@ -319,6 +297,11 @@ const form = ref({
     iconPath: '',
     is_active: true
 });
+
+// ── Delete confirm state ─────────────────────────────────────
+const showDeleteModal = ref(false);
+const rewardToDelete = ref(null);
+const isDeleting = ref(false);
 
 const activeCount = computed(() => rewards.value.filter(r => r.is_active).length);
 const totalClaims = computed(() => rewards.value.reduce((sum, r) => sum + (r.claimed_count || 0), 0));
@@ -356,28 +339,10 @@ const sortedRewards = computed(() => {
 const PAGE_SIZE = 5;
 const currentPage = ref(1);
 
-const totalPages = computed(() => Math.max(1, Math.ceil(sortedRewards.value.length / PAGE_SIZE)));
-
 const paginatedRewards = computed(() => {
     const start = (currentPage.value - 1) * PAGE_SIZE;
     return sortedRewards.value.slice(start, start + PAGE_SIZE);
 });
-
-// Visible page numbers (max 5 buttons, centred on currentPage)
-const pageNumbers = computed(() => {
-    const total = totalPages.value;
-    if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
-    const current = currentPage.value;
-    let start = Math.max(1, current - 2);
-    const end = Math.min(total, start + 4);
-    start = Math.max(1, end - 4);
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-});
-
-const goToPage = (page) => {
-    if (page < 1 || page > totalPages.value) return;
-    currentPage.value = page;
-};
 
 // Reset to page 1 whenever rewards list changes
 watch(() => rewards.value.length, () => { currentPage.value = 1; });
@@ -389,12 +354,10 @@ const handleImageError = (event) => {
 const loadRewards = async () => {
     isLoading.value = true;
     try {
-        // Get ALL rewards (including inactive) for facilitator management
         const { data } = await axios.get('/api/rewards/all');
         rewards.value = data.rewards || [];
     } catch (err) {
         console.error('Failed to load rewards:', err);
-        // Fallback to available rewards if all endpoint fails
         try {
             const { data } = await axios.get('/api/rewards/available');
             rewards.value = data || [];
@@ -468,15 +431,33 @@ const toggleActive = async (reward) => {
     }
 };
 
-const deleteReward = async (reward) => {
-    if (!confirm(`Delete "${reward.title || reward.name}"? This will also remove it from all student inventories.`)) return;
+// ── Delete flow ──────────────────────────────────────────────
+// Step 1: user clicks trash icon → open modal
+const promptDelete = (reward) => {
+    rewardToDelete.value = reward;
+    showDeleteModal.value = true;
+};
 
+// Step 2: user clicks Cancel in modal
+const cancelDelete = () => {
+    showDeleteModal.value = false;
+    rewardToDelete.value = null;
+};
+
+// Step 3: user clicks Delete Reward in modal
+const confirmDelete = async () => {
+    if (!rewardToDelete.value) return;
+    isDeleting.value = true;
     try {
-        await axios.delete(`/api/rewards/${reward.id}`);
+        await axios.delete(`/api/rewards/${rewardToDelete.value.id}`);
         toast.success('Reward deleted');
         loadRewards();
     } catch (err) {
         toast.error('Failed to delete reward');
+    } finally {
+        isDeleting.value = false;
+        showDeleteModal.value = false;
+        rewardToDelete.value = null;
     }
 };
 
