@@ -562,6 +562,10 @@ font-black	900	Poppins-Black.ttf */
     @apply hover:text-calm-lavender-600 dark:hover:text-calm-lavender-400 transition-colors;
   }
 
+  .nav-active {
+    @apply bg-platinum-50 dark:bg-abyss-900;
+}
+
   /* --- Avatar --- */
   .avatar-sm {
     @apply w-8 h-8 rounded-lg bg-slate-100 dark:bg-abyss-500 border border-slate-200 dark:border-abyss-400;

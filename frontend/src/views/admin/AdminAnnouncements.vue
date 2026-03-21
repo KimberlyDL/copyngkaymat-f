@@ -56,8 +56,8 @@
                     <span :class="['badge', getPriorityBadgeClass(announcement.priority)]">
                         {{ announcement.priority }}
                     </span>
-                    <span :class="['badge', announcement.status === 'active' ? 'badge-lavender' : 'badge-muted']">
-                        {{ announcement.status }}
+                    <span :class="['badge', effectiveStatus(announcement) === 'active' ? 'badge-green' : 'badge-muted']">
+                        {{ effectiveStatus(announcement) === 'active' ? 'Published' : 'Unpublished' }}
                     </span>
                 </div>
 
@@ -81,7 +81,14 @@
                             <div class="flex items-center gap-1.5">
                                 <CalendarIcon class="h-3.5 w-3.5 text-platinum-500" />
                                 <span class="font-mplusrounded text-xs text-platinum-600 dark:text-platinum-500">
-                                    {{ formatDate(announcement.created_at) }}
+                                    {{ formatDate(announcement.createdAt) }}
+                                </span>
+                            </div>
+                            <!-- Expiry badge -->
+                            <div v-if="announcement.expires_at" class="flex items-center gap-1.5">
+                                <ClockIcon class="h-3.5 w-3.5" :class="isExpired(announcement.expires_at) ? 'text-red-400' : 'text-vawc-orange-400'" />
+                                <span class="font-mplusrounded text-xs" :class="isExpired(announcement.expires_at) ? 'text-red-500 dark:text-red-400' : 'text-vawc-orange-500 dark:text-vawc-orange-400'">
+                                    {{ isExpired(announcement.expires_at) ? 'Expired' : 'Expires' }} {{ formatDate(announcement.expires_at) }}
                                 </span>
                             </div>
                         </div>
@@ -180,11 +187,48 @@
                                     <label class="field-label">Status</label>
                                     <div class="ds-select-wrap">
                                         <select v-model="form.status" class="ds-select">
-                                            <option value="active">Active</option>
-                                            <option value="archived">Archived</option>
+                                            <option value="active">Published</option>
+                                            <option value="archived">Unpublished</option>
                                         </select>
                                         <ChevronDownIcon class="ds-select-icon" />
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Expiry date — split date + time inputs (avoids native popup theming issues) -->
+                            <div class="space-y-1.5">
+                                <label class="field-label">
+                                    Expires At
+                                    <span class="font-mplusrounded text-xs text-platinum-500 dark:text-platinum-400 font-normal ml-1">(optional — leave blank to never expire)</span>
+                                </label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <input
+                                        v-model="expiryDate"
+                                        type="date"
+                                        :min="minExpiryDateOnly"
+                                        class="date-input w-full"
+                                        @change="syncExpiryDateTime"
+                                    />
+                                    <input
+                                        v-model="expiryTime"
+                                        type="time"
+                                        class="date-input w-full"
+                                        :disabled="!expiryDate"
+                                        @change="syncExpiryDateTime"
+                                    />
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <p v-if="form.expires_at" class="font-mplusrounded text-xs text-calm-lavender-600 dark:text-calm-lavender-400">
+                                        Will hide from users after {{ formatDate(form.expires_at) }}
+                                    </p>
+                                    <button
+                                        v-if="expiryDate"
+                                        type="button"
+                                        @click="clearExpiry"
+                                        class="font-mplusrounded text-xs text-platinum-500 dark:text-platinum-400 hover:text-red-500 dark:hover:text-red-400 transition-colors ml-auto"
+                                    >
+                                        Clear expiry
+                                    </button>
                                 </div>
                             </div>
 
@@ -224,10 +268,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onUnmounted } from 'vue';
 import {
     PlusIcon, MegaphoneIcon, PencilIcon, TrashIcon,
-    XIcon, UserIcon, CalendarIcon,
+    XIcon, UserIcon, CalendarIcon, Clock as ClockIcon,
     ChevronDown as ChevronDownIcon
 } from 'lucide-vue-next';
 import api from '@/utils/api';
@@ -241,12 +285,25 @@ const isSaving = ref(false);
 const isDeleting = ref(false);
 const isEditing = ref(false);
 const selectedAnnouncement = ref(null);
+let refreshTimer = null;
+
+// Reactive now — ticked every 60s so expired cards auto-unpublish without reload
+const now = ref(new Date());
+
+// Derive effective status: if active but expires_at is past, treat as archived
+const effectiveStatus = (ann) => {
+    if (ann.status === 'active' && ann.expires_at && new Date(ann.expires_at) <= now.value) {
+        return 'archived';
+    }
+    return ann.status;
+};
 
 const form = ref({
     title: '',
     content: '',
     priority: 'normal',
-    status: 'active'
+    status: 'active',
+    expires_at: null
 });
 
 const deleteMessage = computed(() =>
@@ -272,6 +329,40 @@ const formatDate = (dateStr) => {
     });
 };
 
+const isExpired = (dateStr) => dateStr && new Date(dateStr) < new Date();
+
+// Split date + time state for the custom expiry picker
+const expiryDate = ref('');
+const expiryTime = ref('00:00');
+const minExpiryDateOnly = new Date().toISOString().slice(0, 10);
+
+const syncExpiryDateTime = () => {
+    if (expiryDate.value) {
+        const time = expiryTime.value || '00:00';
+        form.value.expires_at = `${expiryDate.value}T${time}`;
+    } else {
+        form.value.expires_at = null;
+    }
+};
+
+const clearExpiry = () => {
+    expiryDate.value = '';
+    expiryTime.value = '00:00';
+    form.value.expires_at = null;
+};
+
+// Seed expiryDate/expiryTime when editing an existing announcement
+const seedExpiryFields = (isoString) => {
+    if (isoString) {
+        const d = new Date(isoString);
+        expiryDate.value = d.toISOString().slice(0, 10);
+        expiryTime.value = d.toTimeString().slice(0, 5);
+    } else {
+        expiryDate.value = '';
+        expiryTime.value = '00:00';
+    }
+};
+
 const fetchAnnouncements = async () => {
     isLoading.value = true;
     try {
@@ -286,7 +377,8 @@ const fetchAnnouncements = async () => {
 
 const openCreateModal = () => {
     isEditing.value = false;
-    form.value = { title: '', content: '', priority: 'normal', status: 'active' };
+    form.value = { title: '', content: '', priority: 'normal', status: 'active', expires_at: null };
+    seedExpiryFields(null);
     showModal.value = true;
 };
 
@@ -297,8 +389,10 @@ const editAnnouncement = (announcement) => {
         title: announcement.title,
         content: announcement.content,
         priority: announcement.priority,
-        status: announcement.status
+        status: announcement.status,
+        expires_at: announcement.expires_at || null
     };
+    seedExpiryFields(announcement.expires_at);
     showModal.value = true;
 };
 
@@ -345,7 +439,14 @@ const deleteAnnouncement = async () => {
 };
 
 import { onMounted } from 'vue';
-onMounted(() => fetchAnnouncements());
+onMounted(() => {
+    fetchAnnouncements();
+    refreshTimer = setInterval(() => { now.value = new Date(); }, 60_000);
+});
+
+onUnmounted(() => {
+    clearInterval(refreshTimer);
+});
 </script>
 
 <style scoped>
@@ -487,4 +588,71 @@ select option {
 .dark select option {
     @apply bg-abyss-600 text-platinum-100;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   DATE + TIME INPUTS — fully themed, no native popup
+═══════════════════════════════════════════════════════════ */
+.date-input {
+    @apply appearance-none cursor-pointer transition-all duration-150;
+    @apply bg-platinum-200 dark:bg-abyss-600;
+    @apply border-2 border-platinum-300 dark:border-abyss-500;
+    @apply hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700;
+    @apply text-abyss-800 dark:text-platinum-200;
+    @apply font-medium text-sm;
+    @apply rounded-xl px-4 py-3;
+    @apply focus:outline-none focus:ring-2 focus:ring-calm-lavender-400/40 focus:border-calm-lavender-400;
+    @apply disabled:opacity-40 disabled:cursor-not-allowed;
+    color-scheme: light;
+    /* Force text to start from left — no internal padding offsets */
+    padding-left: 1rem !important;
+}
+
+:global(.dark) .date-input {
+    color-scheme: dark;
+}
+
+/* Nuke all native browser chrome on date/time inputs */
+.date-input::-webkit-calendar-picker-indicator,
+.date-input::-webkit-inner-spin-button,
+.date-input::-webkit-outer-spin-button,
+.date-input::-webkit-clear-button {
+    display: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Field segment colors */
+.date-input::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+
+.date-input::-webkit-datetime-edit-text {
+    @apply text-platinum-400 dark:text-platinum-500;
+    padding: 0 1px;
+}
+
+.date-input::-webkit-datetime-edit-month-field,
+.date-input::-webkit-datetime-edit-day-field,
+.date-input::-webkit-datetime-edit-year-field,
+.date-input::-webkit-datetime-edit-hour-field,
+.date-input::-webkit-datetime-edit-minute-field,
+.date-input::-webkit-datetime-edit-ampm-field {
+    @apply rounded px-0.5;
+}
+
+.date-input::-webkit-datetime-edit-month-field:focus,
+.date-input::-webkit-datetime-edit-day-field:focus,
+.date-input::-webkit-datetime-edit-year-field:focus,
+.date-input::-webkit-datetime-edit-hour-field:focus,
+.date-input::-webkit-datetime-edit-minute-field:focus,
+.date-input::-webkit-datetime-edit-ampm-field:focus {
+    @apply bg-calm-lavender-100 dark:bg-calm-lavender-900/40;
+    @apply text-calm-lavender-700 dark:text-calm-lavender-300;
+    outline: none;
+}
+
 </style>
