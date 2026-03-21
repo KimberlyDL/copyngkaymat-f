@@ -226,8 +226,7 @@ const refreshQuizzes = async () => {
 };
 
 const handleBack = () => {
-  const name = route.path.startsWith('') ? 'facilitator.modules' : 'user.modules';
-  router.push({ name });
+router.push({ name: isPlayer.value ? 'user.modules' : 'facilitator.modules' });
 };
 // @TODO Fix Navigation
 

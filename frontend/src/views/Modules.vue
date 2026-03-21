@@ -94,7 +94,12 @@ const canManageModules = computed(() => {
 });
 
 const viewModule = (id) => {
-  router.push({ name: 'user.module', params: { id } });
+  const role = authStore.user?.role;
+  const isFacilitator = ['admin', 'educator', 'moderator'].includes(role);
+  router.push({
+      name: isFacilitator ? 'facilitator.modules.detail' : 'ModuleDetail',
+      params: { id }
+  });
 };
 
 const handleModuleCreated = async () => {

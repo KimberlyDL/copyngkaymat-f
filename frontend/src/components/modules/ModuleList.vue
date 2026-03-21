@@ -130,12 +130,14 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useModuleStore } from '@/stores/module';
+import { useAuthStore } from '@/stores/auth';
 import ModuleCard from './ModuleCard.vue';
 import AppPagination from '@/components/ui/AppPagination.vue';
 import { Search as SearchIcon, ChevronDown as ChevronDownIcon, X as XIcon, BookOpen as BookOpenIcon } from 'lucide-vue-next';
 
 const router = useRouter();
 const moduleStore = useModuleStore();
+const authStore = useAuthStore();
 
 const localFilters = ref({
     search: '',
@@ -209,7 +211,12 @@ const resetFilters = async () => {
 };
 
 const viewModule = (id) => {
-    router.push({ name: 'facilitator.modules.detail', params: { id } });
+    const role = authStore.user?.role;
+    const isFacilitator = ['admin', 'educator', 'moderator'].includes(role);
+    router.push({
+        name: isFacilitator ? 'facilitator.modules.detail' : 'ModuleDetail',
+        params: { id }
+    });
 };
 
 const formatLabel = (value) => {
