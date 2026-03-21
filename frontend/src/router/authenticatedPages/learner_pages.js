@@ -35,18 +35,18 @@ export const learnerPages = [
         component: () => import('@/views/ModuleDetail.vue'),
         meta: { title: 'Learning Module' }
     },
-    {
-        path: 'learning-paths/:id',
-        name: 'user.learning-path',
-        component: () => import('@/views/dashboard/LearningPath.vue'),
-        meta: { title: 'Learning Path' }
-    },
-    {
-        path: 'leaderboard',
-        name: 'user.leaderboard',
-        component: () => import('@/views/dashboard/Leaderboard.vue'),
-        meta: { title: 'Leaderboards' }
-    },
+    // {
+    //     path: 'learning-paths/:id',
+    //     name: 'user.learning-path',
+    //     component: () => import('@/views/dashboard/LearningPath.vue'),
+    //     meta: { title: 'Learning Path' }
+    // },
+    // {
+    //     path: 'leaderboard',
+    //     name: 'user.leaderboard',
+    //     component: () => import('@/views/dashboard/Leaderboard.vue'),
+    //     meta: { title: 'Leaderboards' }
+    // },
     {
         path: 'rewards-shop',
         name: 'user.rewards-shop',
