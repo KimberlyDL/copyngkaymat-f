@@ -1,5 +1,10 @@
 <template>
-  <div class="page-wrapper animate-in">
+  <div class="page-wrapper animate-in">      
+    
+    <button @click="handleBack" class="back-btn group w-fit">
+        <ArrowLeftIcon class="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+        <span>Back to Library</span>
+      </button>
     <div class="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
       <!-- Sidebar -->
@@ -285,6 +290,7 @@ import {
   School as SchoolIcon,
   BookOpen as BookOpenIcon,
   ArrowRight as ArrowRightIcon,
+  ArrowLeft as ArrowLeftIcon,
   Plus as PlusIcon,
   Megaphone as MegaphoneIcon,
   Pencil as PencilIcon,
@@ -434,6 +440,10 @@ watch(activeTab, (newTab) => {
   if (newTab === 'Progress' && isFacilitator.value) fetchProgressReport();
   if (newTab === 'Feed') fetchAnnouncements();
 });
+
+const handleBack = () => {
+router.push({ name: isFacilitator.value ? 'facilitator.classrooms' : 'classrooms.index' });
+};
 
 onMounted(() => {
   fetchClassroomDetails();
