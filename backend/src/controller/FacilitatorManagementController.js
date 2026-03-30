@@ -1,9 +1,8 @@
 // src/controller/FacilitatorManagementController.js
-const { User } = require('../model');
+const { User, Module, Classroom, ClassroomMember, Sequelize  } = require('../model');
 const { Op } = require('sequelize');
 const crypto = require('crypto');
 const emailService = require('../services/EmailService');
-
 /**
  * Admin: Create facilitator account
  */
@@ -254,6 +253,48 @@ exports.deleteFacilitator = async (req, res, next) => {
             message: 'Facilitator account deleted successfully.'
         });
     } catch (error) {
+        next(error);
+    }
+};
+
+exports.getDashboardStats = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+ 
+        // 1. Total modules created by this facilitator
+        const totalModules = await Module.count({
+            where: { created_by: userId }
+        });
+ 
+        // 2. All classrooms owned by this facilitator
+        const classrooms = await Classroom.findAll({
+            where: { created_by: userId },
+            attributes: ['id']
+        });
+ 
+        const totalClassrooms = classrooms.length;
+        const classroomIds = classrooms.map(c => c.id);
+ 
+        // 3. Unique students across all their classrooms
+        let totalStudents = 0;
+        if (classroomIds.length > 0) {
+            totalStudents = await ClassroomMember.count({
+                where: { classroom_id: classroomIds },
+                distinct: true,
+                col: 'user_id'
+            });
+        }
+ 
+        return res.status(200).json({
+            success: true,
+            stats: {
+                total_modules: totalModules,
+                total_classrooms: totalClassrooms,
+                total_students: totalStudents
+            }
+        });
+    } catch (error) {
+        console.error('getDashboardStats error:', error);
         next(error);
     }
 };
