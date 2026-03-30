@@ -429,7 +429,7 @@ const handleSubmit = async () => {
     error.value = null;
     try {
         const files = { moduleFile: moduleFile.value, thumbnail: thumbnail.value };
-        await moduleStore.createModule(form, files);
+        await moduleStore.createModule({ ...form}, files);
         emit('saved');
     } catch (err) {
         error.value = err.response?.data?.message || 'Setup failed';
