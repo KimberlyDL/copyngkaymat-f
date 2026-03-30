@@ -48,7 +48,6 @@ app.use('/api/modules', moduleRoutes); // Ito ang gagamitin natin (walang v1)
 app.use('/api/v1/classrooms', classroomRoutes);
 app.use('/api/v1/facilitators', facilitatorRoutes);
 app.use('/api/v1/quizzes', quizRoutes);
-app.use('/api/v1/classrooms', classroomRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/chatbot', chatbotRoutes);
