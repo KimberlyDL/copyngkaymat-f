@@ -32,5 +32,23 @@ export const adminPages = [
         name: 'admin.announcements',
         component: () => import('@/views/admin/AdminAnnouncements.vue'),
         meta: { title: 'Public Announcements' }
-    }
+    },
+    {
+        path: 'modules',
+        name: 'admin.modules',
+        component: () => import('@/views/Modules.vue'),
+        meta: { title: 'My Modules' }
+    },
+    {
+        path: 'modules/:id',
+        name: 'admin.module.detail',
+        component: () => import('@/views/ModuleDetail.vue'),
+        meta: { title: 'Learning Module' }
+    },
+    //     {
+    //     path: 'reports',
+    //     name: 'admin.reports',
+    //     component: () => import('@/views/admin/AdminReports.vue'),
+    //     meta: { title: 'Reports' }
+    // },
 ];

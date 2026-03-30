@@ -29,12 +29,12 @@ export const learnerPages = [
         component: () => import('@/views/Modules.vue'),
         meta: { title: 'Learning Modules' }
     },
-    {
-        path: 'modules/:id',
-        name: 'user.module.detail',
-        component: () => import('@/views/ModuleDetail.vue'),
-        meta: { title: 'Learning Module' }
-    },
+{
+    path: 'modules/:id',
+    name: 'user.module.detail',
+    component: () => import('@/views/ModuleDetail.vue'),
+    meta: { title: 'Learning Module' }
+},
     // {
     //     path: 'learning-paths/:id',
     //     name: 'user.learning-path',
