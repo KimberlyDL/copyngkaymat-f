@@ -226,7 +226,7 @@ class ModuleService {
                     {
                         model: Classroom,
                         as: 'classroom',
-                        attributes: ['id', 'name']
+                        attributes: ['id', 'name', 'join_code']
                     }
                 ]
             });
