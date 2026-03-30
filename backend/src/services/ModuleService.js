@@ -226,7 +226,8 @@ class ModuleService {
                     {
                         model: Classroom,
                         as: 'classroom',
-                        attributes: ['id', 'name', 'join_code']
+                        attributes: ['id', 'name', 'join_code'],
+                        required: false
                     }
                 ]
             });
@@ -312,7 +313,13 @@ class ModuleService {
                     model: User,
                     as: 'creator',
                     attributes: ['id', 'name', 'email']
-                }],
+                },
+            {                                          // 👈 add this
+            model: Classroom,
+            as: 'classroom',
+            attributes: ['id', 'name', 'join_code'],
+            required: false                        // LEFT JOIN — keeps public modules
+        }],
                 order: [['created_at', 'DESC']],
                 limit,
                 offset,

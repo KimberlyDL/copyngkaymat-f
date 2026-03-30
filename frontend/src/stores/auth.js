@@ -106,8 +106,13 @@ async function login({ email, password }) {
         }
     }
 
+async function requestPasswordReset(email) {
+  const res = await api.post('/api/v1/auth/forgot-password', { email })
+  return res.data
+}
+    
     return {
         user, isLoading, isGoogleLoading, isAuthenticated, me, pendingEmail, activeSessions,
-        signup, login, logout, fetchUser, restoreSession, changePassword
+        signup, login, logout, fetchUser, restoreSession, changePassword, requestPasswordReset
     };
 });

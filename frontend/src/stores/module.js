@@ -139,11 +139,15 @@ export const useModuleStore = defineStore('module', () => {
                 if (files.thumbnail) formData.append('thumbnail', files.thumbnail);
 
                 // 2. Text Data fields
-                Object.keys(data).forEach(key => {
-                    if (data[key] !== null && data[key] !== undefined) {
-                        formData.append(key, data[key]);
-                    }
-                });
+Object.keys(data).forEach(key => {
+    const value = data[key];
+    if (value === null || value === undefined) return;
+    if (typeof value === 'boolean') {
+        formData.append(key, value ? '1' : '0');
+    } else {
+        formData.append(key, value);
+    }
+});
 
                 response = await api.post('/api/modules', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
