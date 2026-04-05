@@ -55,33 +55,33 @@ export const useAuthStore = defineStore("auth", () => {
         return await fetchUser();
     }
 
-async function login({ email, password }) {
-    isLoading.value = true;
-    try {
-        const res = await api.post("/api/v1/auth/login", { email, password });
-        const token = res?.data?.token;
+    async function login({ email, password }) {
+        isLoading.value = true;
+        try {
+            const res = await api.post("/api/v1/auth/login", { email, password });
+            const token = res?.data?.token;
 
-        if (!token) throw new Error("Login failed: Access token missing.");
+            if (!token) throw new Error("Login failed: Access token missing.");
 
-        setAuthToken(token);
-        user.value = res.data.user;
-        
-        // 🟢 Alisin ang toast.success dito kung mayroon man, sa component na lang
-        return { ok: true, user: user.value };
-    } catch (e) {
-        // 🔴 ALISIN ang toast.error(message) dito!
-        // Hayaan ang LoginNew.vue o ang API interceptor ang magpakita ng error.
-        
-        const data = e?.response?.data;
-        throw e; // I-throw lang ang error pabalik sa component
-    } finally {
-        isLoading.value = false;
+            setAuthToken(token);
+            user.value = res.data.user;
+
+            // 🟢 Alisin ang toast.success dito kung mayroon man, sa component na lang
+            return { ok: true, user: user.value };
+        } catch (e) {
+            // 🔴 ALISIN ang toast.error(message) dito!
+            // Hayaan ang LoginNew.vue o ang API interceptor ang magpakita ng error.
+
+            const data = e?.response?.data;
+            throw e; // I-throw lang ang error pabalik sa component
+        } finally {
+            isLoading.value = false;
+        }
     }
-}
 
     async function logout() {
-        try { 
-            await apiLogout(); 
+        try {
+            await apiLogout();
             toast.info("Session ended. You have been safely logged out.");
         } catch (error) {
             console.error("Logout error:", error);
@@ -106,13 +106,24 @@ async function login({ email, password }) {
         }
     }
 
-async function requestPasswordReset(email) {
-  const res = await api.post('/api/v1/auth/forgot-password', { email })
-  return res.data
-}
-    
+    async function performPasswordReset(payload) {
+        isLoading.value = true;
+        try {
+            const { data } = await api.post("/api/v1/auth/reset-password", payload);
+            return { ok: true, message: data.message };
+        } catch (e) {
+            throw e; // Let the component handle the toast
+        } finally {
+            isLoading.value = false;
+        }
+    }
+    async function requestPasswordReset(email) {
+        const res = await api.post('/api/v1/auth/forgot-password', { email })
+        return res.data
+    }
+
     return {
         user, isLoading, isGoogleLoading, isAuthenticated, me, pendingEmail, activeSessions,
-        signup, login, logout, fetchUser, restoreSession, changePassword, requestPasswordReset
+        signup, login, logout, fetchUser, restoreSession, changePassword, requestPasswordReset, performPasswordReset
     };
 });
