@@ -39,7 +39,6 @@ export const roleGuard = async (to, from, next) => {
                 : [to.meta.requiresRole]
 
             if (!requiredRoles.includes(userRole)) {
-                // Pinagandang Access Denied message gamit ang Toast
                 toast.error('Access Denied: You do not have permission to view this section')
 
                 const redirectMap = {
