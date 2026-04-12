@@ -119,6 +119,19 @@
                     </div>
                 </nav>
 
+<router-link 
+    :to="{ name: 'user.behavioral-assessment' }" 
+    class="menu-item group"
+    active-class="active-link"
+>
+    <div class="flex items-center gap-4">
+        <div class="p-2 rounded-lg bg-platinum-100 dark:bg-abyss-700 group-hover:bg-calm-lavender-100 dark:group-hover:bg-calm-lavender-900/30 transition-colors">
+            <component :is="'ActivityIcon'" class="w-4 h-4" />
+        </div>
+        <span v-if="isFull" class="menu-text">Behavioral AI</span>
+    </div>
+</router-link>
+
                 <!-- Profile trigger -->
                 <div class="mt-auto p-4 relative border-t border-platinum-200 dark:border-abyss-600 container-bg">
                     <div ref="profileTriggerRef" @click="profileMenuOpen = !profileMenuOpen"
@@ -195,7 +208,7 @@ import ConfirmLogoutModal from '@/components/ui/ConfirmLogoutModal.vue'
 import {
     ChevronLeft, ChevronRight, Library, Gift, Package,
     MoreVertical, User as UserIcon, Settings, LogOut,
-    LayoutDashboard, School, ShieldCheck as ShieldCheckIcon, Trophy
+    LayoutDashboard, School, ShieldCheck as ShieldCheckIcon, Trophy, ActivityIcon
 } from 'lucide-vue-next'
 
 const route = useRoute()

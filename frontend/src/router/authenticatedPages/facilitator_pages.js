@@ -35,7 +35,7 @@ export const facilitatorPages = [
     },
     {
         path: 'modules/:id',
-        name: 'facilitator.module.detail',
+        name: 'facilitator.modules.detail',
         component: () => import('@/views/ModuleDetail.vue'),
         meta: { title: 'Learning Module' }
     },
@@ -49,6 +49,12 @@ export const facilitatorPages = [
         path: 'rewards',
         name: 'facilitator.rewards',
         component: () => import('@/views/facilitator/RewardsManager.vue'),
-        meta: { title: 'Rewards Manager' }
-    }
+        meta: { title: 'Rewards Manager',requiresAuth: true, role: 'facilitator' }
+    },
+    {
+        path: 'ml-analytics',
+        name: 'facilitator.ml-analytics',
+        component: () => import('@/views/facilitator/MLAnalytics.vue'),
+        meta: { title: 'ML Analytics Dashboard' }
+    },
 ];

@@ -16,15 +16,21 @@ class ModuleController {
                 return res.status(400).json({ success: false, message: 'Title is required' });
             }
 
-            // Verify classroom ownership kung may classroom_id na binigay
-            if (classroom_id && classroom_id !== 'null') {
-                const classroom = await Classroom.findByPk(classroom_id);
-                if (!classroom || classroom.created_by !== userId) {
-                    return res.status(403).json({ success: false, message: 'Unauthorized: You are not the facilitator of this classroom' });
-                }
+            // 1. Create the module via Service
+            const result = await ModuleService.createModule(req.body, userId);
+
+            // 2. BROADCAST NOTIFICATION TO CLASSROOM
+            if (result.success && classroom_id && classroom_id !== 'null') {
+                // We don't "await" this to prevent slowing down the response to the facilitator
+                RoleDispatcher.notifyClassroom(classroom_id, {
+                    title: 'New Module Available',
+                    message: `A new module "${title}" has been uploaded to your classroom.`,
+                    icon: 'book-open',
+                    type: 'system',
+                    action_url: `/dashboard/modules/${result.module.id}`
+                }).catch(err => console.error('Notification broadcast failed:', err));
             }
 
-            const result = await ModuleService.createModule(req.body, userId);
             return res.status(201).json(result);
         } catch (error) {
             next(error);
@@ -51,6 +57,7 @@ class ModuleController {
                     return res.status(403).json({ success: false, message: 'Access Denied: You do not own this classroom' });
                 }
             }
+
 
             // 2. Initial Creation
             const moduleResult = await ModuleService.createModule(req.body, userId);
@@ -83,112 +90,120 @@ class ModuleController {
             }
 
             const updatedModule = await ModuleService.getModuleById(moduleId, true);
-            
-            return res.status(201).json({ 
-                success: true, 
-                message: 'Module created successfully', 
-                module: updatedModule.module, 
-                uploads: uploadResults 
-            });
 
-        } catch (error) {
-            if (createdModuleId) {
-                await ModuleService.permanentlyDeleteModule(createdModuleId).catch(() => {});
-            }
-            console.error("CreateModuleWithFiles Error:", error);
-            next(error);
+            // 5. BROADCAST NOTIFICATION TO CLASSROOM
+            // This notifies all students enrolled in the classroom about the new material
+            if (moduleResult.success && classroom_id && classroom_id !== 'null') {
+            const RoleDispatcher = require('../utils/RoleDispatcher');
+            RoleDispatcher.notifyClassroom(classroom_id, {
+                title: 'New Module Available',
+                message: `A new module "${title}" has been uploaded.`,
+                icon: 'book-open',
+                type: 'system',
+                action_url: `/dashboard/modules/${moduleId}` // Use moduleId here
+            }).catch(err => console.error('Notification broadcast failed:', err));
         }
+
+        // Return the moduleResult we created in step 2
+        return res.status(201).json(moduleResult);
+
+    } catch (error) {
+        if (createdModuleId) {
+            await ModuleService.permanentlyDeleteModule(createdModuleId).catch(() => { });
+        }
+        next(error);
+    }
     }
 
     /**
      * Get List: Filters by classroom_id, search, and category
      */
     async getModules(req, res, next) {
-    try {
-        const { classroom_id, all_accessible } = req.query;
-        const userId = req.user.id;
+        try {
+            const { classroom_id, all_accessible } = req.query;
+            const userId = req.user.id;
 
-        // Kunin ang accessible IDs para sa security check (para sa classroom-specific modules)
-        const facilitatedClasses = await Classroom.findAll({ where: { created_by: userId }, attributes: ['id'] });
-        const memberClasses = await ClassroomMember.findAll({ where: { user_id: userId }, attributes: ['classroom_id'] });
+            // Kunin ang accessible IDs para sa security check (para sa classroom-specific modules)
+            const facilitatedClasses = await Classroom.findAll({ where: { created_by: userId }, attributes: ['id'] });
+            const memberClasses = await ClassroomMember.findAll({ where: { user_id: userId }, attributes: ['classroom_id'] });
 
-        const accessibleIds = [
-            ...facilitatedClasses.map(c => Number(c.id)),
-            ...memberClasses.map(m => Number(m.classroom_id))
-        ];
+            const accessibleIds = [
+                ...facilitatedClasses.map(c => Number(c.id)),
+                ...memberClasses.map(m => Number(m.classroom_id))
+            ];
 
-        const filters = {
-            ...req.query,
-            // Support all_accessible flag to get both public and classroom modules
-            all_accessible: all_accessible === 'true',
-            // Siguraduhing napapasa ang 'null' nang tama
-            classroom_id: (classroom_id === undefined || classroom_id === 'null') ? null : classroom_id,
-            accessibleClassroomIds: [...new Set(accessibleIds)],
-            includeUnpublished: ['admin', 'educator', 'moderator'].includes(req.user.role)
-        };
+            const filters = {
+                ...req.query,
+                // Support all_accessible flag to get both public and classroom modules
+                all_accessible: all_accessible === 'true',
+                // Siguraduhing napapasa ang 'null' nang tama
+                classroom_id: (classroom_id === undefined || classroom_id === 'null') ? null : classroom_id,
+                accessibleClassroomIds: [...new Set(accessibleIds)],
+                includeUnpublished: ['admin', 'educator', 'moderator'].includes(req.user.role)
+            };
 
-        const result = await ModuleService.getModules(filters);
-        return res.status(200).json({ success: true, ...result });
-    } catch (error) {
-        console.error("ModuleController.getModules Error:", error);
-        next(error);
+            const result = await ModuleService.getModules(filters);
+            return res.status(200).json({ success: true, ...result });
+        } catch (error) {
+            console.error("ModuleController.getModules Error:", error);
+            next(error);
+        }
     }
-}
 
     /**
      * Get Single Module with Standardized Access Control
      */
-async getModuleById(req, res, next) {
-    try {
-        const { id } = req.params;
-        const currentUserId = Number(req.user.id);
-        const userRole = req.user.role;
+    async getModuleById(req, res, next) {
+        try {
+            const { id } = req.params;
+            const currentUserId = Number(req.user.id);
+            const userRole = req.user.role;
 
-        const moduleData = await Module.findByPk(id, {
-            include: [{
-                model: Classroom,
-                as: 'classroom',
-                include: [{ model: User, as: 'students', attributes: ['id'] }]
-            }]
-        });
+            const moduleData = await Module.findByPk(id, {
+                include: [{
+                    model: Classroom,
+                    as: 'classroom',
+                    include: [{ model: User, as: 'students', attributes: ['id'] }]
+                }]
+            });
 
-        if (!moduleData) {
-            return res.status(404).json({ success: false, message: 'Module not found' });
-        }
-
-        // 1. PUBLIC MODULE CHECK (No Classroom ID)
-        if (!moduleData.classroom_id) {
-            return res.status(200).json({ success: true, module: moduleData });
-        }
-
-        // 2. CLASSROOM MODULE CHECK
-        const classroom = moduleData.classroom;
-        if (!classroom) {
-            return res.status(404).json({ success: false, message: 'Classroom association missing' });
-        }
-
-        const isFacilitator = Number(classroom.created_by) === currentUserId;
-        const isMember = classroom.students && classroom.students.some(s => Number(s.id) === currentUserId);
-        const isAdmin = userRole === 'admin';
-
-        if (isFacilitator || isMember || isAdmin) {
-            // View count logic for players
-            if (userRole === 'player') {
-                ModuleService.incrementViewCount(id, currentUserId).catch(() => {});
+            if (!moduleData) {
+                return res.status(404).json({ success: false, message: 'Module not found' });
             }
-            return res.status(200).json({ success: true, module: moduleData });
+
+            // 1. PUBLIC MODULE CHECK (No Classroom ID)
+            if (!moduleData.classroom_id) {
+                return res.status(200).json({ success: true, module: moduleData });
+            }
+
+            // 2. CLASSROOM MODULE CHECK
+            const classroom = moduleData.classroom;
+            if (!classroom) {
+                return res.status(404).json({ success: false, message: 'Classroom association missing' });
+            }
+
+            const isFacilitator = Number(classroom.created_by) === currentUserId;
+            const isMember = classroom.students && classroom.students.some(s => Number(s.id) === currentUserId);
+            const isAdmin = userRole === 'admin';
+
+            if (isFacilitator || isMember || isAdmin) {
+                // View count logic for players
+                if (userRole === 'player') {
+                    ModuleService.incrementViewCount(id, currentUserId).catch(() => { });
+                }
+                return res.status(200).json({ success: true, module: moduleData });
+            }
+
+            return res.status(403).json({
+                success: false,
+                message: 'Access Denied: You are not part of this classroom.'
+            });
+
+        } catch (error) {
+            console.error("Module Access Error:", error);
+            next(error);
         }
-
-        return res.status(403).json({ 
-            success: false, 
-            message: 'Access Denied: You are not part of this classroom.' 
-        });
-
-    } catch (error) {
-        console.error("Module Access Error:", error);
-        next(error);
     }
-}
     /**
      * Facilitator Dashboard List
      */
@@ -257,6 +272,86 @@ async getModuleById(req, res, next) {
         try {
             const result = await ModuleService.getModuleStats();
             return res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getModuleEngagement(req, res, next) {
+        try {
+            const { id } = req.params;
+            const userId = req.user.id;
+            const userRole = req.user.role;
+
+            // Verify the module exists and the requester owns it (or is admin)
+            const module = await Module.findByPk(id);
+            if (!module) {
+                return res.status(404).json({ success: false, message: 'Module not found' });
+            }
+            if (Number(module.created_by) !== Number(userId) && userRole !== 'admin') {
+                return res.status(403).json({ success: false, message: 'Access denied' });
+            }
+
+            // Fetch viewers
+            const { ModuleView, QuizAttempt, Quiz, User } = require('../model');
+            const viewers = await ModuleView.findAll({
+                where: { module_id: id },
+                include: [{ model: User, as: 'user', attributes: ['id', 'first_name', 'last_name', 'email'] }],
+                order: [['viewed_at', 'DESC']]
+            });
+
+            // Fetch quiz takers
+            const takers = await QuizAttempt.findAll({
+                where: { module_id: id },
+                include: [
+                    { model: User, as: 'user', attributes: ['id', 'first_name', 'last_name', 'email'] },
+                    { model: Quiz, as: 'quiz', attributes: ['title'] }
+                ],
+                order: [['created_at', 'DESC']]
+            });
+
+            return res.status(200).json({ success: true, viewers, takers });
+        } catch (error) {
+            next(error);
+        }
+
+    }
+
+    async uploadModuleFile(req, res, next) {
+        try {
+            const { id } = req.params;
+            const module = await Module.findByPk(id);
+            if (!module) return res.status(404).json({ success: false, message: 'Module not found' });
+            if (module.created_by !== req.user.id && req.user.role !== 'admin') {
+                return res.status(403).json({ success: false, message: 'Permission denied' });
+            }
+            if (!req.file) {
+                return res.status(400).json({ success: false, message: 'No file provided' });
+            }
+            const result = await ModuleService.uploadModuleFile(
+                id, req.file.buffer, req.file.mimetype, req.file.originalname, req.user.id
+            );
+            return res.status(200).json({ success: true, ...result });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async uploadModuleThumbnail(req, res, next) {
+        try {
+            const { id } = req.params;
+            const module = await Module.findByPk(id);
+            if (!module) return res.status(404).json({ success: false, message: 'Module not found' });
+            if (module.created_by !== req.user.id && req.user.role !== 'admin') {
+                return res.status(403).json({ success: false, message: 'Permission denied' });
+            }
+            if (!req.file) {
+                return res.status(400).json({ success: false, message: 'No thumbnail provided' });
+            }
+            const result = await ModuleService.uploadModuleThumbnail(
+                id, req.file.buffer, req.file.mimetype, req.file.originalname, req.user.id
+            );
+            return res.status(200).json({ success: true, ...result });
         } catch (error) {
             next(error);
         }

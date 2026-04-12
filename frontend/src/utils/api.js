@@ -64,13 +64,13 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("jwt"); // Ensure this key matches your setAuthToken key
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
+// api.interceptors.request.use((config) => {
+//     const token = localStorage.getItem("jwt"); // Ensure this key matches your setAuthToken key
+//     if (token) {
+//         config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+// });
 
 // Response Interceptor: Handle 401s via Silent Refresh
 api.interceptors.response.use(
@@ -144,6 +144,24 @@ export async function logoutEverywhere() {
 export async function logout() {
     try { await api.post("/api/v1/auth/logout"); } catch { }
     clearAuthToken();
+}
+
+export function getRefreshToken() {
+    try {
+        return sessionStorage.getItem(REFRESH_TOKEN_KEY) || null;
+    } catch { return null; }
+}
+
+export function setRefreshToken(token) {
+    try {
+        sessionStorage.setItem(REFRESH_TOKEN_KEY, token);
+    } catch { }
+}
+
+export function clearRefreshToken() {
+    try {
+        sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+    } catch { }
 }
 
 export default api;

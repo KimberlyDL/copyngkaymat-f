@@ -3,13 +3,14 @@ const jwt = require('jsonwebtoken');
 const jwtService = require('../services/JwtService');
 const { getDeviceInfo } = require('../middleware/AuthMiddleware');
 const emailService = require('../services/EmailService');
+const isProd = process.env.NODE_ENV === 'production';
 
 const setRefreshCookie = (res, token) => {
     res.cookie('refresh_token', token, {
         httpOnly: true, // Invisible to frontend JS
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'None', // Allows cross-site/third-party integration
-        path: '/api/refresh', // Security: only send to the refresh route
+        sameSite: isProd ? 'None' : 'Lax', // Allows cross-site/third-party integration
+        path: '/api/v1/auth/refresh', // Security: only send to the refresh route
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 };
@@ -130,10 +131,10 @@ exports.login = async (req, res, next) => {
                 });
             } else {
                 // Auto-reactivate if suspension has expired
-                await user.update({ 
-                    account_status: 'active', 
-                    suspended_until: null, 
-                    suspension_reason: null 
+                await user.update({
+                    account_status: 'active',
+                    suspended_until: null,
+                    suspension_reason: null
                 });
             }
         }
@@ -650,24 +651,54 @@ exports.forgotPassword = async (req, res, next) => {
 
 exports.resetPassword = async (req, res, next) => {
     try {
-        const { token, password } = req.body;
+        const { token, password, password_confirmation } = req.body;
 
-        // 1. Decode without verifying first to get user ID
+        // 1. Basic validation (matching changePassword's thoroughness)
+        if (!password || !password_confirmation) {
+            return res.status(422).json({
+                message: 'New password and confirmation are required.'
+            });
+        }
+
+        if (password !== password_confirmation) {
+            return res.status(422).json({
+                message: 'Passwords do not match.'
+            });
+        }
+
+        if (password.length < 8) {
+            return res.status(422).json({
+                message: 'Password must be at least 8 characters.'
+            });
+        }
+
+        // 2. Decode without verifying first to get user ID
         const payload = jwt.decode(token);
         const user = await User.scope('withPassword').findByPk(payload?.id);
-
         if (!user) return res.status(404).json({ message: 'User not found' });
 
-        // 2. 🟢 Verify token against the current user state (One-Time Use check)
+        // 3. Verify token (one-time use check) — do this BEFORE making any changes
         jwtService.verifyActionToken(token, 'password_reset', user);
 
+        // 4. Update password
         user.password = password;
-        await user.save(); // This updates password_changed_at
+        user.requires_password_change = false; // clear force-change flag if set
+        await user.save(); // updates password_changed_at
 
-        await jwtService.logoutAll(user.id); //
+        // 5. Security cleanup — revoke ALL sessions (token is now consumed/invalid)
+        await jwtService.logoutAll(user.id);
 
-        res.json({ message: 'Password reset successful.' });
+        // 6. Send confirmation email
+        await emailService.sendPasswordChangedEmail(user);
+
+        // 7. Don't issue new tokens here — user should log in fresh after a reset
+        res.json({ message: 'Password reset successful. Please log in with your new password.' });
+
     } catch (error) {
-        res.status(400).json({ message: error.message || 'Invalid reset link.' });
+        // Distinguish token errors from server errors
+        if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
+            return res.status(400).json({ message: 'Reset link is invalid or has expired.' });
+        }
+        next(error);
     }
 };

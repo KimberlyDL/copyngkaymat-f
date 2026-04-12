@@ -24,9 +24,9 @@
         </div>
 
         <!-- Classrooms Grid -->
-        <div v-else-if="classroomStore.classrooms.length > 0"
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <div v-for="classroom in classroomStore.classrooms" :key="classroom.id"
+        <div v-else-if="classroomStore.classrooms.length > 0" class="space-y-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div v-for="classroom in paginatedClassrooms" :key="classroom.id"
                 @click="enterClassroom(classroom.id)" class="card card-hover cursor-pointer group">
                 <div class="flex items-start gap-4 mb-5">
                     <div
@@ -52,6 +52,14 @@
                         class="w-4 h-4 text-platinum-400 group-hover:text-calm-lavender-500 group-hover:translate-x-1 transition-all shrink-0 ml-2" />
                 </div>
             </div>
+            </div>
+
+            <AppPagination
+                v-model="currentPage"
+                :total="classroomStore.classrooms.length"
+                :page-size="PAGE_SIZE"
+                item-label="classrooms"
+            />
         </div>
 
         <!-- Empty State -->
@@ -66,19 +74,21 @@
             </p>
         </div>
 
-        <CreateClassroomModal v-if="showCreateModal" @close="showCreateModal = false" @created="handleCreated" />
+        <Teleport to="body"><CreateClassroomModal v-if="showCreateModal" @close="showCreateModal = false" @created="handleCreated" /></Teleport>
+        
         <JoinClassroomModal v-if="showJoinModal" @close="showJoinModal = false" @join="handleJoin" />
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useClassroomStore } from '@/stores/classroom';
 import { ArrowRight as ArrowRightIcon, School as SchoolIcon, Plus as PlusIcon } from 'lucide-vue-next';
 import CreateClassroomModal from '@/components/classrooms/CreateClassroomModal.vue';
 import JoinClassroomModal from '@/components/classrooms/JoinClassroomModal.vue';
+import AppPagination from '@/components/ui/AppPagination.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -86,6 +96,16 @@ const classroomStore = useClassroomStore();
 
 const showCreateModal = ref(false);
 const showJoinModal = ref(false);
+
+const PAGE_SIZE = 5;
+const currentPage = ref(1);
+
+const paginatedClassrooms = computed(() => {
+    const start = (currentPage.value - 1) * PAGE_SIZE;
+    return classroomStore.classrooms.slice(start, start + PAGE_SIZE);
+});
+
+watch(() => classroomStore.classrooms.length, () => { currentPage.value = 1; });
 
 const isFacilitator = computed(() => ['admin', 'educator', 'moderator'].includes(authStore.user?.role));
 

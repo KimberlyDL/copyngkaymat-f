@@ -20,7 +20,10 @@
         </button>
       </div>
     </div>
-
+<button v-if="canEdit" @click="goToStats" class="btn-secondary">
+  <BarChart2Icon class="w-3.5 h-3.5 text-calm-lavender-500" />
+  <span>View Stats</span>
+</button>
     <!-- Loading -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-24 gap-3">
       <div class="spinner"></div>
@@ -146,8 +149,18 @@
       </div>
     </main>
 
-    <DeleteConfirmModal v-if="showDeleteModal" :module-title="module?.title" @confirm="handleDelete"
-      @cancel="showDeleteModal = false" />
+    <ConfirmModal
+      :is-open="showDeleteModal"
+      variant="danger"
+      title="Delete Module?"
+      :message="deleteMessage"
+      warning-text="All associated quizzes and student progress will also be deleted. This cannot be undone."
+      confirm-label="Delete Module"
+      cancel-label="Cancel"
+      :loading="isDeleting"
+      @confirm="handleDelete"
+      @cancel="showDeleteModal = false"
+    />
     <EditModuleModal v-if="showEditModal" :module="module" @saved="handleModuleUpdated"
       @cancel="showEditModal = false" />
     <CreateQuizModal :is-open="showQuizModal" :module-id="module?.id" @close="showQuizModal = false"
@@ -171,7 +184,7 @@ import { useToast } from '@/utils/useToast';
 
 import DocumentViewer from '@/components/modules/DocumentViewer.vue';
 import ModuleSidebar from '@/components/modules/ModuleSidebar.vue';
-import DeleteConfirmModal from '@/components/modules/DeleteConfirmModal.vue';
+import ConfirmModal from '@/components/ui/ConfirmModal.vue';
 import EditModuleModal from '@/components/modules/EditModuleModal.vue';
 import CreateQuizModal from '@/components/modules/CreateQuizModal.vue';
 
@@ -186,6 +199,13 @@ const sidebarOpen = ref(false);
 const error = ref(null);
 const loading = ref(true);
 const showDeleteModal = ref(false);
+const isDeleting = ref(false);
+
+const deleteMessage = computed(() =>
+    module.value?.title
+        ? `You are about to permanently remove "${module.value.title}".`
+        : 'You are about to permanently remove this module.'
+);
 const showEditModal = ref(false);
 const showQuizModal = ref(false);
 const quizzes = ref([]);
@@ -197,7 +217,7 @@ const isPlayer = computed(() => authStore.user?.role === 'player');
 const toggleSidebar = () => { sidebarOpen.value = !sidebarOpen.value; };
 
 const formatCategory = (c) => {
-  const map = { 'gad': 'Culture', 'sexual_health': 'Health', 'vawc': 'Safety', 'general': 'Standard' };
+  const map = { 'gad': 'Institutional', 'sexual_health': 'Health', 'vawc': 'Safety', 'general': 'Standard' };
   return map[c] || c?.toUpperCase() || 'Other';
 };
 
@@ -209,26 +229,50 @@ const refreshQuizzes = async () => {
 };
 
 const handleBack = () => {
-  const name = route.path.startsWith('/facilitator') ? 'facilitator.modules' : 'user.modules';
-  router.push({ name });
+    // If the user navigated here from within the app (classroom page, module list, etc.)
+    // go back to exactly where they came from — preserves classroom → module → back flow
+    if (window.history.state?.back) {
+        router.back();
+        return;
+    }
+
+    // Fallback for direct links / new tabs — send to the correct list page by role
+    const role = authStore.user?.role;
+    if (role === 'player') {
+        router.push({ name: 'user.modules' });
+    } else if (role === 'admin') {
+        router.push({ name: 'admin.modules' });
+    } else if (['educator', 'moderator'].includes(role)) {
+        router.push({ name: 'facilitator.modules' });
+    } else {
+        // Unknown role — safest fallback is home
+        router.push({ name: 'home' });
+    }
 };
-// @TODO Fix Navigation
 
 const handleQuizClick = (id) => {
   if (isPlayer.value) router.push({ name: 'quiz.player', params: { id } });
   else toast.info("Facilitator view: Preview only.");
 };
 
+const goToStats = () => {
+  router.push({ name: 'facilitator.module-stats', params: { id: route.params.id } });
+};
+
 const editModule = () => { showEditModal.value = true; };
 const confirmDelete = () => { showDeleteModal.value = true; };
 
 const handleDelete = async () => {
+  isDeleting.value = true;
   try {
     await moduleStore.deleteModule(module.value.id);
     toast.success('Module removed.');
     handleBack();
   } catch (err) { toast.error('Removal failed.'); }
-  finally { showDeleteModal.value = false; }
+  finally {
+    isDeleting.value = false;
+    showDeleteModal.value = false;
+  }
 };
 
 const handleModuleUpdated = async () => {

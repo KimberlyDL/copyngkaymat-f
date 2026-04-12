@@ -7,6 +7,15 @@ const { authenticate, requireRole } = require('../middleware/AuthMiddleware');
 // All routes require authentication
 router.use(authenticate);
 
+// ===== Facilitator Self-Stats =====
+
+/**
+ * @route   GET /api/v1/facilitators/dashboard-stats
+ * @desc    Get the logged-in facilitator's own module/classroom/student counts
+ * @access  Educator, Moderator, Admin
+ */
+router.get('/dashboard-stats', requireRole(['educator', 'moderator', 'admin']), facilitatorController.getDashboardStats);
+
 // ===== Admin-Only Routes =====
 
 /**

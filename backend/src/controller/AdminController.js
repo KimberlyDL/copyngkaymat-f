@@ -5,6 +5,7 @@ const {
 } = require('../model');
 const { Op, fn, col, literal } = require('sequelize');
 const PDFDocument = require('pdfkit');
+const NotificationController = require('./NotificationController');
 
 /**
  * Admin: Get system analytics/stats
@@ -1213,78 +1214,66 @@ exports.updateUserStatus = async (req, res, next) => {
         if (!req.user || req.user.role !== 'admin') {
             return res.status(403).json({ message: 'Access denied.' });
         }
-
+ 
         const { userId } = req.params;
         const { status, reason, suspended_until } = req.body;
-
-        // Validate status
+ 
         const validStatuses = ['active', 'deactivated', 'suspended', 'banned'];
         if (!validStatuses.includes(status)) {
-            return res.status(400).json({ 
-                message: 'Invalid status. Must be: active, deactivated, suspended, or banned.' 
+            return res.status(400).json({
+                message: 'Invalid status. Must be: active, deactivated, suspended, or banned.'
             });
         }
-
-        // Find user
+ 
         const user = await User.findByPk(userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found.' });
-        }
-
-        // Prevent admin from modifying other admins
+        if (!user) return res.status(404).json({ message: 'User not found.' });
+ 
         if (user.role === 'admin' && user.id !== req.user.id) {
-            return res.status(403).json({ 
-                message: 'Cannot modify another admin account.' 
-            });
+            return res.status(403).json({ message: 'Cannot modify another admin account.' });
         }
-
-        // Prevent self-suspension/ban
+ 
         if (user.id === req.user.id && ['suspended', 'banned', 'deactivated'].includes(status)) {
-            return res.status(400).json({ 
-                message: 'Cannot deactivate, suspend, or ban your own account.' 
+            return res.status(400).json({
+                message: 'Cannot deactivate, suspend, or ban your own account.'
             });
         }
-
-        // Build update data
+ 
         const updateData = {
             account_status: status,
             suspension_reason: null,
             suspended_until: null
         };
-
-        // Handle suspension specifics
+ 
         if (status === 'suspended') {
             if (!suspended_until) {
-                return res.status(400).json({ 
-                    message: 'Suspension end date is required.' 
-                });
+                return res.status(400).json({ message: 'Suspension end date is required.' });
             }
             updateData.suspended_until = new Date(suspended_until);
             updateData.suspension_reason = reason || 'Account suspended by administrator.';
         } else if (status === 'banned') {
             updateData.suspension_reason = reason || 'Account banned by administrator.';
         }
-
+ 
         await user.update(updateData);
-
-        // Create notification for the user
-        await Notification.create({
-            user_id: user.id,
-            title: `Account ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+ 
+        // ── CHANGED: use NotificationController so SSE + Web Push fire ──────
+        await NotificationController.create(user.id, {
+            type:    'system',
+            title:   `Account ${status.charAt(0).toUpperCase() + status.slice(1)}`,
             message: getStatusNotificationMessage(status, reason, suspended_until),
-            type: 'system',
-            is_read: false
+            icon:    status === 'active' ? 'check-circle' : 'alert-circle'
         });
-
+        // ────────────────────────────────────────────────────────────────────
+ 
         res.json({
             message: `User account ${status} successfully.`,
             user: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                account_status: status,
+                id:               user.id,
+                username:         user.username,
+                email:            user.email,
+                account_status:   status,
                 suspension_reason: updateData.suspension_reason,
-                suspended_until: updateData.suspended_until
+                suspended_until:  updateData.suspended_until
             }
         });
     } catch (error) {
@@ -1333,64 +1322,53 @@ exports.bulkUpdateUserStatus = async (req, res, next) => {
         if (!req.user || req.user.role !== 'admin') {
             return res.status(403).json({ message: 'Access denied.' });
         }
-
+ 
         const { userIds, status, reason, suspended_until } = req.body;
-
+ 
         if (!Array.isArray(userIds) || userIds.length === 0) {
             return res.status(400).json({ message: 'User IDs array is required.' });
         }
-
+ 
         const validStatuses = ['active', 'deactivated', 'suspended', 'banned'];
         if (!validStatuses.includes(status)) {
-            return res.status(400).json({ 
-                message: 'Invalid status. Must be: active, deactivated, suspended, or banned.' 
+            return res.status(400).json({
+                message: 'Invalid status. Must be: active, deactivated, suspended, or banned.'
             });
         }
-
-        // Filter out admin users and self
+ 
         const users = await User.findAll({
-            where: {
-                id: { [Op.in]: userIds },
-                role: { [Op.ne]: 'admin' }
-            }
+            where: { id: { [Op.in]: userIds }, role: { [Op.ne]: 'admin' } }
         });
-
-        const filteredIds = users
-            .filter(u => u.id !== req.user.id)
-            .map(u => u.id);
-
+ 
+        const filteredIds = users.filter(u => u.id !== req.user.id).map(u => u.id);
+ 
         if (filteredIds.length === 0) {
-            return res.status(400).json({ 
-                message: 'No valid users to update.' 
-            });
+            return res.status(400).json({ message: 'No valid users to update.' });
         }
-
-        // Build update data
+ 
         const updateData = {
-            account_status: status,
-            suspension_reason: status === 'banned' || status === 'suspended' ? 
-                (reason || `Account ${status} by administrator.`) : null,
-            suspended_until: status === 'suspended' && suspended_until ? 
-                new Date(suspended_until) : null
+            account_status:   status,
+            suspension_reason: status === 'banned' || status === 'suspended'
+                ? (reason || `Account ${status} by administrator.`)
+                : null,
+            suspended_until: status === 'suspended' && suspended_until
+                ? new Date(suspended_until)
+                : null
         };
-
-        await User.update(updateData, {
-            where: { id: { [Op.in]: filteredIds } }
-        });
-
-        // Create notifications for affected users
-        const notifications = filteredIds.map(userId => ({
-            user_id: userId,
-            title: `Account ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+ 
+        await User.update(updateData, { where: { id: { [Op.in]: filteredIds } } });
+ 
+        // ── CHANGED: use NotificationController so SSE + Web Push fire ──────
+        await NotificationController.createBatch(filteredIds, {
+            type:    'system',
+            title:   `Account ${status.charAt(0).toUpperCase() + status.slice(1)}`,
             message: getStatusNotificationMessage(status, reason, suspended_until),
-            type: 'system',
-            is_read: false
-        }));
-
-        await Notification.bulkCreate(notifications);
-
+            icon:    status === 'active' ? 'check-circle' : 'alert-circle'
+        });
+        // ────────────────────────────────────────────────────────────────────
+ 
         res.json({
-            message: `${filteredIds.length} user(s) updated to ${status}.`,
+            message:       `${filteredIds.length} user(s) updated to ${status}.`,
             updated_count: filteredIds.length
         });
     } catch (error) {

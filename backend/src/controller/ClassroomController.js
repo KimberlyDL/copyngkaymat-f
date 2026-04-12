@@ -419,3 +419,67 @@ exports.deleteClassroomAnnouncement = async (req, res, next) => {
         next(error);
     }
 };
+/**
+ * Facilitator: Update classroom name/description
+ */
+exports.updateClassroom = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { name, description } = req.body;
+
+        const classroom = await Classroom.findByPk(id);
+        if (!classroom) {
+            return res.status(404).json({ message: 'Classroom not found.' });
+        }
+
+        // Only the creator or admin can update
+        if (classroom.created_by !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({ 
+                message: 'Forbidden: Only the classroom facilitator can update this classroom.' 
+            });
+        }
+
+        if (name !== undefined && !name.trim()) {
+            return res.status(422).json({ message: 'Classroom name cannot be empty.' });
+        }
+
+        await classroom.update({
+            name: name ? name.trim() : classroom.name,
+            description: description !== undefined ? (description?.trim() || null) : classroom.description
+        });
+
+        res.json({
+            message: 'Classroom updated successfully.',
+            classroom
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * Facilitator: Delete a classroom
+ */
+exports.deleteClassroom = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const classroom = await Classroom.findByPk(id);
+        if (!classroom) {
+            return res.status(404).json({ message: 'Classroom not found.' });
+        }
+
+        // Only the creator or admin can delete
+        if (classroom.created_by !== req.user.id && req.user.role !== 'admin') {
+            return res.status(403).json({ 
+                message: 'Forbidden: Only the classroom facilitator can delete this classroom.' 
+            });
+        }
+
+        await classroom.destroy();
+
+        res.json({ message: 'Classroom deleted successfully.' });
+    } catch (error) {
+        next(error);
+    }
+};

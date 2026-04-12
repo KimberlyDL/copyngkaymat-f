@@ -5,6 +5,8 @@ import api, {
     setAuthToken,
     clearAuthToken,
     getAuthToken,
+    setRefreshToken,    // Added from his version
+    clearRefreshToken,  // Added from his version
     logout as apiLogout,
     logoutEverywhere as apiLogoutEverywhere
 } from "@/utils/api";
@@ -35,6 +37,13 @@ export const useAuthStore = defineStore("auth", () => {
         }
     }
 
+    // NEW: Session restoration for the ML features
+    async function restoreSession() {
+        const token = getAuthToken();
+        if (!token) return null;
+        return await fetchUser();
+    }
+
     async function signup(payload) {
         isLoading.value = true;
         try {
@@ -42,7 +51,7 @@ export const useAuthStore = defineStore("auth", () => {
             toast.success("Account created! Please verify your email to continue.");
             return { success: true, message: res.data.message, email: res.data.email };
         } catch (e) {
-            const errorMsg = e.response?.data?.message || "Registration failed. Please try again.";
+            const errorMsg = e.response?.data?.message || "Registration failed.";
             toast.error(errorMsg);
             throw e;
         } finally {
@@ -50,34 +59,26 @@ export const useAuthStore = defineStore("auth", () => {
         }
     }
 
-    async function restoreSession() {
-        if (!getAuthToken()) return null;
-        return await fetchUser();
+    async function login(payload) {
+        isLoading.value = true;
+        try {
+            const { data } = await api.post("/api/v1/auth/login", payload);
+            
+            // Core Security Update: Store both tokens
+            if (data.token) setAuthToken(data.token);
+            if (data.refreshToken) setRefreshToken(data.refreshToken);
+            
+            user.value = data.user;
+            toast.success(`Welcome back, ${data.user.name}!`);
+            return { ok: true, user: data.user };
+        } catch (e) {
+            const msg = e?.response?.data?.message || "Login failed. Please check your credentials.";
+            toast.error(msg);
+            throw e;
+        } finally {
+            isLoading.value = false;
+        }
     }
-
-async function login({ email, password }) {
-    isLoading.value = true;
-    try {
-        const res = await api.post("/api/v1/auth/login", { email, password });
-        const token = res?.data?.token;
-
-        if (!token) throw new Error("Login failed: Access token missing.");
-
-        setAuthToken(token);
-        user.value = res.data.user;
-        
-        // 🟢 Alisin ang toast.success dito kung mayroon man, sa component na lang
-        return { ok: true, user: user.value };
-    } catch (e) {
-        // 🔴 ALISIN ang toast.error(message) dito!
-        // Hayaan ang LoginNew.vue o ang API interceptor ang magpakita ng error.
-        
-        const data = e?.response?.data;
-        throw e; // I-throw lang ang error pabalik sa component
-    } finally {
-        isLoading.value = false;
-    }
-}
 
     async function logout() {
         try { 
@@ -86,7 +87,9 @@ async function login({ email, password }) {
         } catch (error) {
             console.error("Logout error:", error);
         } finally {
+            // Clean up all security artifacts
             clearAuthToken();
+            clearRefreshToken();
             user.value = null;
             activeSessions.value = [];
         }
@@ -108,6 +111,6 @@ async function login({ email, password }) {
 
     return {
         user, isLoading, isGoogleLoading, isAuthenticated, me, pendingEmail, activeSessions,
-        signup, login, logout, fetchUser, restoreSession, changePassword
+        signup, login, logout, fetchUser, restoreSession, changePassword, 
     };
 });

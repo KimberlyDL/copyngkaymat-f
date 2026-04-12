@@ -17,6 +17,11 @@ export const roleGuard = async (to, from, next) => {
             await authStore.restoreSession()
         }
 
+        // if (!authStore.isAuthenticated) {
+        //     toast.warning('Authentication Required: Please log in to access this page')
+        //     return next({ name: 'login', query: { redirect: to.fullPath } })
+        // }
+
         // Still not authenticated
         if (!authStore.isAuthenticated) {
             toast.warning('Authentication Required: Please log in to access this page')
@@ -34,7 +39,6 @@ export const roleGuard = async (to, from, next) => {
                 : [to.meta.requiresRole]
 
             if (!requiredRoles.includes(userRole)) {
-                // Pinagandang Access Denied message gamit ang Toast
                 toast.error('Access Denied: You do not have permission to view this section')
 
                 const redirectMap = {
