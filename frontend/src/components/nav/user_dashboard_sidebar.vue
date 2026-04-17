@@ -24,10 +24,8 @@
                     <div class="flex items-center gap-3 group/logo">
                         <div class="relative flex-shrink-0 transition-transform duration-500"
                             :class="isIcon && 'scale-90'">
-                            <div
-                                class="relative w-12 h-12 bg-gradient-to-br from-calm-lavender-600 via-neon-pink-500 to-calm-lavender-700 rounded-2xl flex items-center justify-center group-hover/logo:rotate-6 transition-all">
-                                <ShieldCheckIcon class="w-7 h-7 text-white" />
-                            </div>
+<img src="@/assets/LogongPrototeced.svg" alt="ProtectEd Logo"
+  class="w-12 h-12 group-hover/logo:rotate-6 transition-all" />
                         </div>
 
                         <transition name="fade">
