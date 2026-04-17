@@ -395,6 +395,13 @@ function toggleChat() {
     if (isOpen.value) nextTick(() => scrollToBottom());
 }
 
+// Open chat (used by external components like ImpactSection)
+function openChat() {
+    if (!isOpen.value) toggleChat();
+}
+
+defineExpose({ openChat })
+
 // Toggle fullscreen
 function toggleFullscreen() {
     isFullscreen.value = !isFullscreen.value;

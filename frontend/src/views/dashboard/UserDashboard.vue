@@ -1,5 +1,5 @@
 <template>
-    <div class="page-wrapper animate-in font-poppins text-abyss-800 dark:text-platinum-100">
+    <div class="page-wrapper animate-in text-slate-800 dark:text-platinum-100">
         <div class="space-y-8">
 
             <!-- ════════════════════════════════════════
@@ -12,35 +12,43 @@
                         {{ currentGreeting }},
                         <span class="text-calm-lavender-600 dark:text-calm-lavender-400">{{ userFirstName }}</span> 👋
                     </h1>
-                    <p class="text-base font-medium text-platinum-600 dark:text-platinum-400">
+                    <!-- Motivational sub-line: empathetic copy → font-mplusrounded -->
+                    <p class="font-mplusrounded text-base font-medium leading-relaxed
+                               text-platinum-600 dark:text-platinum-400">
                         {{ currentDate }} &bull; {{ motivationalMessage }}
                     </p>
                 </div>
 
                 <!-- Level + Streak chips -->
                 <div class="flex gap-3 flex-wrap shrink-0">
+                    <!-- Level chip -->
                     <div class="stat-chip">
-                        <div
-                            class="p-2 rounded-xl bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400">
+                        <div class="p-2 rounded-xl
+                                    bg-amber-100 dark:bg-amber-500/20
+                                    text-amber-600 dark:text-amber-400">
                             <ZapIcon class="h-4 w-4" />
                         </div>
                         <div class="flex flex-col leading-none">
-                            <span
-                                class="font-mplusrounded text-xs text-platinum-600 dark:text-platinum-400 mb-0.5 uppercase tracking-wide">Level</span>
-                            <span class="text-xl font-bold text-abyss-800 dark:text-platinum-100">
+                            <!-- Chip label: technical micro-UI → font-dosis -->
+                            <span class="font-dosis text-xs font-semibold uppercase tracking-wide mb-0.5
+                                          text-platinum-600 dark:text-platinum-400">Level</span>
+                            <!-- Chip value: gamified number → font-madimione -->
+                            <span class="font-madimione text-xl text-abyss-800 dark:text-platinum-100">
                                 {{ auth.user?.gamification?.level || 1 }}
                             </span>
                         </div>
                     </div>
+                    <!-- Streak chip -->
                     <div class="stat-chip">
-                        <div
-                            class="p-2 rounded-xl bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400">
+                        <div class="p-2 rounded-xl
+                                    bg-orange-100 dark:bg-orange-500/20
+                                    text-orange-600 dark:text-orange-400">
                             <FlameIcon class="h-4 w-4" />
                         </div>
                         <div class="flex flex-col leading-none">
-                            <span
-                                class="font-mplusrounded text-xs text-platinum-600 dark:text-platinum-400 mb-0.5 uppercase tracking-wide">Streak</span>
-                            <span class="text-xl font-bold text-abyss-800 dark:text-platinum-100">
+                            <span class="font-dosis text-xs font-semibold uppercase tracking-wide mb-0.5
+                                          text-platinum-600 dark:text-platinum-400">Streak</span>
+                            <span class="font-madimione text-xl text-abyss-800 dark:text-platinum-100">
                                 {{ auth.user?.gamification?.streak || 0 }}
                             </span>
                         </div>
@@ -69,7 +77,8 @@
                     class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div v-for="ann in visibleAnnouncements" :key="ann.id"
                         class="item-card !p-5 group cursor-pointer hover:-translate-y-0.5 transition-transform duration-200">
-                        <!-- Priority + posted time -->
+
+                        <!-- Priority badge -->
                         <div class="flex items-center gap-3 mb-4">
                             <span :class="[
                                 'badge text-xs capitalize',
@@ -79,15 +88,18 @@
                             ]">{{ ann.priority || 'Normal' }}</span>
                         </div>
 
-                        <!-- Title -->
-                        <h4
-                            class="font-bold text-base text-abyss-800 dark:text-platinum-100 leading-snug mb-2.5
-                                   group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400 transition-colors">
+                        <!-- Announcement title: gamified heading → font-madimione -->
+                        <h4 class="font-madimione text-base
+                                    text-abyss-800 dark:text-platinum-100
+                                    leading-snug mb-2.5
+                                    group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400
+                                    transition-colors">
                             {{ ann.title }}
                         </h4>
 
-                        <!-- Content -->
-                        <p class="text-sm text-platinum-600 dark:text-platinum-400 line-clamp-2 leading-relaxed mb-4">
+                        <!-- Announcement body: GAD/VAWC-safe empathetic copy → font-mplusrounded + leading-relaxed -->
+                        <p class="font-mplusrounded text-sm leading-relaxed line-clamp-2 mb-4
+                                   text-platinum-600 dark:text-platinum-400">
                             {{ ann.content }}
                         </p>
 
@@ -97,7 +109,7 @@
                                 <CalendarDaysIcon class="h-3 w-3 shrink-0" />
                                 <span>
                                     {{ ann.updatedAt && ann.updatedAt !== ann.createdAt
-                                        ? 'Updated:  ' + formatFullDate(ann.updatedAt)
+                                        ? 'Updated: ' + formatFullDate(ann.updatedAt)
                                         : 'Posted: ' + formatFullDate(ann.createdAt) }}
                                 </span>
                             </div>
@@ -109,8 +121,10 @@
                     </div>
                 </div>
 
+                <!-- Empty announcements -->
                 <div v-else class="text-center py-8">
-                    <p class="font-medium text-base text-platinum-500 dark:text-platinum-500">
+                    <p class="font-mplusrounded text-base font-medium leading-relaxed
+                               text-platinum-500 dark:text-platinum-500">
                         No new announcements at this time.
                     </p>
                 </div>
@@ -118,6 +132,7 @@
 
             <!-- ════════════════════════════════════════
                  DAILY FACT BANNER
+                 GAD/VAWC context — empathetic typography mandatory
             ════════════════════════════════════════ -->
             <div class="fact-banner">
                 <div class="p-2.5 rounded-xl shrink-0 mt-0.5
@@ -127,11 +142,14 @@
                     <GraduationCapIcon class="h-6 w-6" />
                 </div>
                 <div class="flex-1">
-                    <span
-                        class="font-mplusrounded text-xs text-calm-lavender-600 dark:text-calm-lavender-400 uppercase tracking-widest mb-1.5 block">
+                    <!-- Label: technical micro-UI → font-dosis -->
+                    <span class="font-dosis text-xs font-semibold uppercase tracking-widest mb-1.5 block
+                                  text-calm-lavender-600 dark:text-calm-lavender-400">
                         Daily Fact
                     </span>
-                    <p class="text-base font-medium text-abyss-700 dark:text-platinum-100 leading-relaxed italic">
+                    <!-- Fact body: GAD/VAWC-safe → font-mplusrounded + leading-relaxed + italic -->
+                    <p class="font-mplusrounded text-base font-medium leading-relaxed italic
+                               text-abyss-700 dark:text-platinum-100">
                         "{{ currentFact }}"
                     </p>
                 </div>
@@ -141,14 +159,17 @@
                  QUICK ACTIONS
             ════════════════════════════════════════ -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <router-link v-for="action in userQuickActions" :key="action.label" :to="{ name: action.name }"
+                <router-link v-for="action in userQuickActions" :key="action.label"
+                    :to="{ name: action.name }"
                     class="quick-action-card group">
                     <div :class="`quick-action-icon ${action.bg}`">
                         <component :is="action.icon" class="h-5 w-5 text-white" />
                     </div>
-                    <span class="text-sm font-bold text-abyss-800 dark:text-platinum-100
-                                 group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400
-                                 transition-colors uppercase tracking-wide">
+                    <!-- Action label: technical nav → font-dosis -->
+                    <span class="font-dosis text-sm font-bold uppercase tracking-wide
+                                  text-abyss-800 dark:text-platinum-100
+                                  group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400
+                                  transition-colors">
                         {{ action.label }}
                     </span>
                 </router-link>
@@ -159,45 +180,50 @@
             ════════════════════════════════════════ -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-                <!-- XP Progress + Stats (col 8) -->
+                <!-- ── XP Progress + Stats (col 8) ── -->
                 <div class="lg:col-span-8 space-y-6">
 
                     <!-- XP Progress card -->
                     <div class="card">
                         <div class="flex items-center gap-3 mb-6">
-                            <div class="h-6 w-1.5 bg-calm-lavender-600 dark:bg-calm-lavender-500 rounded-full shrink-0">
-                            </div>
-                            <h3 class="font-madimione text-xl text-abyss-800 dark:text-platinum-100">Your Progress</h3>
+                            <div class="h-6 w-1.5 rounded-full shrink-0
+                                         bg-calm-lavender-600 dark:bg-calm-lavender-500"></div>
+                            <h3 class="font-madimione text-xl text-abyss-800 dark:text-platinum-100">
+                                Your Progress
+                            </h3>
                         </div>
 
                         <div class="space-y-5">
                             <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-3">
                                 <div>
-                                    <p
-                                        class="font-mplusrounded text-xs text-platinum-600 dark:text-platinum-400 uppercase tracking-widest mb-1">
+                                    <!-- XP label: technical → font-dosis -->
+                                    <p class="font-dosis text-xs font-semibold uppercase tracking-widest mb-1
+                                               text-platinum-600 dark:text-platinum-400">
                                         Total Experience
                                     </p>
-                                    <p class="text-5xl font-bold text-abyss-900 dark:text-platinum-50 tracking-tight">
+                                    <!-- XP value: gamified hero number → font-madimione -->
+                                    <p class="font-madimione text-5xl tracking-tight
+                                               text-abyss-900 dark:text-platinum-50">
                                         {{ auth.user?.gamification?.experience_points?.toLocaleString() || 0 }}
-                                        <span
-                                            class="text-2xl text-calm-lavender-600 dark:text-calm-lavender-400 font-bold">XP</span>
+                                        <span class="text-2xl text-calm-lavender-600 dark:text-calm-lavender-400">XP</span>
                                     </p>
                                 </div>
                                 <div class="text-left md:text-right">
-                                    <p
-                                        class="font-mplusrounded text-xs text-calm-lavender-600 dark:text-calm-lavender-400 uppercase tracking-widest mb-1">
+                                    <!-- Level label: technical → font-dosis -->
+                                    <p class="font-dosis text-xs font-semibold uppercase tracking-widest mb-1
+                                               text-calm-lavender-600 dark:text-calm-lavender-400">
                                         Level {{ auth.user?.gamification?.level || 1 }}
                                     </p>
-                                    <p class="text-2xl font-bold text-platinum-500 dark:text-platinum-500">
+                                    <!-- Percent: gamified stat → font-madimione -->
+                                    <p class="font-madimione text-2xl text-platinum-500 dark:text-platinum-500">
                                         {{ xpProgressPercent }}%
                                     </p>
                                 </div>
                             </div>
 
                             <!-- XP bar -->
-                            <div class="h-4 w-full bg-platinum-200 dark:bg-abyss-700 rounded-full
-                                        border-2 border-platinum-300 dark:border-abyss-600 overflow-hidden">
-                                <div class="h-full bg-calm-lavender-600 dark:bg-calm-lavender-500 rounded-full transition-all duration-1000"
+                            <div class="progress-track">
+                                <div class="progress-fill"
                                     :style="{ width: xpProgressPercent + '%' }">
                                 </div>
                             </div>
@@ -215,18 +241,25 @@
                                     <component :is="stat.icon" class="h-5 w-5" />
                                 </div>
                             </div>
-                            <p class="text-3xl font-bold text-abyss-900 dark:text-platinum-50 mb-1">{{ stat.val }}</p>
-                            <p
-                                class="font-mplusrounded text-xs text-platinum-600 dark:text-platinum-400 uppercase tracking-wide">
+                            <!-- Stat value: gamified → font-madimione -->
+                            <p class="font-madimione text-3xl text-abyss-900 dark:text-platinum-50 mb-1">
+                                {{ stat.val }}
+                            </p>
+                            <!-- Stat label: technical micro-UI → font-dosis -->
+                            <p class="font-dosis text-xs font-semibold uppercase tracking-wide
+                                       text-platinum-600 dark:text-platinum-400">
                                 {{ stat.label }}
                             </p>
-                            <p class="text-sm font-medium text-platinum-500 dark:text-platinum-500 mt-0.5">{{ stat.sub
-                                }}</p>
+                            <!-- Stat sub: empathetic helper text → font-mplusrounded -->
+                            <p class="font-mplusrounded text-sm font-medium mt-0.5
+                                       text-platinum-500 dark:text-platinum-500">
+                                {{ stat.sub }}
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Leaderboard (col 4) -->
+                <!-- ── Leaderboard (col 4) ── -->
                 <div class="lg:col-span-4 lg:sticky lg:top-8">
                     <div class="card">
                         <div class="flex items-center gap-3 mb-6">
@@ -250,10 +283,11 @@
                                         :class="index === 0 ? 'rank-badge--gold' : index === 1 ? 'rank-badge--silver' : index === 2 ? 'rank-badge--bronze' : ''">
                                         {{ index + 1 }}
                                     </div>
-                                    <span
-                                        class="text-sm font-semibold truncate max-w-[100px]
-                                                 text-abyss-700 dark:text-platinum-200
-                                                 group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400 transition-colors">
+                                    <!-- Player name: technical nav → font-dosis -->
+                                    <span class="font-dosis text-sm font-semibold truncate max-w-[100px]
+                                                  text-abyss-700 dark:text-platinum-200
+                                                  group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400
+                                                  transition-colors">
                                         {{ player.name }}
                                     </span>
                                 </div>
@@ -262,12 +296,12 @@
                         </div>
 
                         <button @click="isLeaderboardOpen = true" class="btn-primary w-full justify-center mt-6">
-                            View Global Rankings
+                            <span class="main-button-text">View Global Rankings</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Educational Videos — full width -->
+                <!-- ── Educational Videos — full width ── -->
                 <div class="lg:col-span-12">
                     <section class="space-y-5">
                         <div class="flex items-center gap-3">
@@ -278,40 +312,53 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                            <a v-for="video in educationalVideos" :key="video.id" :href="video.link" target="_blank"
+                            <a v-for="video in educationalVideos" :key="video.id"
+                                :href="video.link" target="_blank"
                                 class="video-card group">
+
                                 <!-- Thumbnail -->
-                                <div class="relative h-44 w-full bg-platinum-200 dark:bg-abyss-700 overflow-hidden">
+                                <div class="relative h-44 w-full
+                                             bg-platinum-200 dark:bg-abyss-700 overflow-hidden">
                                     <img :src="video.thumbnail" :alt="video.title"
                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                    <div
-                                        class="absolute inset-0 bg-abyss-900/40 group-hover:bg-abyss-900/20 transition-colors flex items-center justify-center">
+                                    <div class="absolute inset-0 flex items-center justify-center
+                                                 bg-abyss-900/40 group-hover:bg-abyss-900/20 transition-colors">
                                         <div class="play-btn">
                                             <PlayIcon class="w-5 h-5 text-white fill-white ml-0.5" />
                                         </div>
                                     </div>
-                                    <span
-                                        class="absolute top-2.5 right-2.5 px-2 py-0.5 bg-abyss-900/80 text-white text-xs font-bold rounded-lg uppercase">
+                                    <!-- Duration chip: technical label → font-dosis -->
+                                    <span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-lg
+                                                  font-dosis text-xs font-bold uppercase
+                                                  bg-abyss-900/80 text-white">
                                         {{ video.duration }}
                                     </span>
-                                    <span
-                                        class="absolute bottom-2.5 left-2.5 px-2 py-0.5 bg-calm-lavender-600 text-white text-xs font-bold rounded-lg uppercase">
+                                    <!-- Category chip: badge-lavender pattern → font-dosis -->
+                                    <span class="absolute bottom-2.5 left-2.5 px-2 py-0.5 rounded-lg
+                                                  font-dosis text-xs font-bold uppercase
+                                                  bg-calm-lavender-600 text-white">
                                         {{ video.category }}
                                     </span>
                                 </div>
-                                <!-- Body -->
+
+                                <!-- Video body -->
                                 <div class="p-4">
-                                    <h4
-                                        class="font-bold text-base text-abyss-800 dark:text-platinum-100 leading-snug mb-1.5 line-clamp-2
-                                               group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400 transition-colors">
+                                    <!-- Video title: gamified heading → font-madimione -->
+                                    <h4 class="font-madimione text-base leading-snug line-clamp-2 mb-1.5
+                                                text-abyss-800 dark:text-platinum-100
+                                                group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400
+                                                transition-colors">
                                         {{ video.title }}
                                     </h4>
-                                    <p
-                                        class="text-sm text-platinum-600 dark:text-platinum-400 mb-3 line-clamp-2 leading-relaxed">
+                                    <!-- Description: GAD/VAWC-safe body → font-mplusrounded + leading-relaxed -->
+                                    <p class="font-mplusrounded text-sm leading-relaxed line-clamp-2 mb-3
+                                               text-platinum-600 dark:text-platinum-400">
                                         {{ video.description }}
                                     </p>
-                                    <span
-                                        class="font-mplusrounded text-xs text-calm-lavender-600 dark:text-calm-lavender-400 uppercase tracking-widest group-hover:underline">
+                                    <!-- CTA micro-link: technical → font-dosis -->
+                                    <span class="font-dosis text-xs font-semibold uppercase tracking-widest
+                                                  text-calm-lavender-600 dark:text-calm-lavender-400
+                                                  group-hover:underline">
                                         Watch Now →
                                     </span>
                                 </div>
@@ -362,6 +409,7 @@ const visibleAnnouncements = computed(() =>
         return new Date(ann.expires_at) > now.value
     })
 )
+
 const educationalVideos = ref([
     {
         id: 1,
@@ -412,33 +460,20 @@ const currentFact = ref(dailyFacts[Math.floor(Math.random() * dailyFacts.length)
 
 const formatTimeAgo = (dateStr) => {
     if (!dateStr) return "Unknown time";
-
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return "Invalid date";
-
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
-
-    // Threshold constants
     const minute = 60;
     const hour = 3600;
     const day = 86400;
-
-    // 2. Relative time for the first 24 hours
     if (diffInSeconds < 30) return "Just now";
     if (diffInSeconds < minute) return `${diffInSeconds}s ago`;
     if (diffInSeconds < hour) return `${Math.floor(diffInSeconds / minute)}m ago`;
     if (diffInSeconds < day) return `${Math.floor(diffInSeconds / hour)}h ago`;
-
-    // 3. Fallback: Show actual Date and Time for older posts
-    // Options: month 'short' (Mar), day 'numeric' (1), hour/minute
     return date.toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
+        month: 'short', day: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: '2-digit', hour12: true
     });
 };
 
@@ -571,7 +606,7 @@ onUnmounted(() => {
 .stat-chip {
     @apply flex items-center gap-3 px-4 py-3 rounded-2xl;
     @apply bg-platinum-100 dark:bg-abyss-700;
-    @apply border-2 border-platinum-300 dark:border-abyss-600;
+    @apply border-2 border-platinum-300 dark:border-abyss-500;
     @apply hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700;
     @apply transition-colors duration-150;
 }
@@ -583,7 +618,7 @@ onUnmounted(() => {
 .quick-action-card {
     @apply flex items-center gap-4 px-4 py-4 rounded-2xl no-underline transition-all duration-150;
     @apply bg-platinum-100 dark:bg-abyss-700;
-    @apply border-2 border-platinum-300 dark:border-abyss-600;
+    @apply border-2 border-platinum-300 dark:border-abyss-500;
     border-bottom-width: 4px;
     border-bottom-color: theme('colors.platinum.400');
     @apply hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700;
@@ -605,7 +640,7 @@ onUnmounted(() => {
 .leaderboard-row {
     @apply flex items-center justify-between px-3.5 py-2.5 rounded-xl;
     @apply bg-platinum-200 dark:bg-abyss-800;
-    @apply border-2 border-platinum-300 dark:border-abyss-600;
+    @apply border-2 border-platinum-300 dark:border-abyss-500;
     @apply hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700;
     @apply transition-colors duration-150;
 }
@@ -626,32 +661,18 @@ onUnmounted(() => {
 .rank-badge {
     @apply w-7 h-7 flex items-center justify-center rounded-full shrink-0;
     @apply bg-platinum-300 dark:bg-abyss-600;
-    @apply text-xs font-bold text-abyss-600 dark:text-platinum-400;
+    @apply font-dosis text-xs font-bold text-abyss-600 dark:text-platinum-400;
 }
 
-.rank-badge--gold {
-    background: #fef3c7;
-    color: #d97706;
-    border: 1.5px solid #fbbf24;
-}
-
-.rank-badge--silver {
-    background: #f3f4f6;
-    color: #6b7280;
-    border: 1.5px solid #d1d5db;
-}
-
-.rank-badge--bronze {
-    background: #fdf4ed;
-    color: #b45309;
-    border: 1.5px solid #f59e0b;
-}
+.rank-badge--gold   { background: #fef3c7; color: #d97706; border: 1.5px solid #fbbf24; }
+.rank-badge--silver { background: #f3f4f6; color: #6b7280; border: 1.5px solid #d1d5db; }
+.rank-badge--bronze { background: #fdf4ed; color: #b45309; border: 1.5px solid #f59e0b; }
 
 /* ═══════════════════════════════════════════════════════════
    XP BADGE
 ═══════════════════════════════════════════════════════════ */
 .xp-badge {
-    @apply text-xs font-bold px-2 py-0.5 rounded-lg;
+    @apply font-dosis text-xs font-bold px-2 py-0.5 rounded-lg;
     @apply bg-calm-lavender-100 dark:bg-calm-lavender-900/20;
     @apply text-calm-lavender-700 dark:text-calm-lavender-300;
     border: 1.5px solid theme('colors.calm-lavender.200');
@@ -667,7 +688,7 @@ onUnmounted(() => {
 .video-card {
     @apply rounded-2xl overflow-hidden no-underline block;
     @apply bg-platinum-100 dark:bg-abyss-700;
-    @apply border-2 border-platinum-300 dark:border-abyss-600;
+    @apply border-2 border-platinum-300 dark:border-abyss-500;
     @apply hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700;
     @apply hover:-translate-y-0.5 transition-all duration-200;
 }
@@ -694,23 +715,17 @@ onUnmounted(() => {
 }
 
 @keyframes fadeSlideUp {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
+
 /* ═══════════════════════════════════════════════════════════
    ANNOUNCEMENT META FOOTER
 ═══════════════════════════════════════════════════════════ */
 .ann-meta-footer {
     @apply flex flex-col gap-1 pt-3;
     @apply border-t border-amber-200 dark:border-amber-500/20;
-    @apply font-mplusrounded text-xs text-platinum-500 dark:text-platinum-500;
+    @apply font-dosis text-xs font-medium text-platinum-500 dark:text-platinum-500;
 }
 
 .ann-expiry {
