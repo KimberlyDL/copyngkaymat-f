@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-slate-50 dark:bg-abyss-900 custom-font-poppins text-black dark:text-white relative selection:bg-purple-500/30 transition-colors duration-500">
+    <div class="min-h-screen bg-slate-50 dark:bg-abyss-900 text-black dark:text-white relative selection:bg-purple-500/30 transition-colors duration-500">
         
         
         <FacilitatorSidebar />
@@ -41,7 +41,7 @@ const sidebarStore = useSidebarStore();
 </script>
 
 <style scoped>
-.custom-font-poppins { font-family: 'Poppins', sans-serif !important; }
+@reference "@/style.css";
 
 /* SMOOTH TRANSITION BETWEEN VIEWS */
 .layout-shift-enter-active,

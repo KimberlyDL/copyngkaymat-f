@@ -45,9 +45,7 @@ const sidebarStore = useSidebarStore()
 </script>
 
 <style scoped>
-.custom-font-poppins {
-    font-family: 'Poppins', sans-serif !important;
-}
+@reference "@/style.css";
 
 /* REFINED PAGE TRANSITIONS */
 .page-shift-enter-active,

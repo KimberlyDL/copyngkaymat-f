@@ -9,7 +9,7 @@
         </Transition>
 
         <aside :class="[
-            'fixed top-0 left-0 bottom-0 z-[60] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] custom-font-poppins',
+            'fixed top-0 left-0 bottom-0 z-[60] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]',
             'container-bg',
             isHidden && 'hidden md:block translate-x-[-100%]',
             isIcon && 'w-22 md:block',
@@ -119,18 +119,6 @@
                     </div>
                 </nav>
 
-<router-link 
-    :to="{ name: 'user.behavioral-assessment' }" 
-    class="menu-item group"
-    active-class="active-link"
->
-    <div class="flex items-center gap-4">
-        <div class="p-2 rounded-lg bg-platinum-100 dark:bg-abyss-700 group-hover:bg-calm-lavender-100 dark:group-hover:bg-calm-lavender-900/30 transition-colors">
-            <component :is="'ActivityIcon'" class="w-4 h-4" />
-        </div>
-        <span v-if="isFull" class="menu-text">Behavioral AI</span>
-    </div>
-</router-link>
 
                 <!-- Profile trigger -->
                 <div class="mt-auto p-4 relative border-t border-platinum-200 dark:border-abyss-600 container-bg">
@@ -227,6 +215,7 @@ const navItems = [
     { name: 'Leaderboards', action: () => isLeaderboardOpen.value = true, isActive: () => isLeaderboardOpen.value, icon: Trophy, color: 'text-yellow-500', fill: 'fill-yellow-500/20' },
     { name: 'Classrooms', route: 'classrooms.index', icon: School, color: 'text-blue-500', fill: 'fill-blue-500/20' },
     { name: 'Modules', route: 'user.modules', icon: Library, color: 'text-emerald-500', fill: 'fill-emerald-500/20' },
+    { name: 'Behavioral AI', route: 'user.behavioral-assessment', icon: ActivityIcon, color: 'text-rose-500', fill: 'fill-rose-500/20' },
     { name: 'My Inventory', route: 'user.my-inventory', icon: Package, color: 'text-neon-pink-500', fill: 'fill-neon-pink-500/20' },
     { name: 'Rewards Shop', route: 'user.rewards-shop', icon: Gift, color: 'text-orange-500', fill: 'fill-orange-500/20' }
 ]
@@ -314,10 +303,6 @@ onUnmounted(() => {
 <style scoped>
 @reference "@/style.css";
 
-.custom-font-poppins {
-    font-family: 'Poppins', sans-serif !important;
-}
-
 .scroll-left-container {
     direction: rtl;
     overflow-y: auto;
@@ -344,7 +329,6 @@ onUnmounted(() => {
 
 .menu-item {
     @apply w-full flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase hover:text-calm-lavender-600 hover:bg-calm-lavender-500/5 transition-all border-b border-platinum-200 dark:border-abyss-600 last:border-none;
-    font-family: 'Poppins', sans-serif !important;
 }
 
 .slide-up-enter-active,

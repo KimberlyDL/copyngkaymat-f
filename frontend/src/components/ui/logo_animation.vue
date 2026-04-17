@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col items-center justify-center custom-font-poppins">
+    <div class="flex flex-col items-center justify-center">
         <div class="logo-container mb-6 transform transition-all duration-700" :class="[animationClass, statusColorClass]">
             <svg class="w-16 h-16 md:w-20 md:h-20 drop-shadow-2xl" viewBox="0 0 500 416" xmlns="http://www.w3.org/2000/svg">
                 <g class="transition-all duration-500">
@@ -54,11 +54,7 @@ const statusColorClass = computed(() => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700;1,900&display=swap');
-
-.custom-font-poppins {
-    font-family: 'Poppins', sans-serif !important;
-}
+@reference "@/style.css";
 
 /* Institutional Neural Pulse Animation */
 @keyframes neural-pulse {

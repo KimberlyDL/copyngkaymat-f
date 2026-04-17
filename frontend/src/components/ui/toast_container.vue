@@ -1,7 +1,7 @@
 <template>
     <Teleport to="body">
         <TransitionGroup name="toast" tag="div"
-            class="fixed bottom-6 right-6 z-[300] flex flex-col gap-4 pointer-events-none custom-font-poppins">
+            class="fixed bottom-6 right-6 z-[300] flex flex-col gap-4 pointer-events-none">
             <Toast v-for="toast in toastStore.toasts" :key="toast.id" :toast="toast"
                 class="pointer-events-auto hover:scale-[1.02] transition-transform duration-300" />
         </TransitionGroup>
@@ -17,11 +17,7 @@ const toastStore = useToastStore()
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700;1,900&display=swap');
-
-.custom-font-poppins {
-    font-family: 'Poppins', sans-serif !important;
-}
+@reference "@/style.css";
 
 /* Institutional Slide & Blur Animation */
 .toast-enter-active,

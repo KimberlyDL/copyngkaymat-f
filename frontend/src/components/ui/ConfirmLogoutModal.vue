@@ -2,7 +2,7 @@
     <Teleport to="body">
         <Transition name="fade">
             <div v-if="isOpen"
-                class="fixed inset-0 z-[300] flex items-center justify-center p-4 overflow-hidden font-['Poppins']">
+                class="fixed inset-0 z-[300] flex items-center justify-center p-4 overflow-hidden">
                 <div class="absolute inset-0 bg-[#020203]/95 backdrop-blur-md" @click="closeModal"></div>
 
                 <div
@@ -73,6 +73,8 @@ const handleConfirm = async () => {
 </script>
 
 <style scoped>
+@reference "@/style.css";
+
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.3s ease;

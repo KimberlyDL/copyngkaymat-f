@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#020203] font-['Poppins'] text-white antialiased relative">
+  <div class="min-h-screen bg-[#020203]text-white antialiased relative">
     
     <AIChatbot />
 
@@ -33,6 +33,7 @@ onMounted(async () => {
 </script>
 
 <style>
+@reference "@/style.css";
 /* Siguraduhin na ang transition ay hindi nakaka-block sa UI */
 .page-enter-active, .page-leave-active {
   transition: opacity 0.2s ease;

@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 bg-slate-50 dark:bg-[#06050a] p-3 sm:p-4 md:p-0 transition-colors duration-500 font-poppins selection:bg-purple-500/30">
+    <div class="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 bg-slate-50 dark:bg-[#06050a] p-3 sm:p-4 md:p-0 transition-colors duration-500 selection:bg-purple-500/30">
 
         <div class="relative w-full h-[30vh] md:h-full overflow-hidden rounded-[2rem] md:rounded-none">
             <div class="absolute inset-0 md:p-4 lg:p-6 bg-slate-50 dark:bg-[#06050a] transition-colors duration-500">
@@ -75,6 +75,8 @@
 </template>
 
 <style scoped>
+@reference "@/style.css";
+
 /* Ultra-Slow Mesh Background Animation */
 @keyframes mesh-flow {
     0% { background-position: 0% 0%; }
@@ -106,5 +108,4 @@
 .animate-blob-2 { animation: morph-float-2 30s ease-in-out infinite; }
 .animate-blob-3 { animation: morph-float-3 25s ease-in-out infinite; }
 
-.font-poppins { font-family: 'Poppins', sans-serif !important; }
 </style>

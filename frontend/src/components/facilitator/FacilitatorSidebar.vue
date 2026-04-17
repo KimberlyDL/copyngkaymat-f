@@ -9,7 +9,7 @@
         </Transition>
 
         <aside :class="[
-            'fixed top-0 left-0 bottom-0 z-[60] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] custom-font-poppins',
+            'fixed top-0 left-0 bottom-0 z-[60] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]',
             'container-bg',
             isHidden && 'hidden md:block translate-x-[-100%]',
             isIcon && 'w-22 md:block',
@@ -279,8 +279,6 @@ onUnmounted(() => {
 <style scoped>
 @reference "@/style.css";
 
-.custom-font-poppins { font-family: 'Poppins', sans-serif !important; }
-
 .scroll-left-container { direction: rtl; overflow-y: auto; overflow-x: visible; }
 .scroll-content { direction: ltr; display: flex; flex-direction: column; }
 
@@ -290,7 +288,6 @@ onUnmounted(() => {
 
 .menu-item {
     @apply w-full flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase hover:text-calm-lavender-600 hover:bg-calm-lavender-500/5 transition-all border-b border-platinum-200 dark:border-abyss-600 last:border-none;
-    font-family: 'Poppins', sans-serif !important;
 }
 
 /* Active nav item — scoped so it doesn't affect global container-bg-dark */

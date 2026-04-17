@@ -1,5 +1,5 @@
 <template>
-    <div class="p-8 space-y-8 font-['Poppins'] text-white">
+    <div class="p-8 space-y-8 text-white">
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-black uppercase tracking-tighter italic">GAD Inventory</h1>
@@ -58,3 +58,7 @@ const loadRewards = async () => {
 
 onMounted(loadRewards);
 </script>
+
+<style scoped>
+@reference "@/style.css";
+</style>

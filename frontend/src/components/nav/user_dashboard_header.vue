@@ -1,6 +1,6 @@
 <template>
   <header
-    class="sticky top-0 z-30 bg-white/90 dark:bg-[#06050a]/90 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 custom-font-poppins transition-all duration-500">
+    class="sticky top-0 z-30 bg-white/90 dark:bg-[#06050a]/90 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 transition-all duration-500">
     <div class="h-[2px] w-full bg-gradient-to-r from-purple-600 via-fuchsia-500 to-purple-600 opacity-80"></div>
 
     <div class="flex items-center justify-between h-16 px-6 lg:px-10">
@@ -52,7 +52,6 @@ const currentPageTitle = computed(() => route.meta.title || 'Overview');
 </script>
 
 <style scoped>
-.custom-font-poppins {
-  font-family: 'Poppins', sans-serif !important;
-}
+@reference "@/style.css";
+
 </style>

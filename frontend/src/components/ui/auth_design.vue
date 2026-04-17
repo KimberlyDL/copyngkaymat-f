@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-dvh md:h-screen w-full grid grid-cols-1 md:grid-cols-2 bg-slate-50 dark:bg-[#06050a] transition-colors duration-500 font-poppins selection:bg-purple-500/30">
+    <div class="min-h-dvh md:h-screen w-full grid grid-cols-1 md:grid-cols-2 bg-slate-50 dark:bg-[#06050a] transition-colors duration-500 selection:bg-purple-500/30">
 
         <div class="relative w-full h-[30vh] md:h-full overflow-hidden rounded-[2rem] md:rounded-none">
             <div class="absolute inset-0 md:p-4 lg:p-6 bg-slate-50 dark:bg-[#06050a] transition-colors duration-500">
@@ -83,6 +83,8 @@ defineProps({
 </script>
 
 <style scoped>
+@reference "@/style.css";
+
 /* Ultra-Slow Mesh Background Animation for Tactical Depth */
 @keyframes mesh-flow {
     0% { background-position: 0% 0%; }

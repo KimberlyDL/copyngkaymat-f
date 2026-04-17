@@ -1,5 +1,5 @@
 <template>
-  <div :class="['quiz-arena min-h-screen font-poppins overflow-hidden relative transition-colors duration-500',
+  <div :class="['quiz-arena min-h-screen overflow-hidden relative transition-colors duration-500',
     isDark ? 'bg-abyss-900 text-white' : 'bg-slate-50 text-slate-900']">
 
     <!-- Subtle ambient bg (no blur, no glow) -->
@@ -605,6 +605,8 @@ onUnmounted(() => { clearInterval(timer); if (themeObserver) themeObserver.disco
 </script>
 
 <style scoped>
+@reference "@/style.css";
+
 .brand-gradient-text {
   background: linear-gradient(to right, #9333ea, #ec4899);
   -webkit-background-clip: text;

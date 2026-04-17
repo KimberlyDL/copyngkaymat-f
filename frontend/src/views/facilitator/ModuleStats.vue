@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8 space-y-8 min-h-screen bg-slate-50 dark:bg-[#020203] text-black dark:text-white custom-font-poppins transition-colors duration-500">
+  <div class="p-8 space-y-8 min-h-screen bg-slate-50 dark:bg-[#020203] text-black dark:text-white transition-colors duration-500">
     <div class="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-8">
       <div>
         <button @click="$router.push({ name: 'facilitator.modules.detail', params: { id: $route.params.id } })" class="flex items-center gap-2 mb-4 group text-black/50 dark:text-gray-500 hover:text-purple-600 dark:hover:text-white transition-colors">
@@ -171,12 +171,6 @@ onMounted(fetchStats);
 
 <style scoped>
 @reference "@/style.css";
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700;1,900&display=swap');
-
-.custom-font-poppins {
-    font-family: 'Poppins', sans-serif !important;
-}
 
 /* 3D Pill and Table Transitions */
 .animate-vessel {

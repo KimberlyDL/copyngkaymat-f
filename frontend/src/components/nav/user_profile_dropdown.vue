@@ -1,5 +1,5 @@
 <template>
-    <div class="relative custom-font-poppins">
+    <div class="relative">
         <!-- Trigger button -->
         <button ref="triggerRef" @click.stop="open = !open" type="button" :aria-expanded="open"
             class="flex items-center gap-2 p-1 pr-3 rounded-2xl container-bg-dark border border-platinum-200 dark:border-abyss-600 hover:border-calm-lavender-500/30 transition-all active:scale-95 group">
@@ -162,13 +162,8 @@ onUnmounted(() => {
 <style scoped>
 @reference "@/style.css";
 
-.custom-font-poppins {
-    font-family: 'Poppins', sans-serif !important;
-}
-
 .menu-item {
     @apply w-full flex items-center gap-3 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-abyss-600 dark:text-platinum-400 hover:text-calm-lavender-600 dark:hover:text-platinum-50 hover:bg-calm-lavender-500/5 transition-all rounded-xl;
-    font-family: 'Poppins', sans-serif !important;
 }
 
 .slide-up-enter-active,

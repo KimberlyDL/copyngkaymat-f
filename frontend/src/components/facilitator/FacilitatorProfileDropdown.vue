@@ -1,5 +1,5 @@
 <template>
-    <div class="relative profile-node custom-font-poppins" ref="dropdownRef">
+    <div class="relative profile-node" ref="dropdownRef">
         <button @click.stop="isOpen = !isOpen" type="button" :aria-expanded="isOpen" 
             class="w-full flex items-center gap-4 p-2.5 pr-6 rounded-[2rem] bg-white/60 dark:bg-[#0d0d15]/60 backdrop-blur-3xl border border-white dark:border-white/10 hover:border-purple-500/50 transition-all active:scale-95 group shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] relative overflow-hidden">
             
@@ -58,7 +58,7 @@
 
         <Teleport to="body">
             <Transition name="fade">
-                <div v-if="showModal" class="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl custom-font-poppins">
+                <div v-if="showModal" class="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
                     <div class="absolute inset-0" @click="showModal = false"></div>
                     
                     <div class="relative bg-white dark:bg-[#0f0f18] border border-slate-200 dark:border-white/10 rounded-[4rem] p-12 max-w-sm w-full text-center shadow-[0_60px_150px_rgba(0,0,0,0.5)] flex flex-col items-center animate-vessel overflow-hidden">
@@ -143,13 +143,6 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside));
 
 <style scoped>
 @reference "@/style.css";
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700;1,900&display=swap');
-
-.custom-font-poppins {
-    font-family: 'Poppins', sans-serif !important;
-}
-
 .menu-item {
     @apply w-full flex items-center gap-5 px-5 py-4 transition-all rounded-[2rem] border border-transparent;
 }

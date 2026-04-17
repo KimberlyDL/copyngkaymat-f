@@ -158,7 +158,7 @@ onMounted(() => {
         </Transition>
 
         <aside :class="[
-            'fixed top-16 left-0 bottom-0 z-[60] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] font-[\'Poppins\']',
+            'fixed top-16 left-0 bottom-0 z-[60] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
             'bg-white dark:bg-[#060608] text-black dark:text-white border-r border-slate-200 dark:border-white/5',
             isHidden && 'hidden md:block translate-x-[-100%]',
             isIcon && 'w-20 md:block',
@@ -320,13 +320,11 @@ onMounted(() => {
 /* text label inside button */
 .nav-text {
     @apply text-[11px] font-black uppercase tracking-[0.15em] relative z-10;
-    font-family: 'Poppins', sans-serif !important;
 }
 
 /* profile/other menu item style (if used anywhere) */
 .menu-item { 
     @apply w-full flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase hover:text-purple-600 hover:bg-purple-500/5 transition-all border-b border-slate-100 dark:border-white/5 last:border-none; 
-    font-family: 'Poppins', sans-serif !important;
 }
 
 /* scrollbar customization (re‑use from facilitator) */
