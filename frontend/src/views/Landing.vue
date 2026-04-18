@@ -1,22 +1,10 @@
 <template>
-    <div
-        class="min-h-screen bg-gradient-to-br from-platinum-50 via-white to-purple-50 dark:from-abyss-900 dark:via-abyss-800 dark:to-abyss-900">
-        <!-- Navigation -->
+    <div class="min-h-screen bg-platinum-50 dark:bg-abyss-950">
         <LandingNav />
-
-        <!-- Hero Section -->
         <HeroSection />
-
-        <!-- Features Section -->
         <FeaturesSection />
-
-        <!-- Impact Section -->
         <ImpactSection />
-
-        <!-- About Section -->
         <AboutSection />
-
-        <!-- Footer -->
         <LandingFooter />
     </div>
 </template>

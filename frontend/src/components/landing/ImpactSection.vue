@@ -1,97 +1,85 @@
 <template>
-  <section id="dashboard" class="bg-white dark:bg-abyss-900 py-20 px-6 border-t-2 border-slate-100 dark:border-abyss-700">
-    <div class="max-w-6xl mx-auto space-y-16">
+  <section id="modules" class="landing-section bg-platinum-100 dark:bg-abyss-950 py-20 px-6">
+    <div class="max-w-6xl mx-auto">
 
-      <div class="grid lg:grid-cols-2 gap-10 items-center">
-
-        <!-- Left column -->
-        <div class="space-y-6">
-          <div>
-            <p class="font-dosis font-700 text-xs uppercase tracking-[0.25em] text-calm-lavender-600 dark:text-calm-lavender-400 mb-2">Your Progress</p>
-            <h2 class="font-madimione text-3xl md:text-5xl text-slate-900 dark:text-white tracking-tight">Your Advocacy Hub</h2>
-          </div>
-
-          <!-- Daily Fact card — GAD/VAWC body content uses font-mplusrounded + leading-relaxed -->
-          <div class="bg-calm-lavender-600 dark:bg-calm-lavender-700 text-white border-2 border-calm-lavender-800 border-b-[6px] p-6 rounded-3xl relative">
-            <div class="absolute -top-3 -left-3 bg-neon-pink-500 border-2 border-white rounded-full p-2 text-xl">💡</div>
-            <p class="font-mplusrounded text-base font-medium leading-relaxed ml-4">
-              "Consent is a clear, voluntary, and enthusiastic agreement... It can be withdrawn at any time."
-            </p>
-            <p class="font-dosis font-700 text-xs uppercase tracking-[0.2em] mt-4 opacity-80 ml-4">Daily Fact</p>
-          </div>
-
-          <!-- Stat pills -->
-          <div class="flex gap-4">
-            <div class="flex-1 card border-2 border-slate-200 dark:border-abyss-500 border-b-[6px] p-4 rounded-2xl text-center">
-              <span class="block font-madimione text-3xl text-calm-lavender-600 dark:text-calm-lavender-400">Lvl 5</span>
-              <span class="font-dosis font-700 text-xs uppercase tracking-widest text-slate-400 dark:text-platinum-500 mt-1 block">Progress</span>
-            </div>
-            <div class="flex-1 card border-2 border-slate-200 dark:border-abyss-500 border-b-[6px] p-4 rounded-2xl text-center">
-              <span class="block font-madimione text-3xl text-vawc-orange-500">12</span>
-              <span class="font-dosis font-700 text-xs uppercase tracking-widest text-slate-400 dark:text-platinum-500 mt-1 block">Badges</span>
-            </div>
-          </div>
+      <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <p class="font-mplusrounded text-xs font-bold uppercase tracking-[0.2em] text-calm-lavender-500 mb-2">Topics</p>
+          <h2 class="font-madimione text-3xl md:text-4xl text-slate-900 dark:text-white tracking-tight">
+            Featured Learning
+          </h2>
         </div>
-
-        <!-- Right column — Leaderboard -->
-        <div class="container-bg border-2 border-slate-200 dark:border-abyss-500 border-b-[8px] rounded-3xl p-6 md:p-8">
-          <div class="flex justify-between items-end mb-6">
-            <h3 class="font-madimione text-2xl text-slate-800 dark:text-white tracking-wide">Global Rank</h3>
-            <span class="font-madimione text-3xl text-calm-lavender-500">#42</span>
-          </div>
-
-          <div class="space-y-3">
-            <div class="flex justify-between card border-2 border-calm-lavender-300 dark:border-calm-lavender-700/60 border-b-[4px] p-4 rounded-2xl">
-              <span class="font-dosis font-semibold text-slate-800 dark:text-white">1. Jordan_CCS</span>
-              <span class="font-dosis font-bold text-calm-lavender-600 dark:text-calm-lavender-400">12,450 XP</span>
-            </div>
-            <div class="flex justify-between bg-slate-50 dark:bg-abyss-600 border-2 border-slate-200 dark:border-abyss-500 border-b-[4px] p-4 rounded-2xl">
-              <span class="font-dosis font-semibold text-slate-500 dark:text-platinum-400">2. Advocate_Aron</span>
-              <span class="font-dosis font-semibold text-slate-400 dark:text-platinum-500">11,200 XP</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Lumina CTA banner -->
-      <div class="bg-safety-teal-500 dark:bg-safety-teal-600 border-2 border-safety-teal-700 border-b-[8px] rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 text-white relative overflow-hidden">
-        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white opacity-[0.08] rounded-full pointer-events-none"></div>
-        <div class="absolute right-24 top-6 w-16 h-16 bg-white opacity-[0.05] rounded-full pointer-events-none"></div>
-
-        <div class="max-w-xl relative z-10">
-          <h2 class="font-madimione text-3xl md:text-5xl mb-4 tracking-tight">Have a question? <br/> Ask Lumina!</h2>
-          <p class="font-mplusrounded text-base md:text-lg font-medium leading-relaxed opacity-95">
-            Your private AI companion for GAD, VAWC, and Sex Ed questions. Secure, encrypted, and always online to help you understand your rights.
-          </p>
-        </div>
-
-        <button
-          @click="chatbotRef?.openChat()"
-          class="shrink-0 bg-white border-2 border-slate-200 border-b-[6px] active:border-b-[2px] active:translate-y-[4px] text-safety-teal-600 font-madimione text-xl uppercase tracking-wider px-8 py-4 rounded-2xl transition-all relative z-10 hover:-translate-y-0.5">
-          Chat Now
+        <button class="bg-white dark:bg-abyss-700 border-2 border-slate-200 dark:border-abyss-500 border-b-[4px] px-5 py-2.5 rounded-xl font-averta font-semibold text-sm text-slate-600 dark:text-platinum-200 hover:-translate-y-0.5 active:border-b-[2px] active:translate-y-[2px] transition-all w-fit">
+          View All Topics
         </button>
       </div>
 
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <div class="bg-white dark:bg-abyss-700 border-2 border-slate-200 dark:border-abyss-500 border-b-[6px] p-6 rounded-2xl hover:border-calm-lavender-400 transition-colors cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-calm-lavender-100 dark:bg-calm-lavender-900/30 flex items-center justify-center mb-4">📘</div>
+          <h4 class="font-madimione text-xl text-calm-lavender-600 dark:text-calm-lavender-400 mb-2 group-hover:text-calm-lavender-500">GAD Awareness</h4>
+          <p class="font-averta text-sm text-slate-500 dark:text-platinum-400 leading-relaxed">Understanding Gender and Development (GAD) basics.</p>
+        </div>
+
+        <div class="bg-white dark:bg-abyss-700 border-2 border-slate-200 dark:border-abyss-500 border-b-[6px] p-6 rounded-2xl hover:border-vawc-orange-400 transition-colors cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-vawc-orange-100 dark:bg-vawc-orange-900/30 flex items-center justify-center mb-4">⚖️</div>
+          <h4 class="font-madimione text-xl text-vawc-orange-600 dark:text-vawc-orange-400 mb-2 group-hover:text-vawc-orange-500">Legal Rights</h4>
+          <p class="font-averta text-sm text-slate-500 dark:text-platinum-400 leading-relaxed">VAWC: Know Your Rights and legal protections.</p>
+        </div>
+
+        <div class="bg-white dark:bg-abyss-700 border-2 border-slate-200 dark:border-abyss-500 border-b-[6px] p-6 rounded-2xl hover:border-neon-pink-400 transition-colors cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-neon-pink-100 dark:bg-neon-pink-900/30 flex items-center justify-center mb-4">❤️</div>
+          <h4 class="font-madimione text-xl text-neon-pink-600 dark:text-neon-pink-400 mb-2 group-hover:text-neon-pink-500">Sex Ed</h4>
+          <p class="font-averta text-sm text-slate-500 dark:text-platinum-400 leading-relaxed">Safe Relationships and understanding consent.</p>
+        </div>
+
+        <div class="bg-white dark:bg-abyss-700 border-2 border-slate-200 dark:border-abyss-500 border-b-[6px] p-6 rounded-2xl hover:border-safety-teal-400 transition-colors cursor-pointer group">
+          <div class="w-10 h-10 rounded-xl bg-safety-teal-100 dark:bg-safety-teal-900/30 flex items-center justify-center mb-4">🤝</div>
+          <h4 class="font-madimione text-xl text-safety-teal-600 dark:text-safety-teal-400 mb-2 group-hover:text-safety-teal-500">Support Systems</h4>
+          <p class="font-averta text-sm text-slate-500 dark:text-platinum-400 leading-relaxed">How to access community services for help.</p>
+        </div>
+
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-4 justify-center border-t border-slate-200 dark:border-abyss-600 pt-10">
+
+        <button
+          @click="handleMainAction"
+          class="font-averta font-bold text-sm uppercase tracking-wider px-6 py-3 rounded-xl bg-calm-lavender-500 hover:bg-calm-lavender-400 text-white border-2 border-calm-lavender-700 border-b-[4px] active:border-b-[2px] active:translate-y-[2px] transition-all flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+          {{ authStore.isAuthenticated ? 'Go to My Dashboard' : 'Join the Community' }}
+        </button>
+
+        <a
+          href="#features"
+          class="font-averta font-semibold text-sm px-6 py-3 rounded-xl text-slate-600 dark:text-platinum-300 border-2 border-slate-200 dark:border-abyss-500 hover:border-calm-lavender-300 hover:text-calm-lavender-600 transition-all"
+        >
+          See what's inside
+        </a>
+      </div>
     </div>
   </section>
-
-  <!-- Lumina chatbot mounted here so openChat() is accessible via ref -->
-  <AIChatbot ref="chatbotRef" />
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import AIChatbot from '@/components/ui/AIChatbot.vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
-const chatbotRef = ref(null);
+const router    = useRouter();
+const authStore = useAuthStore();
 
-const backgroundOrbs = ref([
-  { size: 500, left: -10, top:  10, delay: 0, opacity: 0.6, blur: 0  },
-  { size: 350, left:  85, top:  40, delay: 2, opacity: 0.5, blur: 0  },
-  { size: 220, left:  70, top:  -5, delay: 4, opacity: 0.4, blur: 10 },
-  { size: 160, left:  10, top:  75, delay: 1, opacity: 0.6, blur: 0  },
-  { size: 280, left:  45, top:  85, delay: 3, opacity: 0.2, blur: 30 },
-  { size: 140, left:  90, top:   5, delay: 2, opacity: 0.3, blur: 2  },
-  { size: 120, left:  30, top:  15, delay: 5, opacity: 0.2, blur: 5  },
-]);
+const handleMainAction = () => {
+  if (authStore.isAuthenticated) {
+    const role = authStore.user?.role;
+    if (role === 'admin') router.push({ name: 'admin.dashboard' });
+    else if (['educator', 'moderator'].includes(role)) router.push({ name: 'facilitator.dashboard' });
+    else router.push({ name: 'user.dashboard' });
+  } else {
+    router.push({ name: 'signup' });
+  }
+};
 </script>

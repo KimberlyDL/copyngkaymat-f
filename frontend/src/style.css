@@ -6,20 +6,58 @@
 /*
   FONT ROLES — ProtectEd Design System
   ─────────────────────────────────────
-  MadimiOne     → Display titles, hero headings, page titles (gamified, warm)
-  Courgette     → Brand wordmark accent, decorative display scripts
+  Averta        → Default sans / body font (replaces system-ui)
+  MadimiOne     → Display titles, hero headings, page titles, CTA buttons (gamified, warm)
+  Courgette     → Brand wordmark accent, decorative display scripts only
   Dosis         → Navigation, sidebar labels, field labels, badges, micro UI text
   MPLUSRounded  → Body copy, descriptions, helper text, subtitles (cozy, readable)
 
-  Migration from Poppins:
-    Poppins body copy   → MPLUSRounded1c  (warmer, rounder, better for GAD/VAWC topics)
-    Poppins UI labels   → Dosis           (variable 200–800, excellent at small sizes)
-    Poppins headings    → MadimiOne       (gamified, ProtectEd brand voice)
-    Poppins scripts     → Courgette       (decorative / brand context only)
+  Typography Migration Guide:
+    Poppins body copy   → Averta / MPLUSRounded1c  (warmer, rounder, better for GAD/VAWC topics)
+    Poppins UI labels   → Dosis                    (variable 200–800, excellent at small sizes)
+    Poppins headings    → MadimiOne                (gamified, ProtectEd brand voice)
+    Poppins scripts     → Courgette                (decorative / brand context only)
 
   Any class that previously used font-['Poppins'] or font-poppins
   should be updated per the role table above.
 */
+
+/* --- Primary Body Font: Averta --- */
+@font-face {
+  font-family: "Averta";
+  src: url("./assets/fonts/AvertaDemoPECuttedDemo-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Brand Script Font: Courgette --- */
+@font-face {
+  font-family: "Courgette";
+  src: url("./assets/fonts/Courgette-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Clean UI Label Font: Dosis (Variable) --- */
+@font-face {
+  font-family: "Dosis";
+  src: url("./assets/fonts/Dosis-VariableFont_wght.ttf") format("truetype");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Playful Display / Title Font: Madimi One --- */
+@font-face {
+  font-family: "MadimiOne";
+  src: url("./assets/fonts/MadimiOne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  size-adjust: 115%;
+}
 
 /* --- Warm Body Font: M PLUS Rounded 1c --- */
 @font-face {
@@ -46,35 +84,6 @@
   font-display: swap;
 }
 
-/* --- Clean UI Label Font: Dosis (Variable) --- */
-@font-face {
-  font-family: "Dosis";
-  src: url("./assets/fonts/Dosis-VariableFont_wght.ttf") format("truetype");
-  font-weight: 200 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* --- Playful Display / Title Font: Madimi One --- */
-@font-face {
-  font-family: "MadimiOne";
-  src: url("./assets/fonts/MadimiOne-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-  size-adjust: 105%;
-}
-
-/* --- Accent / Brand Script Font: Courgette --- */
-@font-face {
-  font-family: "Courgette";
-  src: url("./assets/fonts/Courgette-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-  size-adjust: 115%;
-}
-
 
 /* ================================== */
 /* 2. TAILWIND CSS v4 SETUP (@theme)  */
@@ -86,15 +95,20 @@
 
   /* --- CUSTOM FONT FAMILIES ---
      Usage at a glance:
-       font-mplusrounded → body copy, descriptions, subtitles, helper text, form values
+       font-averta       → default body, general prose, landing page copy
+       font-mplusrounded → sensitive body copy (GAD/VAWC), descriptions, subtitles, helper text, form values
        font-dosis        → field labels, nav names, badges, micro UI chips, tab labels
-       font-madimione    → page titles, section headings, form titles, hero display
+       font-madimione    → page titles, section headings, form titles, hero display, CTA buttons
        font-courgette    → brand wordmark accent, decorative scripts only
   */
+  --font-averta:       "Averta", ui-sans-serif, system-ui, sans-serif;
   --font-mplusrounded: "MPLUSRounded1c", ui-sans-serif, system-ui, sans-serif;
   --font-dosis:        "Dosis", ui-sans-serif, system-ui, sans-serif;
   --font-madimione:    "MadimiOne", ui-sans-serif, sans-serif;
   --font-courgette:    "Courgette", cursive;
+
+  /* Averta is the default sans / body font */
+  --font-sans: "Averta", ui-sans-serif, system-ui, sans-serif;
 
   /* --- BRAND COLORS --- */
 
@@ -158,7 +172,7 @@
   --color-abyss-600:  #171618;
   --color-abyss-700:  #111012;
   --color-abyss-800:  #0c0b0c;
-  --color-abyss-900:  #020203;
+  --color-abyss-900:  #060606;
   --color-abyss-950:  #010101;
 
   /* Platinum: near-white scale for light mode backgrounds */
@@ -201,7 +215,7 @@
 
   --color-obsidian: #0d0d12;
 
-  /* DO NOT USE — legacy aliases */
+  /* DO NOT USE in new code — legacy aliases kept for backwards compatibility */
   --color-purple-500: #8b5cf6;
   --color-purple-600: #7c3aed;
 }
@@ -211,7 +225,7 @@
 
 
 /* ================================== */
-/* 3. BASE STYLES                     */
+/* 3. BASE STYLES & TRANSITIONS       */
 /* ================================== */
 
 @layer base {
@@ -234,13 +248,13 @@
   }
 
   /*
-    Body: MPLUSRounded1c — warm rounded forms suit GAD/VAWC sensitive content.
+    Body: Averta as default sans font.
+    MPLUSRounded used for sensitive GAD/VAWC body content via font-mplusrounded utility.
     Base size 16px: minimum for primary content (prevents iOS zoom, improves a11y).
-    font-weight 400 (normal) default; bump to 500 (medium) for emphasis spans only.
     text-slate-800 in light mode → soft charcoal, reduces contrast glare vs pure black.
   */
   body {
-    @apply font-mplusrounded bg-platinum-50 dark:bg-abyss-950;
+    @apply font-averta bg-slate-50 dark:bg-abyss-950;
     @apply text-slate-800 dark:text-platinum-100;
     @apply antialiased min-h-screen;
     font-size: 16px;
@@ -252,7 +266,6 @@
     Headings: MadimiOne — single-weight (400) display font.
     DO NOT apply font-bold or font-black — MadimiOne has only one weight.
     Use font-size / line-height to create visual hierarchy, not weight.
-    tracking-tight by default; adjust per context with tracking-normal if needed.
   */
   h1, h2, h3, h4 {
     @apply font-madimione tracking-tight text-slate-800 dark:text-platinum-100;
@@ -260,18 +273,19 @@
     line-height: 1.25;
   }
 
-  /* Optical heading scale — clamp() for fluid type across breakpoints */
+  /* Optical heading scale */
   h1 { font-size: clamp(1.875rem, 4vw, 2.5rem);   } /* 30–40px */
   h2 { font-size: clamp(1.5rem,   3vw, 2rem);     } /* 24–32px */
   h3 { font-size: clamp(1.125rem, 2vw, 1.375rem); } /* 18–22px */
   h4 { font-size: 1.0625rem;                      } /* 17px    */
 
   /*
-    Paragraphs: MPLUSRounded1c 16px/normal
-    line-height 1.65 for comfortable reading of educational content
+    Paragraphs: Averta 16px/normal — default body font.
+    Use font-mplusrounded for GAD/VAWC sensitive content.
+    line-height 1.65 for comfortable reading.
   */
   p {
-    @apply font-mplusrounded text-base font-normal;
+    @apply font-averta text-base font-normal;
     @apply text-slate-700 dark:text-platinum-200;
     line-height: 1.65;
   }
@@ -279,7 +293,6 @@
   /*
     Labels: Dosis — variable weight (200–800), excellent small-size legibility.
     Use font-semibold (600) for field labels; the variable axis keeps it sharp.
-    Replaces any prior Poppins usage for form labels.
   */
   label {
     @apply font-dosis text-sm font-semibold;
@@ -315,7 +328,7 @@
   --fc-button-bg-color: rgba(255, 255, 255, 0.05);
   --fc-button-border-color: rgba(255, 255, 255, 0.1);
   --fc-button-hover-bg-color: rgba(255, 255, 255, 0.1);
-  --fc-button-active-bg-color: #7c3aed;
+  --fc-button-active-bg-color: #7e22ce;
   --fc-border-color: rgba(255, 255, 255, 0.05);
 }
 .dark .fc-col-header-cell-cushion,
@@ -439,7 +452,6 @@ nav {
   .field-label {
     /*
       Dosis 11px/700 uppercase — crisp field header above inputs.
-      Dosis variable axis at 700 is visually bold without feeling heavy.
       tracking-widest (0.1em) creates air between characters at small sizes.
     */
     @apply font-dosis text-[11px] font-bold uppercase tracking-widest;
@@ -449,25 +461,21 @@ nav {
   .field-subtext {
     /*
       MPLUSRounded 13px/400 — helper text below inputs.
-      Slightly below body (16px) is OK for support copy — not primary reading content.
-      Rounded letterforms stay legible at 13px; Poppins condensed at this size.
+      Rounded letterforms stay legible at 13px.
     */
     @apply font-mplusrounded text-[13px] font-normal leading-snug;
     @apply text-platinum-600 dark:text-platinum-400;
   }
 
   .field-subtext-error {
-    /*
-      MPLUSRounded 13px/500 — error messages.
-      Slightly heavier than field-subtext to convey urgency without shouting.
-    */
+    /* MPLUSRounded 13px/500 — error messages. */
     @apply font-mplusrounded text-[13px] font-medium leading-snug;
     @apply text-red-500 dark:text-red-400;
   }
 
   .body-subtext {
-    /* MPLUSRounded 14px — general description copy inside cards */
-    @apply font-mplusrounded text-sm font-normal leading-relaxed;
+    /* Averta 14px — general description copy inside cards */
+    @apply font-averta text-sm font-normal leading-relaxed;
     @apply text-platinum-600 dark:text-platinum-400;
   }
 
@@ -487,7 +495,6 @@ nav {
     /*
       MadimiOne 36px — auth page / modal primary title.
       Single weight font: do NOT add font-bold.
-      line-height 1.2 keeps it tight and impactful.
     */
     @apply font-madimione text-4xl font-normal tracking-normal;
     @apply text-abyss-700 dark:text-platinum-200;
@@ -495,11 +502,8 @@ nav {
   }
 
   .form-subtitle {
-    /*
-      MPLUSRounded 16px — auth page tagline with brand gradient.
-      Full 16px ensures it reads as a statement, not a footnote.
-    */
-    @apply font-mplusrounded text-base font-normal leading-relaxed;
+    /* Averta 16px — auth page tagline with brand gradient. */
+    @apply font-averta text-base font-normal leading-relaxed;
     @apply bg-gradient-to-r from-calm-lavender-800 to-neon-pink-600;
     @apply text-transparent bg-clip-text;
   }
@@ -524,7 +528,6 @@ nav {
     /*
       MPLUSRounded 16px — the minimum for inputs (prevents iOS auto-zoom).
       Transparent bg with lavender border: clean, branded, no heavy card feel.
-      py-2.5 = 10px top+bottom = comfortable touch target.
     */
     @apply w-full px-4 py-2.5 bg-transparent rounded-lg;
     @apply border border-calm-lavender-500/50 dark:border-calm-lavender-900/50;
@@ -592,7 +595,7 @@ nav {
   }
 
   .stat-pill-label {
-    /* Dosis 10px/600 — compact stat label; Dosis holds form at 10px where MPLUSRounded softens too much */
+    /* Dosis 10px/600 — compact stat label */
     @apply font-dosis text-[10px] font-semibold uppercase tracking-wide;
     @apply text-platinum-500;
   }
@@ -609,7 +612,6 @@ nav {
       "Flat 3D" tactile button:
       solid lavender bg + border-b-2 darker border = dimensional without shadow.
       active:translate-y-px gives a press-down feedback micro-interaction.
-      font-medium 14px: readable, not shouty.
     */
     @apply flex items-center gap-2 px-4 py-2.5 rounded-xl;
     @apply bg-calm-lavender-600 hover:bg-calm-lavender-700;
@@ -874,6 +876,184 @@ nav {
   .progress-fill {
     @apply h-full rounded-full transition-all duration-700;
     @apply bg-gradient-to-r from-calm-lavender-500 to-neon-pink-500;
+  }
+
+  /* ── Animate In ──────────────────── */
+
+  .animate-in {
+    animation: fadeSlideUp 0.4s ease-out forwards;
+  }
+
+
+  /* ============================================================ */
+  /* LANDING PAGE COMPONENTS                                      */
+  /* ============================================================ */
+
+  /* ── Nav ─────────────────────────── */
+
+  .landing-nav-pill {
+    @apply w-full max-w-5xl;
+    @apply bg-white/80 dark:bg-abyss-600/90;
+    @apply border border-slate-200 dark:border-abyss-500;
+    @apply rounded-2xl px-6 py-3;
+    @apply transition-all duration-300;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .landing-logo-icon {
+    @apply w-9 h-9 rounded-xl flex items-center justify-center shrink-0;
+    @apply bg-gradient-to-br from-calm-lavender-500 to-neon-pink-500;
+    @apply transition-transform duration-300 group-hover:scale-105;
+  }
+
+  .landing-nav-link {
+    @apply font-madimione text-lg text-slate-500 dark:text-platinum-400;
+    @apply hover:text-calm-lavender-600 dark:hover:text-calm-lavender-400;
+    @apply transition-colors duration-200 relative;
+  }
+
+  .landing-btn-ghost {
+    @apply font-averta text-sm font-medium;
+    @apply px-4 py-2 rounded-xl;
+    @apply text-slate-600 dark:text-platinum-300;
+    @apply border border-slate-200 dark:border-abyss-500;
+    @apply hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700;
+    @apply hover:text-calm-lavender-600 dark:hover:text-calm-lavender-400;
+    @apply transition-all duration-200;
+  }
+
+  .landing-btn-primary {
+    @apply font-averta text-sm font-medium;
+    @apply px-4 py-2 rounded-xl;
+    @apply bg-calm-lavender-600 hover:bg-calm-lavender-700;
+    @apply dark:bg-calm-lavender-700 dark:hover:bg-calm-lavender-600;
+    @apply text-white;
+    @apply border border-calm-lavender-700 dark:border-calm-lavender-600;
+    @apply transition-all duration-200;
+  }
+
+
+  /* ── Section Layout ──────────────── */
+
+  .landing-section-bg {
+    @apply bg-platinum-50 dark:bg-abyss-950;
+  }
+
+  .landing-section-alt {
+    @apply bg-white dark:bg-abyss-900;
+  }
+
+  .landing-section {
+    @apply py-20 px-6;
+  }
+
+  .landing-container {
+    @apply max-w-6xl mx-auto;
+  }
+
+  .landing-section-header {
+    @apply text-center mb-14 space-y-4;
+  }
+
+  .landing-section-title {
+    @apply font-madimione text-4xl md:text-5xl text-slate-900 dark:text-white leading-tight tracking-tight;
+  }
+
+  .landing-section-subtitle {
+    /* Averta body — landing page description text */
+    @apply font-averta text-base text-slate-500 dark:text-platinum-400 max-w-2xl mx-auto leading-relaxed;
+  }
+
+
+  /* ── Hero ────────────────────────── */
+
+  .landing-eyebrow {
+    @apply inline-flex items-center gap-2;
+    @apply font-mplusrounded text-xs font-medium;
+    @apply text-safety-teal-700 dark:text-safety-teal-400;
+    @apply bg-safety-teal-50 dark:bg-safety-teal-900/20;
+    @apply border border-safety-teal-200 dark:border-safety-teal-700/40;
+    @apply px-3.5 py-1.5 rounded-full;
+  }
+
+  .landing-btn-cta-primary {
+    @apply inline-flex items-center gap-2;
+    @apply font-mplusrounded text-sm font-medium;
+    @apply px-6 py-3 rounded-xl;
+    @apply bg-calm-lavender-600 hover:bg-calm-lavender-700;
+    @apply dark:bg-calm-lavender-700 dark:hover:bg-calm-lavender-600;
+    @apply text-white;
+    @apply border border-calm-lavender-700 dark:border-calm-lavender-600;
+    @apply transition-all duration-200 hover:-translate-y-0.5;
+  }
+
+  .landing-btn-cta-ghost {
+    @apply inline-flex items-center gap-2;
+    @apply font-averta text-sm font-medium;
+    @apply px-6 py-3 rounded-xl;
+    @apply text-slate-600 dark:text-platinum-300;
+    @apply border border-slate-200 dark:border-abyss-500;
+    @apply hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700;
+    @apply hover:text-calm-lavender-600 dark:hover:text-calm-lavender-400;
+    @apply transition-all duration-200 hover:-translate-y-0.5;
+  }
+
+  .landing-step-card {
+    @apply flex items-start gap-4 p-5 rounded-2xl;
+    @apply bg-white dark:bg-abyss-700;
+    @apply border border-slate-200 dark:border-abyss-600;
+    @apply transition-all duration-200 hover:border-calm-lavender-200 dark:hover:border-calm-lavender-800/60;
+    @apply hover:-translate-y-0.5;
+  }
+
+  .landing-step-number {
+    @apply w-8 h-8 rounded-xl shrink-0;
+    @apply bg-gradient-to-br from-calm-lavender-500 to-neon-pink-500;
+    @apply flex items-center justify-center;
+    @apply font-madimione text-white text-sm;
+  }
+
+
+  /* ── Feature Cards ───────────────── */
+
+  .landing-feature-card {
+    @apply p-6 rounded-2xl;
+    @apply bg-white dark:bg-abyss-700;
+    @apply border border-slate-200 dark:border-abyss-600;
+    @apply transition-all duration-200 hover:border-calm-lavender-200 dark:hover:border-calm-lavender-800/60;
+    @apply hover:-translate-y-0.5;
+  }
+
+  .landing-feature-icon-wrap {
+    @apply w-11 h-11 rounded-xl flex items-center justify-center;
+    @apply bg-calm-lavender-50 dark:bg-calm-lavender-900/20;
+    @apply border border-calm-lavender-100 dark:border-calm-lavender-800/30;
+  }
+
+
+  /* ── Impact Section ──────────────── */
+
+  .landing-impact-card {
+    @apply p-6 rounded-2xl overflow-hidden;
+    @apply bg-white dark:bg-abyss-700;
+    @apply border border-slate-200 dark:border-abyss-600;
+    @apply transition-all duration-200 hover:border-calm-lavender-200 dark:hover:border-calm-lavender-800/40;
+  }
+
+  .landing-stat-card {
+    @apply p-4 rounded-xl text-center;
+    @apply bg-white dark:bg-abyss-700;
+    @apply border border-slate-200 dark:border-abyss-600;
+  }
+
+
+  /* ── About / Pillar Cards ────────── */
+
+  .landing-pillar-card {
+    @apply flex items-start gap-4 p-4 rounded-xl;
+    @apply bg-slate-50 dark:bg-abyss-800;
+    @apply border border-slate-100 dark:border-abyss-600;
+    @apply transition-colors duration-200;
   }
 
 } /* end @layer utilities */
