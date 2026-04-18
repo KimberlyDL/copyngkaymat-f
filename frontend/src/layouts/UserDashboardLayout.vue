@@ -1,6 +1,7 @@
 <template>
     <div
         class="min-h-screen container-bg relative selection:bg-purple-500/30 transition-colors duration-500 overflow-x-hidden">
+        <PWAInstallToast />
         <DashboardSidebar :user-id="$route.params.id || null" />
 
         <div class="relative z-10 flex flex-col min-h-screen">
@@ -37,9 +38,10 @@
 </template>
 
 <script setup>
-import { useSidebarStore } from '@/stores/stores'
-import DashboardHeader from '@/components/nav/user_dashboard_header.vue'
-import DashboardSidebar from '@/components/nav/user_dashboard_sidebar.vue'
+import { useSidebarStore } from '@/stores/stores';
+import DashboardHeader from '@/components/nav/user_dashboard_header.vue';
+import DashboardSidebar from '@/components/nav/user_dashboard_sidebar.vue';
+import PWAInstallToast from '@/components/ui/PWAInstallToast.vue';
 
 const sidebarStore = useSidebarStore()
 </script>

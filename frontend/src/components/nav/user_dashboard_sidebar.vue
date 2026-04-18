@@ -117,6 +117,11 @@
                     </div>
                 </nav>
 
+<PWAInstallSidebarItem
+    :isFull="isFull"
+    :isIcon="isIcon"
+    :isMobileShown="isMobileShown"
+/>
 
                 <!-- Profile trigger -->
                 <div class="mt-auto p-4 relative border-t border-platinum-200 dark:border-abyss-600 container-bg">
@@ -196,6 +201,7 @@ import {
     MoreVertical, User as UserIcon, Settings, LogOut,
     LayoutDashboard, School, ShieldCheck as ShieldCheckIcon, Trophy, ActivityIcon
 } from 'lucide-vue-next'
+import PWAInstallSidebarItem from '@/components/nav/PWAInstallSidebarItem.vue'
 
 const route = useRoute()
 const router = useRouter()
