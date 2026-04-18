@@ -4,24 +4,32 @@
     <!-- ─── Bell Button ─── -->
     <button
       @click="handleBellClick"
-      :class="['relative p-2.5 rounded-xl border-2 transition-all duration-200 font-poppins',
-        isDark
-          ? 'bg-abyss-700 border-abyss-600 hover:bg-abyss-600'
-          : 'bg-platinum-100 border-platinum-300 border-b-4 border-b-black/10 hover:bg-platinum-200',
-        isOpen && (isDark ? 'bg-abyss-600 border-abyss-500' : 'bg-platinum-200 border-platinum-400')]"
+      :class="[
+        'relative p-2.5 rounded-xl border-2 transition-all duration-200',
+        'bg-platinum-100 border-platinum-300 border-b-2 border-b-black/10',
+        'hover:bg-platinum-200',
+        'dark:bg-abyss-700 dark:border-abyss-500 dark:border-b-white/5',
+        'dark:hover:bg-abyss-600',
+        isOpen && 'bg-platinum-200 border-platinum-400 dark:bg-abyss-600 dark:border-abyss-500'
+      ]"
       :aria-label="'Notifications' + (unreadCount > 0 ? ' (' + unreadCount + ' unread)' : '')"
     >
       <BellIcon
-        :class="['w-5 h-5 transition-transform',
-          unreadCount > 0 && 'animate-wiggle',
-          isDark ? 'text-platinum-100' : 'text-abyss-800']"
+        :class="[
+          'w-5 h-5 transition-transform',
+          'text-abyss-800 dark:text-platinum-100',
+          unreadCount > 0 && 'animate-wiggle'
+        ]"
       />
 
       <!-- Unread Badge -->
       <Transition name="badge-pop">
         <span
           v-if="unreadCount > 0"
-          class="absolute -top-1.5 -right-1.5 min-w-[20px] h-[20px] px-1 flex items-center justify-center rounded-full bg-red-500 border-2 border-white dark:border-abyss-800 text-white text-[10px] font-bold font-mplusrounded"
+          class="absolute -top-1.5 -right-1.5 min-w-[20px] h-[20px] px-1
+                 flex items-center justify-center rounded-full
+                 bg-red-500 border-2 border-white dark:border-abyss-700
+                 text-white text-[10px] font-bold font-mplusrounded"
         >
           {{ unreadCount > 99 ? '99+' : unreadCount }}
         </span>
@@ -32,30 +40,29 @@
     <Transition name="dropdown">
       <div
         v-if="isOpen"
-        :class="['absolute right-0 top-full mt-3 w-[380px] max-w-[calc(100vw-2rem)] rounded-2xl border-2 overflow-hidden z-50',
-          isDark
-            ? 'bg-abyss-800 border-abyss-600 shadow-[0_8px_32px_rgba(0,0,0,0.5)]'
-            : 'bg-white border-platinum-300 shadow-[0_4px_0px_0px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.06)]']"
+        class="absolute right-0 top-full mt-3 w-[380px] max-w-[calc(100vw-2rem)]
+               rounded-2xl border-2 overflow-hidden z-50
+               bg-white border-platinum-300
+               shadow-[0_4px_0px_0px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.06)]
+               dark:bg-abyss-600 dark:border-abyss-500
+               dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)]"
       >
 
         <!-- ─── Header ─── -->
         <div
-          :class="['px-5 py-4 border-b-2 flex items-center justify-between',
-            isDark
-              ? 'bg-abyss-700 border-abyss-600'
-              : 'bg-platinum-100 border-platinum-200']"
+          class="px-5 py-4 border-b-2 flex items-center justify-between
+                 bg-platinum-100 border-platinum-200
+                 dark:bg-abyss-700 dark:border-abyss-500"
         >
           <div>
-            <h3
-              :class="['font-bold text-lg leading-tight font-madimione',
-                isDark ? 'text-platinum-50' : 'text-abyss-800']"
-            >
+            <!-- Title: Gamified → font-madimione -->
+            <h3 class="font-madimione text-lg leading-tight
+                        text-abyss-800 dark:text-platinum-50">
               Notifications
             </h3>
-            <p
-              :class="['text-xs font-medium font-mplusrounded mt-0.5',
-                isDark ? 'text-abyss-300' : 'text-abyss-500']"
-            >
+            <!-- Subtitle: Technical label → font-dosis -->
+            <p class="font-dosis text-xs font-medium tracking-wide mt-0.5
+                       text-abyss-500 dark:text-platinum-900">
               {{ unreadCount }} unread
             </p>
           </div>
@@ -66,29 +73,27 @@
             <!-- Sound toggle — wired to store.toggleSound + store.soundEnabled -->
             <button
               @click.stop="toggleSound"
-              :class="['p-2 rounded-xl border-2 transition-all duration-150',
-                isDark
-                  ? 'bg-abyss-600 border-abyss-500 hover:bg-abyss-500'
-                  : 'bg-platinum-200 border-platinum-300 border-b-4 border-b-black/10 hover:bg-platinum-300']"
+              class="p-2 rounded-xl border-2 transition-all duration-150
+                     bg-platinum-200 border-platinum-300 border-b-2 border-b-black/10
+                     hover:bg-platinum-300
+                     dark:bg-abyss-600 dark:border-abyss-500 dark:border-b-white/5
+                     dark:hover:bg-abyss-500"
               :title="soundEnabled ? 'Mute notifications' : 'Unmute notifications'"
             >
               <Volume2Icon
                 v-if="soundEnabled"
-                :class="['w-4 h-4', isDark ? 'text-calm-lavender-300' : 'text-calm-lavender-600']"
+                class="w-4 h-4 text-calm-lavender-600 dark:text-calm-lavender-300"
               />
               <VolumeXIcon
                 v-else
-                :class="['w-4 h-4', isDark ? 'text-abyss-400' : 'text-abyss-400']"
+                class="w-4 h-4 text-abyss-400"
               />
             </button>
 
-            <!-- Unread pill -->
+            <!-- Unread pill — badge-lavender utility from style.css -->
             <span
               v-if="unreadCount > 0"
-              :class="['px-3 py-1 rounded-full text-xs font-bold font-mplusrounded border',
-                isDark
-                  ? 'bg-calm-lavender-900/50 text-calm-lavender-300 border-calm-lavender-700'
-                  : 'bg-calm-lavender-50 text-calm-lavender-700 border-calm-lavender-200']"
+              class="badge badge-lavender font-dosis text-xs font-bold tracking-wide px-3 py-1 rounded-full"
             >
               {{ unreadCount }} New
             </span>
@@ -99,60 +104,65 @@
         <!-- ─── Notification List ─── -->
         <div
           v-if="notifications.length > 0"
-          :class="['max-h-[420px] overflow-y-auto overscroll-contain divide-y',
-            isDark ? 'divide-abyss-600' : 'divide-platinum-200']"
+          class="max-h-[420px] overflow-y-auto overscroll-contain divide-y
+                 divide-platinum-200 dark:divide-abyss-500"
         >
           <div
             v-for="notif in notifications"
             :key="notif.id"
             @click="handleNotifClick(notif)"
-            :class="['px-5 py-4 cursor-pointer transition-colors duration-150',
-              isDark ? 'hover:bg-abyss-700' : 'hover:bg-platinum-50',
+            :class="[
+              'px-5 py-4 cursor-pointer transition-colors duration-150',
+              'hover:bg-platinum-50 dark:hover:bg-abyss-700',
               !notif.is_read
-                ? (isDark ? 'bg-calm-lavender-900/30' : 'bg-calm-lavender-50/60')
-                : (isDark ? 'bg-abyss-800' : 'bg-white')]"
+                ? 'bg-calm-lavender-50/60 dark:bg-calm-lavender-900/30'
+                : 'bg-white dark:bg-abyss-600'
+            ]"
           >
             <div class="flex gap-3 items-start">
 
               <!-- Unread accent bar -->
               <div
-                :class="['w-1 self-stretch rounded-full flex-shrink-0 mt-1',
-                  !notif.is_read
-                    ? (isDark ? 'bg-calm-lavender-400' : 'bg-calm-lavender-500')
-                    : 'bg-transparent']"
+                :class="[
+                  'w-1 self-stretch rounded-full flex-shrink-0 mt-1',
+                  notif.is_read
+                    ? 'bg-transparent'
+                    : 'bg-calm-lavender-500 dark:bg-calm-lavender-400'
+                ]"
               ></div>
 
               <div class="flex-1 min-w-0">
+                <!-- Notification title: Gamified → font-madimione -->
                 <p
-                  :class="['font-bold leading-snug font-poppins',
-                    !notif.is_read ? 'text-base' : 'text-sm',
-                    isDark ? 'text-platinum-100' : 'text-abyss-800']"
+                  :class="[
+                    'font-madimione leading-snug text-abyss-800 dark:text-platinum-100',
+                    !notif.is_read ? 'text-base' : 'text-sm'
+                  ]"
                 >
                   {{ notif.title }}
                 </p>
-                <p
-                  :class="['font-medium mt-1 line-clamp-2 font-poppins text-sm',
-                    isDark ? 'text-abyss-300' : 'text-abyss-600']"
-                >
+
+                <!-- Notification body: Empathetic → font-mplusrounded + leading-relaxed (GAD/VAWC safe) -->
+                <p class="font-mplusrounded font-medium text-sm leading-relaxed mt-1
+                           line-clamp-2 text-abyss-600 dark:text-platinum-800">
                   {{ notif.message }}
                 </p>
-                <p
-                  :class="['text-xs font-mplusrounded mt-2',
-                    isDark ? 'text-abyss-400' : 'text-abyss-400']"
-                >
+
+                <!-- Timestamp: Technical micro-UI → font-dosis -->
+                <p class="font-dosis text-xs tracking-wide mt-2
+                           text-abyss-400 dark:text-platinum-800">
                   {{ new Date(notif.created_at).toLocaleString() }}
                 </p>
               </div>
 
               <!-- Unread dot -->
               <div v-if="!notif.is_read" class="flex-shrink-0 pt-1.5">
-                <div
-                  :class="['w-2.5 h-2.5 rounded-full border-2',
-                    isDark
-                      ? 'bg-calm-lavender-400 border-calm-lavender-700'
-                      : 'bg-calm-lavender-500 border-calm-lavender-200']"
-                ></div>
+                <div class="w-2.5 h-2.5 rounded-full border-2
+                             bg-calm-lavender-500 border-calm-lavender-200
+                             dark:bg-calm-lavender-400 dark:border-calm-lavender-700">
+                </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -160,44 +170,35 @@
         <!-- ─── Empty State ─── -->
         <div
           v-else
-          :class="['py-14 px-6 text-center',
-            isDark ? 'bg-abyss-800' : 'bg-white']"
+          class="py-14 px-6 text-center bg-white dark:bg-abyss-600"
         >
-          <div
-            :class="['w-16 h-16 rounded-2xl border-2 flex items-center justify-center mx-auto mb-4',
-              isDark
-                ? 'bg-abyss-700 border-abyss-600'
-                : 'bg-platinum-100 border-platinum-200']"
-          >
-            <BellOffIcon
-              :class="['w-8 h-8', isDark ? 'text-abyss-400' : 'text-abyss-400']"
-            />
+          <!-- Icon well -->
+          <div class="w-16 h-16 rounded-2xl border-2 flex items-center justify-center mx-auto mb-4
+                       bg-platinum-100 border-platinum-200
+                       dark:bg-abyss-700 dark:border-abyss-500">
+            <BellOffIcon class="w-8 h-8 text-abyss-400 dark:text-abyss-300" />
           </div>
-          <p
-            :class="['font-bold text-base font-madimione',
-              isDark ? 'text-platinum-100' : 'text-abyss-800']"
-          >
+
+          <!-- empty-state-title from style.css — overriding colour for better contrast -->
+          <p class="font-madimione text-base text-slate-700 dark:text-platinum-200">
             No notifications
           </p>
-          <p
-            :class="['text-sm font-medium font-poppins mt-1',
-              isDark ? 'text-abyss-400' : 'text-abyss-500']"
-          >
+
+          <!-- empty-state-desc from style.css -->
+          <p class="empty-state-desc">
             You're all caught up!
           </p>
         </div>
 
         <!-- ─── Footer ─── -->
         <div
-          :class="['px-5 py-3 border-t-2',
-            isDark
-              ? 'bg-abyss-700 border-abyss-600'
-              : 'bg-platinum-100 border-platinum-200']"
+          class="px-5 py-3 border-t-2
+                 bg-platinum-100 border-platinum-200
+                 dark:bg-abyss-700 dark:border-abyss-500"
         >
-          <p
-            :class="['text-xs font-medium font-mplusrounded text-center',
-              isDark ? 'text-abyss-400' : 'text-abyss-400']"
-          >
+          <!-- Footer: Technical micro-UI → font-dosis -->
+          <p class="font-dosis text-xs tracking-widest uppercase text-center
+                     text-abyss-500 dark:text-platinum-300">
             ProtectED · Notification Center
           </p>
         </div>
@@ -222,7 +223,8 @@ const router = useRouter();
 // soundEnabled is pulled from the store — persisted to localStorage by store.toggleSound
 const { notifications, unreadCount, isOpen, soundEnabled } = storeToRefs(notificationStore);
 
-// Theme detection
+// Theme detection — kept for any JS-side logic (e.g. audio cues).
+// Template theming is handled entirely via Tailwind dark: variants.
 const isDark = ref(document.documentElement.classList.contains('dark'));
 let themeObserver = null;
 
@@ -246,7 +248,6 @@ const handleNotifClick = async (notif) => {
       await notificationStore.markAsRead(notif.id);
     }
 
-    // 3. Use the router instance to navigate
     if (notif.action_url) {
       // Close the notification dropdown first
       isOpen.value = false;
@@ -276,7 +277,7 @@ const unlockAudioOnce = () => {
 };
 
 onMounted(() => {
-  // Theme observer
+  // Theme observer — keeps isDark ref in sync for any JS-side usage
   themeObserver = new MutationObserver(() => {
     isDark.value = document.documentElement.classList.contains('dark');
   });
@@ -342,6 +343,6 @@ onUnmounted(() => {
 /* ── Custom scrollbar ── */
 .overflow-y-auto::-webkit-scrollbar       { width: 5px; }
 .overflow-y-auto::-webkit-scrollbar-track { background: transparent; }
-.overflow-y-auto::-webkit-scrollbar-thumb { background: #d1cfc8; border-radius: 99px; }
-.dark .overflow-y-auto::-webkit-scrollbar-thumb { background: #2d3748; }
+.overflow-y-auto::-webkit-scrollbar-thumb { background: #c9c8ca; border-radius: 99px; } /* platinum-300 */
+.dark .overflow-y-auto::-webkit-scrollbar-thumb { background: #1c1b1d; }                /* abyss-500   */
 </style>

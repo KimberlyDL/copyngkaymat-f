@@ -1,26 +1,32 @@
 <template>
-    <div class="space-y-6 font-poppins">
+    <div class="space-y-6">
 
+        <!-- ── Toolbar ──────────────────────────────────────────── -->
         <div class="toolbar sticky top-4 z-30">
 
             <!-- Search -->
             <div class="relative flex-1 min-w-0">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <SearchIcon
-                        class="h-4 w-4 text-platinum-500 group-focus-within:text-calm-lavender-600 transition-colors" />
+                    <SearchIcon class="h-4 w-4 text-platinum-500" />
                 </div>
-                <input v-model="localFilters.search" type="text" placeholder="Search modules by title…"
-                    class="input-field !pl-11 !py-3 !rounded-xl !border-platinum-200 dark:!border-abyss-500 !bg-platinum-50 dark:!bg-abyss-600 placeholder:!text-platinum-700 dark:placeholder:!text-platinum-400"
-                    @input="debouncedSearch" />
+                <input
+                    v-model="localFilters.search"
+                    type="text"
+                    placeholder="Search modules by title…"
+                    class="input-field !pl-11 !py-3 !rounded-xl
+                           !border-platinum-200 dark:!border-abyss-500
+                           !bg-platinum-50 dark:!bg-abyss-600
+                           placeholder:!text-platinum-500 dark:placeholder:!text-platinum-500"
+                    @input="debouncedSearch"
+                />
             </div>
 
             <!-- Divider -->
             <div class="hidden md:block h-8 w-px bg-platinum-300 dark:bg-abyss-500 shrink-0"></div>
 
-            <!-- Filter selects -->
+            <!-- Filters -->
             <div class="flex items-center gap-2 flex-wrap">
 
-                <!-- Category -->
                 <div class="filter-select-wrap">
                     <select v-model="localFilters.category" class="filter-select" @change="applyFilters">
                         <option :value="null">All Types</option>
@@ -32,7 +38,6 @@
                     <ChevronDownIcon class="filter-select-icon" />
                 </div>
 
-                <!-- Difficulty -->
                 <div class="filter-select-wrap">
                     <select v-model="localFilters.difficulty_level" class="filter-select" @change="applyFilters">
                         <option :value="null">All Levels</option>
@@ -43,24 +48,26 @@
                     <ChevronDownIcon class="filter-select-icon" />
                 </div>
 
-                <!-- Reset -->
-                <button v-if="hasActiveFilters" @click="resetFilters" title="Clear filters" class="reset-btn">
+                <button v-if="hasActiveFilters" @click="resetFilters" class="reset-btn">
                     <XIcon class="w-3.5 h-3.5" />
-                    <span>Reset</span>
+                    <span class="font-dosis font-semibold text-sm">Reset</span>
                 </button>
 
             </div>
         </div>
 
-        <!-- Active filter badges -->
+        <!-- Active filter badges ─────────────────────────────── -->
         <div v-if="hasActiveFilters" class="flex flex-wrap gap-2 animate-fade-in">
-            <span v-for="(value, key) in activeFiltersDisplay" :key="key"
-                class="badge badge-lavender !text-xs !px-3 !py-1 capitalize">
+            <span
+                v-for="(value, key) in activeFiltersDisplay"
+                :key="key"
+                class="badge badge-lavender !text-xs !px-3 !py-1"
+            >
                 <span class="font-semibold">{{ key }}:</span>&nbsp;{{ value }}
             </span>
         </div>
 
-        <!-- Loading state -->
+        <!-- Loading ──────────────────────────────────────────── -->
         <div v-if="moduleStore.loading && modules.length === 0"
             class="flex flex-col items-center justify-center py-32 gap-4">
             <div class="spinner"></div>
@@ -69,103 +76,106 @@
 
         <div v-else-if="filteredModules.length > 0" class="space-y-8">
 
-            <!-- Public Modules Section -->
+            <!-- Public Modules ──────────────────────────────── -->
             <section v-if="publicModules.length > 0">
                 <div class="flex items-center gap-3 mb-4">
-                    <div
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-safety-teal-50 dark:bg-safety-teal-900/20 border-2 border-safety-teal-200 dark:border-safety-teal-800/40">
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl
+                                bg-safety-teal-50 dark:bg-safety-teal-900/20
+                                border-2 border-safety-teal-200 dark:border-safety-teal-800/40">
                         <GlobeIcon class="w-3.5 h-3.5 text-safety-teal-600 dark:text-safety-teal-400" />
-                        <span
-                            class="text-xs font-bold uppercase tracking-widest text-safety-teal-700 dark:text-safety-teal-400">Public
-                            Access</span>
+                        <span class="font-dosis text-xs font-bold uppercase tracking-widest
+                                     text-safety-teal-700 dark:text-safety-teal-400">
+                            Public Access
+                        </span>
                     </div>
-                    <span class="text-xs font-medium text-platinum-500">
+                    <span class="font-dosis text-xs font-medium text-platinum-500">
                         {{ publicModules.length }} module{{ publicModules.length !== 1 ? 's' : '' }}
                     </span>
                     <div class="flex-1 h-px bg-platinum-200 dark:bg-abyss-600"></div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                    <ModuleCard v-for="module in visibleModules(publicModules, 'public')" :key="module.id"
-                        :module="module" @view="viewModule"
-                        class="hover:-translate-y-0.5 transition-transform duration-200" />
+                    <ModuleCard
+                        v-for="module in visibleModules(publicModules, 'public')"
+                        :key="module.id"
+                        :module="module"
+                        @view="viewModule"
+                    />
                 </div>
 
-                <!-- Show more / Show less -->
                 <div class="flex justify-end">
-                    <button v-if="publicModules.length > SECTION_LIMIT" @click="toggleExpand('public')"
-                        class="show-more-btn">
-                        <span v-if="isExpanded('public')">
-                            <ChevronUpIcon class="w-3.5 h-3.5" />
-                            Show less
+                    <button v-if="publicModules.length > SECTION_LIMIT" @click="toggleExpand('public')" class="show-more-btn">
+                        <span v-if="isExpanded('public')" class="flex items-center gap-1.5">
+                            <ChevronUpIcon class="w-3.5 h-3.5" /> Show less
                         </span>
-                        <span v-else>
-                            <ChevronDownIcon class="w-3.5 h-3.5" />
-                            Show all {{ publicModules.length }} modules
+                        <span v-else class="flex items-center gap-1.5">
+                            <ChevronDownIcon class="w-3.5 h-3.5" /> Show all {{ publicModules.length }} modules
                         </span>
                     </button>
                 </div>
             </section>
 
-            <!-- Classroom Modules — grouped per classroom, collapsible -->
+            <!-- Classroom Groups ────────────────────────────── -->
             <section v-for="group in classroomGroups" :key="group.classroomName">
 
-                <!-- Clickable group header -->
-                <button type="button" @click="toggleGroup(group.classroomName)"
-                    class="group/header flex items-center gap-3 mb-4 w-full text-left focus:outline-none">
-                    <!-- Chevron rotates when expanded -->
+                <button
+                    type="button"
+                    @click="toggleGroup(group.classroomName)"
+                    class="group/header flex items-center gap-3 mb-4 w-full text-left focus:outline-none"
+                >
                     <ChevronRightIcon
                         class="w-4 h-4 text-calm-lavender-500 dark:text-calm-lavender-400 shrink-0 transition-transform duration-200"
-                        :class="{ 'rotate-90': !isCollapsed(group.classroomName) }" />
+                        :class="{ 'rotate-90': !isCollapsed(group.classroomName) }"
+                    />
 
-                    <!-- Classroom badge -->
-                    <div
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-calm-lavender-50 dark:bg-calm-lavender-900/20 border-2 border-calm-lavender-200 dark:border-calm-lavender-800/40 group-hover/header:border-calm-lavender-400 dark:group-hover/header:border-calm-lavender-600 transition-colors">
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl
+                                bg-calm-lavender-50 dark:bg-calm-lavender-900/20
+                                border-2 border-calm-lavender-200 dark:border-calm-lavender-800/40
+                                group-hover/header:border-calm-lavender-400 dark:group-hover/header:border-calm-lavender-600
+                                transition-colors">
                         <LockIcon class="w-3.5 h-3.5 text-calm-lavender-600 dark:text-calm-lavender-400" />
-                        <span
-                            class="text-xs font-bold uppercase tracking-widest text-calm-lavender-700 dark:text-calm-lavender-400">
+                        <span class="font-dosis text-xs font-bold uppercase tracking-widest
+                                     text-calm-lavender-700 dark:text-calm-lavender-400">
                             {{ group.classroomName }}
                         </span>
-                        <span
-                            class="font-mono text-xs font-semibold text-calm-lavender-500 dark:text-calm-lavender-500 tracking-widest border border-calm-lavender-200 dark:border-calm-lavender-800/40 px-1.5 py-0.5 rounded-lg">
+                        <span class="font-mono text-xs font-semibold tracking-widest
+                                     text-calm-lavender-500 dark:text-calm-lavender-500
+                                     border border-calm-lavender-200 dark:border-calm-lavender-800/40
+                                     px-1.5 py-0.5 rounded-lg">
                             {{ group.joinCode }}
                         </span>
                     </div>
 
-                    <span class="text-xs font-medium text-platinum-500">
+                    <span class="font-dosis text-xs font-medium text-platinum-500">
                         {{ group.modules.length }} module{{ group.modules.length !== 1 ? 's' : '' }}
                     </span>
 
-                    <!-- Hint shown only while collapsed -->
                     <span v-if="isCollapsed(group.classroomName)"
-                        class="text-xs text-platinum-400 dark:text-platinum-600 italic">
+                        class="font-mplusrounded text-xs italic text-platinum-400 dark:text-platinum-600">
                         — click to expand
                     </span>
 
                     <div class="flex-1 h-px bg-platinum-200 dark:bg-abyss-600"></div>
                 </button>
 
-                <!-- Collapsible grid with CSS height transition -->
-                <Transition name="group-collapse" @enter="onGroupEnter" @after-enter="onGroupAfterEnter"
-                    @leave="onGroupLeave">
+                <Transition name="group-collapse" @enter="onGroupEnter" @after-enter="onGroupAfterEnter" @leave="onGroupLeave">
                     <div v-show="!isCollapsed(group.classroomName)" class="overflow-hidden">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-2">
-                            <ModuleCard v-for="module in visibleModules(group.modules, group.classroomName)"
-                                :key="module.id" :module="module" @view="viewModule"
-                                class="hover:-translate-y-0.5 transition-transform duration-200" />
+                            <ModuleCard
+                                v-for="module in visibleModules(group.modules, group.classroomName)"
+                                :key="module.id"
+                                :module="module"
+                                @view="viewModule"
+                            />
                         </div>
-
-                        <!-- Show more / Show less -->
                         <div class="flex justify-end">
                             <button v-if="group.modules.length > SECTION_LIMIT"
                                 @click.stop="toggleExpand(group.classroomName)" class="show-more-btn">
                                 <span v-if="isExpanded(group.classroomName)" class="flex items-center gap-1.5">
-                                    <ChevronUpIcon class="w-3.5 h-3.5" />
-                                    Show less
+                                    <ChevronUpIcon class="w-3.5 h-3.5" /> Show less
                                 </span>
                                 <span v-else class="flex items-center gap-1.5">
-                                    <ChevronDownIcon class="w-3.5 h-3.5" />
-                                    Show all {{ group.modules.length }} modules
+                                    <ChevronDownIcon class="w-3.5 h-3.5" /> Show all {{ group.modules.length }} modules
                                 </span>
                             </button>
                         </div>
@@ -173,10 +183,9 @@
                 </Transition>
 
             </section>
-
         </div>
 
-        <!-- Empty state -->
+        <!-- Empty state ──────────────────────────────────────── -->
         <div v-else class="empty-state">
             <div class="empty-state-icon">
                 <BookOpenIcon class="w-7 h-7 text-platinum-400" />
@@ -187,7 +196,7 @@
             </p>
             <button v-if="hasActiveFilters" @click="resetFilters" class="mt-5 btn-primary btn-3d mx-auto">
                 <XIcon class="w-4 h-4" />
-                Clear Filters
+                <span class="font-dosis font-semibold text-sm uppercase tracking-wider">Clear Filters</span>
             </button>
         </div>
 
@@ -215,16 +224,9 @@ const router = useRouter();
 const moduleStore = useModuleStore();
 const authStore = useAuthStore();
 
-const localFilters = ref({
-    search: '',
-    category: null,
-    difficulty_level: null
-});
-
-// ── All modules from store ───────────────────────────────────
+const localFilters = ref({ search: '', category: null, difficulty_level: null });
 const modules = computed(() => moduleStore.modules);
 
-// Client-side filtering
 const filteredModules = computed(() => {
     let list = modules.value;
     const { search, category, difficulty_level } = localFilters.value;
@@ -237,10 +239,7 @@ const filteredModules = computed(() => {
     return list;
 });
 
-// ── Grouped by classroom ─────────────────────────────────────
-const publicModules = computed(() =>
-    filteredModules.value.filter(m => !m.classroom_id)
-);
+const publicModules = computed(() => filteredModules.value.filter(m => !m.classroom_id));
 
 const classroomGroups = computed(() => {
     const classroomModules = filteredModules.value.filter(m => m.classroom_id);
@@ -260,19 +259,14 @@ const classroomGroups = computed(() => {
     return [...map.values()];
 });
 
-// ── Collapsible classroom groups ─────────────────────────────
 const collapsedGroups = ref(new Set());
-
-const toggleGroup = (classroomName) => {
+const toggleGroup = (name) => {
     const next = new Set(collapsedGroups.value);
-    if (next.has(classroomName)) next.delete(classroomName);
-    else next.add(classroomName);
+    if (next.has(name)) next.delete(name); else next.add(name);
     collapsedGroups.value = next;
 };
+const isCollapsed = (name) => collapsedGroups.value.has(name);
 
-const isCollapsed = (classroomName) => collapsedGroups.value.has(classroomName);
-
-// ── Transition hooks ─────────────────────────────────────────
 const onGroupEnter = (el) => { el.style.height = el.scrollHeight + 'px'; };
 const onGroupAfterEnter = (el) => { el.style.height = 'auto'; };
 const onGroupLeave = (el) => {
@@ -280,32 +274,25 @@ const onGroupLeave = (el) => {
     window.requestAnimationFrame(() => { el.style.height = '0'; });
 };
 
-// ── Per-section Show More ────────────────────────────────────
 const SECTION_LIMIT = 3;
 const expandedSections = ref(new Set());
-
 const toggleExpand = (key) => {
     const next = new Set(expandedSections.value);
-    if (next.has(key)) next.delete(key);
-    else next.add(key);
+    if (next.has(key)) next.delete(key); else next.add(key);
     expandedSections.value = next;
 };
-
 const isExpanded = (key) => expandedSections.value.has(key);
+const visibleModules = (list, key) => isExpanded(key) ? list : list.slice(0, SECTION_LIMIT);
 
-const visibleModules = (moduleList, key) =>
-    isExpanded(key) ? moduleList : moduleList.slice(0, SECTION_LIMIT);
-
-// ── Filters ──────────────────────────────────────────────────
 const hasActiveFilters = computed(() =>
     Object.values(localFilters.value).some(v => v !== null && v !== '')
 );
 
 const activeFiltersDisplay = computed(() => {
     const display = {};
-    if (localFilters.value.search) display.search = `Query: "${localFilters.value.search}"`;
-    if (localFilters.value.category) display.category = `Type: ${formatLabel(localFilters.value.category)}`;
-    if (localFilters.value.difficulty_level) display.difficulty_level = `Level: ${formatLabel(localFilters.value.difficulty_level)}`;
+    if (localFilters.value.search) display.search = `"${localFilters.value.search}"`;
+    if (localFilters.value.category) display.category = formatLabel(localFilters.value.category);
+    if (localFilters.value.difficulty_level) display.level = formatLabel(localFilters.value.difficulty_level);
     return display;
 });
 
@@ -314,14 +301,9 @@ const debouncedSearch = () => {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => applyFilters(), 500);
 };
+const applyFilters = () => {};
+const resetFilters = () => { localFilters.value = { search: '', category: null, difficulty_level: null }; };
 
-const applyFilters = () => { };
-
-const resetFilters = () => {
-    localFilters.value = { search: '', category: null, difficulty_level: null };
-};
-
-// ── Navigation ───────────────────────────────────────────────
 const viewModule = (id) => {
     const role = authStore.user?.role;
     const isFacilitator = ['facilitator', 'educator', 'moderator', 'admin'].includes(role);
@@ -334,7 +316,6 @@ const viewModule = (id) => {
 const formatLabel = (value) =>
     value.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
-// ── Init ─────────────────────────────────────────────────────
 onMounted(async () => {
     await moduleStore.fetchModules({ all_accessible: true, include_classroom: true, limit: 100 });
 });
@@ -359,8 +340,8 @@ onMounted(async () => {
     @apply bg-platinum-200 dark:bg-abyss-600;
     @apply border-2 border-platinum-300 dark:border-abyss-500;
     @apply hover:border-calm-lavender-300 dark:hover:border-calm-lavender-700;
+    @apply font-dosis text-sm font-medium;
     @apply text-abyss-800 dark:text-platinum-200;
-    @apply font-medium text-sm;
     @apply rounded-xl py-2.5 pl-4 pr-9;
     @apply focus:outline-none focus:ring-2 focus:ring-calm-lavender-400/40 focus:border-calm-lavender-400;
 }
@@ -373,7 +354,6 @@ onMounted(async () => {
 .reset-btn {
     @apply inline-flex items-center gap-1.5 shrink-0;
     @apply px-3 py-2.5 rounded-xl;
-    @apply font-medium text-sm;
     @apply bg-platinum-200 dark:bg-abyss-600;
     @apply text-platinum-700 dark:text-platinum-300;
     @apply border-2 border-platinum-300 dark:border-abyss-500;
@@ -387,7 +367,7 @@ onMounted(async () => {
 
 .show-more-btn {
     @apply mt-4 flex items-center gap-1.5;
-    @apply text-sm font-semibold;
+    @apply font-dosis text-sm font-semibold;
     @apply text-calm-lavender-500 dark:text-calm-lavender-400;
     @apply hover:text-calm-lavender-400 dark:hover:text-calm-lavender-300;
     @apply transition-colors duration-150;
@@ -402,32 +382,18 @@ onMounted(async () => {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(6px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-select option {
-    @apply bg-platinum-50 text-abyss-800;
-}
+select option { @apply bg-platinum-50 text-abyss-800; }
+.dark select option { @apply bg-abyss-600 text-platinum-100; }
 
-.dark select option {
-    @apply bg-abyss-600 text-platinum-100;
-}
-
-/* ── Classroom group collapse transition ──────────────────── */
 .group-collapse-enter-active,
 .group-collapse-leave-active {
     transition: height 0.25s ease, opacity 0.25s ease;
     overflow: hidden;
 }
-
 .group-collapse-enter-from,
 .group-collapse-leave-to {
     height: 0 !important;

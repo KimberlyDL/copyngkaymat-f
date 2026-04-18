@@ -1,6 +1,6 @@
 <template>
     <header
-        class="sticky top-0 z-30 bg-white/90 dark:bg-[#06050a]/90 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 custom-font-poppins transition-all duration-500">
+        class="sticky top-0 z-30 bg-white/90 dark:bg-[#06050a]/90 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 transition-all duration-500">
         <div class="h-[2px] w-full bg-gradient-to-r from-purple-600 via-fuchsia-500 to-purple-600 opacity-80"></div>
 
         <div class="flex items-center justify-between h-16 px-6 lg:px-10">
@@ -47,15 +47,6 @@ const currentPageTitle = computed(() => route.meta.title || 'Dashboard');
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700;1,900&display=swap');
+@reference "@/style.css";
 
-.custom-font-poppins {
-    font-family: 'Poppins', sans-serif !important;
-}
-
-/* Ensure placeholder uses Poppins */
-::placeholder {
-    font-family: 'Poppins', sans-serif;
-    letter-spacing: 0.025em;
-}
 </style>

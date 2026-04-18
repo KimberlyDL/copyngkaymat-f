@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-6 bg-slate-900/40 dark:bg-[#020203]/80 backdrop-blur-md transition-all duration-500 custom-font-poppins" 
+    class="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-6 bg-slate-900/40 dark:bg-[#020203]/80 backdrop-blur-md transition-all duration-500" 
     @click.self="$emit('close')"
   >
     <div 
@@ -64,12 +64,7 @@ const handleJoin = () => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700;1,900&display=swap');
-
-.custom-font-poppins {
-  font-family: 'Poppins', sans-serif !important;
-}
-
+@reference "@/style.css";
 .animate-in {
     animation: modalEntry 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

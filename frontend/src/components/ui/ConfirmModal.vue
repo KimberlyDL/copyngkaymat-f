@@ -7,7 +7,7 @@
                        flex items-start justify-center pt-24 px-6 pb-6 overflow-y-auto"
                 @click.self="onCancel"
             >
-                <div class="confirm-shell animate-modal font-poppins">
+                <div class="confirm-shell animate-modal">
 
                     <!-- Icon stamp -->
                     <div :class="['icon-stamp mx-auto mb-6', iconStampClass]">
@@ -19,7 +19,7 @@
                         <h3 class="font-madimione text-2xl text-abyss-800 dark:text-platinum-100 leading-tight">
                             {{ title }}
                         </h3>
-                        <p class="font-poppins text-base text-platinum-700 dark:text-platinum-400 leading-relaxed px-2">
+                        <p class="text-base text-platinum-700 dark:text-platinum-400 leading-relaxed px-2">
                             <!-- Slot for custom message, falls back to message prop -->
                             <slot>{{ message }}</slot>
                         </p>

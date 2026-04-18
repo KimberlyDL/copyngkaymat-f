@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed bottom-6 right-6 z-[999] font-poppins">
+    <div class="fixed bottom-6 right-6 z-[999]">
 
         <!-- ═══════════════════════════════════════════════════
              CHAT WINDOW
@@ -394,6 +394,13 @@ function toggleChat() {
     hasNewMessage.value = false;
     if (isOpen.value) nextTick(() => scrollToBottom());
 }
+
+// Open chat (used by external components like ImpactSection)
+function openChat() {
+    if (!isOpen.value) toggleChat();
+}
+
+defineExpose({ openChat })
 
 // Toggle fullscreen
 function toggleFullscreen() {

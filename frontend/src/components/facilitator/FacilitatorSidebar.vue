@@ -9,7 +9,7 @@
         </Transition>
 
         <aside :class="[
-            'fixed top-0 left-0 bottom-0 z-[60] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] custom-font-poppins',
+            'fixed top-0 left-0 bottom-0 z-[60] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]',
             'container-bg',
             isHidden && 'hidden md:block translate-x-[-100%]',
             isIcon && 'w-22 md:block',
@@ -22,9 +22,8 @@
                 <div :class="['flex items-center h-24 relative transition-all duration-500 border-b border-platinum-200 dark:border-abyss-600', isFull ? 'px-6' : 'justify-center px-0']">
                     <router-link :to="{ name: 'facilitator.dashboard' }" class="flex items-center gap-3 group/logo">
                         <div class="relative flex-shrink-0 transition-transform duration-500" :class="isIcon && 'scale-90'">
-                            <div class="relative w-12 h-12 bg-gradient-to-br from-calm-lavender-600 via-neon-pink-500 to-calm-lavender-700 rounded-2xl flex items-center justify-center group-hover/logo:rotate-6 transition-all">
-                                <ShieldCheckIcon class="w-7 h-7 text-white" />
-                            </div>
+<img src="@/assets/LogongPrototeced.svg" alt="ProtectEd Logo"
+  class="w-12 h-12 group-hover/logo:rotate-6 transition-all" />
                         </div>
                         <Transition name="fade">
                             <div v-if="isFull" class="flex flex-col">
@@ -279,8 +278,6 @@ onUnmounted(() => {
 <style scoped>
 @reference "@/style.css";
 
-.custom-font-poppins { font-family: 'Poppins', sans-serif !important; }
-
 .scroll-left-container { direction: rtl; overflow-y: auto; overflow-x: visible; }
 .scroll-content { direction: ltr; display: flex; flex-direction: column; }
 
@@ -290,7 +287,6 @@ onUnmounted(() => {
 
 .menu-item {
     @apply w-full flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase hover:text-calm-lavender-600 hover:bg-calm-lavender-500/5 transition-all border-b border-platinum-200 dark:border-abyss-600 last:border-none;
-    font-family: 'Poppins', sans-serif !important;
 }
 
 /* Active nav item — scoped so it doesn't affect global container-bg-dark */

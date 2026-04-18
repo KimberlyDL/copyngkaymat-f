@@ -14,7 +14,7 @@ function goBack() {
 </script>
 
 <template>
-    <div class="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-6 bg-slate-50 dark:bg-[#06050a] custom-font-poppins selection:bg-purple-500/30 transition-colors duration-500">
+    <div class="min-h-screen w-full relative overflow-hidden flex items-center justify-center p-6 bg-slate-50 dark:bg-[#06050a] selection:bg-purple-500/30 transition-colors duration-500">
         
         <div class="fixed top-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-600/5 dark:bg-purple-600/10 rounded-full blur-[120px] animate-pulse pointer-events-none"></div>
         <div class="fixed bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-fuchsia-600/5 dark:bg-fuchsia-600/10 rounded-full blur-[120px] animate-pulse delay-1000 pointer-events-none"></div>
@@ -65,12 +65,7 @@ function goBack() {
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700;1,900&display=swap');
-
-.custom-font-poppins {
-    font-family: 'Poppins', sans-serif !important;
-}
-
+@reference "@/style.css";
 /* Institutional Entrance Animation */
 .animate-in {
     animation: zoomEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;

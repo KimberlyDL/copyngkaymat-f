@@ -9,7 +9,7 @@
         </Transition>
 
         <aside :class="[
-            'fixed top-0 left-0 bottom-0 z-[60] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] custom-font-poppins',
+            'fixed top-0 left-0 bottom-0 z-[60] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]',
             'container-bg',
             isHidden && 'hidden md:block translate-x-[-100%]',
             isIcon && 'w-22 md:block',
@@ -22,9 +22,8 @@
                 <div :class="['flex items-center h-24 relative transition-all duration-500 border-b border-platinum-200 dark:border-abyss-600', isFull ? 'px-6' : 'justify-center px-0']">
                     <router-link :to="{ name: 'admin.dashboard' }" class="flex items-center gap-3 group/logo">
                         <div class="relative flex-shrink-0 transition-transform duration-500" :class="isIcon && 'scale-90'">
-                            <div class="relative w-12 h-12 bg-gradient-to-br from-calm-lavender-600 via-neon-pink-500 to-calm-lavender-700 rounded-2xl flex items-center justify-center group-hover/logo:rotate-6 transition-all">
-                                <ShieldCheckIcon class="w-7 h-7 text-white" />
-                            </div>
+<img src="@/assets/LogongPrototeced.svg" alt="ProtectEd Logo"
+  class="w-12 h-12 group-hover/logo:rotate-6 transition-all" />
                         </div>
                         <Transition name="fade">
                             <div v-if="isFull" class="flex flex-col">
@@ -58,9 +57,7 @@
                     <div class="scroll-content space-y-1.5 pb-4 mt-2">
 
                         <div v-for="(item, index) in navItems" :key="index">
-                            <button
-                                @click="router.push({ name: item.route })"
-                                :class="[
+                            <button @click="router.push({ name: item.route })" :class="[
                                     'group relative flex items-center transition-all duration-300 py-1.5 ml-4 w-[calc(100%-1rem+1px)] rounded-l-2xl z-10 outline-none',
                                     route.name === item.route
                                         ? 'nav-active cursor-default'
@@ -202,7 +199,7 @@ const navItems = [
     { name: 'Analytics',      route: 'admin.dashboard',     icon: LayoutDashboardIcon, color: 'text-calm-lavender-500', fill: 'fill-calm-lavender-500/20' },
     { name: 'Facilitators',   route: 'admin.facilitators',  icon: UsersIcon,           color: 'text-blue-500',          fill: 'fill-blue-500/20' },
     { name: 'Students',       route: 'admin.students',      icon: GraduationCapIcon,   color: 'text-emerald-500',       fill: 'fill-emerald-500/20' },
-    { name: 'Reports',        route: 'admin.reports',       icon: ClipboardListIcon,   color: 'text-yellow-500',        fill: 'fill-yellow-500/20' },
+    // { name: 'Reports',        route: 'admin.reports',       icon: ClipboardListIcon,   color: 'text-yellow-500',        fill: 'fill-yellow-500/20' },
     { name: 'Modules',        route: 'admin.modules',       icon: BookOpenIcon,        color: 'text-orange-500',        fill: 'fill-orange-500/20' },
     { name: 'Announcements',  route: 'admin.announcements', icon: MegaphoneIcon,       color: 'text-neon-pink-500',     fill: 'fill-neon-pink-500/20' },
 ]
@@ -276,7 +273,6 @@ onUnmounted(() => {
 <style scoped>
 @reference "@/style.css";
 
-.custom-font-poppins { font-family: 'Poppins', sans-serif !important; }
 
 .scroll-left-container { direction: rtl; overflow-y: auto; overflow-x: visible; }
 .scroll-content { direction: ltr; display: flex; flex-direction: column; }
@@ -287,9 +283,11 @@ onUnmounted(() => {
 
 .menu-item {
     @apply w-full flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase hover:text-calm-lavender-600 hover:bg-calm-lavender-500/5 transition-all border-b border-platinum-200 dark:border-abyss-600 last:border-none;
-    font-family: 'Poppins', sans-serif !important;
 }
 
+.nav-active {
+    @apply bg-platinum-50 dark:bg-abyss-900;
+}
 .slide-up-enter-active, .slide-up-leave-active { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translateY(15px) scale(0.95); }
 
