@@ -206,7 +206,7 @@ const handleLogin = async () => {
 
         if (unverified) {
             const email = form.value.email;
-            authStore.setPendingEmail(email);
+            authStore.pendingEmail = email;
             toast.info("Please verify your email address.");
             router.push({ name: 'verify-notice', query: { email } });
             return;

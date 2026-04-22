@@ -4,6 +4,7 @@ import axios from "axios";
 // ====== Config ======
 const API_ORIGIN = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "") || "http://localhost:3000";
 const TOKEN_KEY = "jwt";
+const REFRESH_TOKEN_KEY = "refresh_token";
 
 // ====== Axios base instance ======
 const api = axios.create({

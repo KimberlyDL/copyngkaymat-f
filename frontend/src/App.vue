@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#020203]text-white antialiased relative">
+  <div class="min-h-screen bg-[#020203] text-white antialiased relative">
     
     <AIChatbot />
 
@@ -22,7 +22,7 @@ import AIChatbot from '@/components/ui/AIChatbot.vue';
 
 const authStore = useAuthStore();
 // Gamitin ang storeToRefs para ma-detect ng Vue kapag nag-login/logout ka
-const { isLoggedIn } = storeToRefs(authStore);
+const { isAuthenticated } = storeToRefs(authStore);
 
 onMounted(async () => {
     // I-restore ang session kapag ni-refresh ang page
