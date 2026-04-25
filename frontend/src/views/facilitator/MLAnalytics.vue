@@ -44,53 +44,53 @@
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
 
         <!-- Total -->
-        <div class="stat-pill flex-col items-start gap-1">
+        <div class="stat-card">
           <div class="flex items-center gap-2 w-full">
             <div class="card-icon-wrap">
               <BarChart3Icon class="w-3.5 h-3.5 text-calm-lavender-600 dark:text-calm-lavender-400" />
             </div>
             <p class="stat-pill-label">Total</p>
           </div>
-          <p class="stat-pill-value text-slate-800 dark:text-platinum-100 pl-1">
+          <p class="stat-card-value text-slate-800 dark:text-platinum-100">
             {{ stats.totalAnalyses || 0 }}
           </p>
         </div>
 
         <!-- Flagged -->
-        <div class="stat-pill flex-col items-start gap-1">
+        <div class="stat-card">
           <div class="flex items-center gap-2 w-full">
             <div class="p-2.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/30">
               <FlagIcon class="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
             </div>
             <p class="stat-pill-label">Flagged</p>
           </div>
-          <p class="stat-pill-value text-red-600 dark:text-red-400 pl-1">
+          <p class="stat-card-value text-red-600 dark:text-red-400">
             {{ stats.flaggedCount || 0 }}
           </p>
         </div>
 
         <!-- Needs Review -->
-        <div class="stat-pill flex-col items-start gap-1">
+        <div class="stat-card">
           <div class="flex items-center gap-2 w-full">
             <div class="p-2.5 rounded-xl bg-vawc-orange-50 dark:bg-vawc-orange-900/20 border border-vawc-orange-100 dark:border-vawc-orange-800/30">
               <ClockIcon class="w-3.5 h-3.5 text-vawc-orange-600 dark:text-vawc-orange-400" />
             </div>
             <p class="stat-pill-label">Needs Review</p>
           </div>
-          <p class="stat-pill-value text-vawc-orange-600 dark:text-vawc-orange-400 pl-1">
+          <p class="stat-card-value text-vawc-orange-600 dark:text-vawc-orange-400">
             {{ stats.unreviewedCount || 0 }}
           </p>
         </div>
 
         <!-- Reviewed -->
-        <div class="stat-pill flex-col items-start gap-1">
+        <div class="stat-card">
           <div class="flex items-center gap-2 w-full">
             <div class="p-2.5 rounded-xl bg-safety-teal-50 dark:bg-safety-teal-900/20 border border-safety-teal-100 dark:border-safety-teal-800/30">
               <CheckCircle2Icon class="w-3.5 h-3.5 text-safety-teal-600 dark:text-safety-teal-400" />
             </div>
             <p class="stat-pill-label">Reviewed</p>
           </div>
-          <p class="stat-pill-value text-safety-teal-600 dark:text-safety-teal-400 pl-1">
+          <p class="stat-card-value text-safety-teal-600 dark:text-safety-teal-400">
             {{ reviewedCount }}
           </p>
         </div>
@@ -104,7 +104,7 @@
             <select
               v-model="filters.riskLevel"
               @change="fetchResults(1)"
-              class="input-field !py-2 !pr-8 appearance-none cursor-pointer min-w-[140px]"
+              class="select-field"
             >
               <option value="">All Risk Levels</option>
               <option value="Severe">Severe</option>
@@ -140,9 +140,9 @@
           </label>
 
           <!-- Result count -->
-          <div class="ml-auto stat-pill !py-1.5 !px-3 gap-2">
+          <div class="ml-auto count-pill">
             <ListIcon class="w-3.5 h-3.5 text-platinum-400" />
-            <p class="stat-pill-label !text-slate-600 dark:!text-platinum-400">
+            <p class="stat-pill-label">
               {{ resultsMeta.total }} result{{ resultsMeta.total !== 1 ? 's' : '' }}
             </p>
           </div>
@@ -251,6 +251,16 @@
               </tr>
             </tbody>
           </table>
+        </div>
+        <!-- ── Pagination ───────────────────────────────────────── -->
+        <div v-if="results.length" class="px-5 py-4">
+          <AppPagination
+            v-model="resultsMeta.page"
+            :total="resultsMeta.total"
+            :page-size="5"
+            item-label="results"
+            @update:modelValue="fetchResults($event)"
+          />
         </div>
       </div>
 
@@ -374,6 +384,7 @@ import {
   X as XIcon,
   BrainCircuit as BrainCircuitIcon,
 } from 'lucide-vue-next';
+import AppPagination from '@/components/ui/AppPagination.vue';
 
 // ── State (preserved exactly) ──────────────────────────────────
 const loading = ref(true);
@@ -420,7 +431,7 @@ const fetchStats = async () => {
 };
 
 const fetchResults = async (page = 1) => {
-  const params = new URLSearchParams({ page, limit: 20 });
+  const params = new URLSearchParams({ page, limit: 5 });
   if (filters.riskLevel)     params.append('riskLevel',  filters.riskLevel);
   if (filters.flaggedOnly)   params.append('flaggedOnly', 'true');
   if (filters.unreviewedOnly) params.append('reviewed',  'false');
@@ -515,4 +526,45 @@ onMounted(refreshAll);
   opacity: 0;
   transform: translateY(12px);
 }
+
+/* ── Stat card (column layout — avoids overriding stat-pill base flex-row) ── */
+.stat-card {
+  @apply flex flex-col items-start gap-3 p-5 rounded-xl;
+  @apply bg-white dark:bg-abyss-600;
+  @apply border border-slate-200 dark:border-abyss-500;
+}
+
+/* ── Stat card value (larger than stat-pill-value's text-lg) ── */
+.stat-card-value {
+  @apply font-madimione text-4xl leading-none;
+}
+
+/* ── Count pill (result counter in filter bar) ──────────────── */
+.count-pill {
+  @apply ml-auto flex items-center gap-2 px-3 py-1.5 rounded-xl;
+  @apply bg-white dark:bg-abyss-600;
+  @apply border border-slate-200 dark:border-abyss-500;
+}
+
+/* ── Select field ───────────────────────────────────────────────
+   Explicit bg overrides browser default white dropdown in dark mode.
+   color-scheme: dark signals the browser to render the native
+   <option> list with a dark background.
+─────────────────────────────────────────────────────────────── */
+.select-field {
+  @apply px-3 py-2 pr-8 rounded-lg appearance-none cursor-pointer min-w-[140px];
+  @apply bg-white dark:bg-abyss-700;
+  @apply border border-calm-lavender-500/50 dark:border-calm-lavender-900/50;
+  @apply font-dosis text-xs font-semibold;
+  @apply text-slate-700 dark:text-platinum-200;
+  @apply focus:outline-none focus:ring-2 focus:ring-calm-lavender-500/40 focus:border-calm-lavender-500;
+  @apply transition-all duration-200;
+}
+
+
+/* Force browser native dropdown list to dark in dark mode */
+:global(.dark) .select-field {
+  color-scheme: dark;
+}
+
 </style>
