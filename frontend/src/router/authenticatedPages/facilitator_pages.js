@@ -49,7 +49,7 @@ export const facilitatorPages = [
         path: 'rewards',
         name: 'facilitator.rewards',
         component: () => import('@/views/facilitator/RewardsManager.vue'),
-        meta: { title: 'Rewards Manager',requiresAuth: true, role: 'facilitator' }
+        meta: { title: 'Rewards Manager' }
     },
     {
         path: 'ml-analytics',
