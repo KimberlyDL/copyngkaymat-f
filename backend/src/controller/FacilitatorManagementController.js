@@ -82,7 +82,7 @@ exports.createFacilitator = async (req, res, next) => {
  */
 exports.getFacilitators = async (req, res, next) => {
     try {
-        if (!req.user || !['admin', 'educator'].includes(req.user.role)) {
+        if (!req.user || req.user.role !== 'admin') {
             return res.status(403).json({
                 message: 'Unauthorized access.'
             });

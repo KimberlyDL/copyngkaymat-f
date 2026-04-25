@@ -28,9 +28,9 @@ router.post('/', requireRole('admin'), facilitatorController.createFacilitator);
 /**
  * @route   GET /api/v1/facilitators
  * @desc    Get all facilitators with pagination
- * @access  Admin, Educator
+ * @access  Admin
  */
-router.get('/', requireRole(['admin', 'educator']), facilitatorController.getFacilitators);
+router.get('/', requireRole('admin'), facilitatorController.getFacilitators);
 
 /**
  * @route   PATCH /api/v1/facilitators/:facilitatorId
