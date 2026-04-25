@@ -78,10 +78,20 @@
 
             <!-- Public Modules ──────────────────────────────── -->
             <section v-if="publicModules.length > 0">
-                <div class="flex items-center gap-3 mb-4">
+                <button
+                    type="button"
+                    @click="toggleGroup('__public__')"
+                    class="group/header flex items-center gap-3 mb-4 w-full text-left focus:outline-none"
+                >
+                    <ChevronRightIcon
+                        class="w-4 h-4 text-safety-teal-500 dark:text-safety-teal-400 shrink-0 transition-transform duration-200"
+                        :class="{ 'rotate-90': !isCollapsed('__public__') }"
+                    />
                     <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl
                                 bg-safety-teal-50 dark:bg-safety-teal-900/20
-                                border-2 border-safety-teal-200 dark:border-safety-teal-800/40">
+                                border-2 border-safety-teal-200 dark:border-safety-teal-800/40
+                                group-hover/header:border-safety-teal-400 dark:group-hover/header:border-safety-teal-600
+                                transition-colors">
                         <GlobeIcon class="w-3.5 h-3.5 text-safety-teal-600 dark:text-safety-teal-400" />
                         <span class="font-dosis text-xs font-bold uppercase tracking-widest
                                      text-safety-teal-700 dark:text-safety-teal-400">
@@ -91,28 +101,35 @@
                     <span class="font-dosis text-xs font-medium text-platinum-500">
                         {{ publicModules.length }} module{{ publicModules.length !== 1 ? 's' : '' }}
                     </span>
+                    <span v-if="isCollapsed('__public__')"
+                        class="font-mplusrounded text-xs italic text-platinum-400 dark:text-platinum-600">
+                        — click to expand
+                    </span>
                     <div class="flex-1 h-px bg-platinum-200 dark:bg-abyss-600"></div>
-                </div>
+                </button>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                    <ModuleCard
-                        v-for="module in visibleModules(publicModules, 'public')"
-                        :key="module.id"
-                        :module="module"
-                        @view="viewModule"
-                    />
-                </div>
-
-                <div class="flex justify-end">
-                    <button v-if="publicModules.length > SECTION_LIMIT" @click="toggleExpand('public')" class="show-more-btn">
-                        <span v-if="isExpanded('public')" class="flex items-center gap-1.5">
-                            <ChevronUpIcon class="w-3.5 h-3.5" /> Show less
-                        </span>
-                        <span v-else class="flex items-center gap-1.5">
-                            <ChevronDownIcon class="w-3.5 h-3.5" /> Show all {{ publicModules.length }} modules
-                        </span>
-                    </button>
-                </div>
+                <Transition name="group-collapse" @enter="onGroupEnter" @after-enter="onGroupAfterEnter" @leave="onGroupLeave">
+                    <div v-show="!isCollapsed('__public__')" class="overflow-hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-2">
+                            <ModuleCard
+                                v-for="module in visibleModules(publicModules, 'public')"
+                                :key="module.id"
+                                :module="module"
+                                @view="viewModule"
+                            />
+                        </div>
+                        <div class="flex justify-end">
+                            <button v-if="publicModules.length > SECTION_LIMIT" @click.stop="toggleExpand('public')" class="show-more-btn">
+                                <span v-if="isExpanded('public')" class="flex items-center gap-1.5">
+                                    <ChevronUpIcon class="w-3.5 h-3.5" /> Show less
+                                </span>
+                                <span v-else class="flex items-center gap-1.5">
+                                    <ChevronDownIcon class="w-3.5 h-3.5" /> Show all {{ publicModules.length }} modules
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </Transition>
             </section>
 
             <!-- Classroom Groups ────────────────────────────── -->
