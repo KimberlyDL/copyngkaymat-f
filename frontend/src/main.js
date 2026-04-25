@@ -5,8 +5,11 @@ import { createPinia } from "pinia";
 import "./style.css";
 import "leaflet/dist/leaflet.css";
 
-// import '@fullcalendar/daygrid/index.css'
-// import '@fullcalendar/timegrid/index.css'
+// Initialize dark mode on startup: respect saved preference, fallback to OS
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+}
 
 const app = createApp(App);
 

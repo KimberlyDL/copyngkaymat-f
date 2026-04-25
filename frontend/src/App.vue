@@ -22,7 +22,7 @@ import AIChatbot from '@/components/ui/AIChatbot.vue';
 
 const authStore = useAuthStore();
 // Gamitin ang storeToRefs para ma-detect ng Vue kapag nag-login/logout ka
-const { isLoggedIn } = storeToRefs(authStore);
+const { isAuthenticated } = storeToRefs(authStore);
 
 import { useToast } from '@/utils/useToast';
 

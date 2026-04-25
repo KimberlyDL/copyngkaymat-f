@@ -139,18 +139,18 @@ const loadRewards = async () => {
 
 const claimReward = async (item) => {
   try {
-    const { data } = await axios.post(`/api/rewards/claim/${item.id}`);
+    await axios.post(`/api/rewards/claim/${item.id}`);
     toast.success('Success! Visit the GAD Office to claim your item.');
-    if (authStore.user?.gamification && data.remaining_xp !== undefined) {
-      authStore.user.gamification.experience_points = data.remaining_xp;
-    }
-    loadRewards();
+    await Promise.all([authStore.fetchUser(), loadRewards()]);  // re-fetches /me → gets real XP
   } catch (err) {
     toast.error(err.response?.data?.message || 'Error executing redemption.');
   }
 };
 
-onMounted(loadRewards);
+onMounted(() => {
+  authStore.fetchUser();   // guarantees gamification is loaded on page entry
+  loadRewards();
+});
 </script>
 
 <style scoped>

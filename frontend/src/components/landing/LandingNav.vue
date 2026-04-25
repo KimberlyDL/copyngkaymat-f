@@ -35,10 +35,10 @@
         <div class="flex items-center gap-2 flex-shrink-0">
 
           <template v-if="!isAuthenticated">
-            <router-link :to="{ name: 'facilitator.login' }"
+            <!-- <router-link :to="{ name: 'facilitator.login' }"
               class="hidden md:block font-averta text-sm text-slate-400 dark:text-platinum-500 hover:text-safety-teal-500 px-3 py-1.5 transition-colors">
               Educator
-            </router-link>
+            </router-link> -->
             <router-link :to="{ name: 'login' }"
               class="font-averta text-sm font-medium text-slate-600 dark:text-platinum-300 hover:text-calm-lavender-600 px-3 py-1.5 transition-colors">
               Log In

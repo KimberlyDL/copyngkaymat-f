@@ -173,7 +173,7 @@ async function onResend() {
 
     try {
         isLoading.value = true;
-        auth.setPendingEmail(model.email);
+        auth.pendingEmail = model.email;
         await auth.resendVerificationEmail(model.email);
         toast.success("Verification email sent!");
         if (cooldown.value === 0) startCooldown();
@@ -192,5 +192,5 @@ onBeforeUnmount(() => {
     if (timer) clearInterval(timer);
 });
 
-watch(() => model.email, (val) => auth.setPendingEmail(val));
+watch(() => model.email, (val) => { auth.pendingEmail = val; });
 </script>

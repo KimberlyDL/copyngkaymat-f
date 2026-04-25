@@ -317,12 +317,17 @@ exports.me = async (req, res, next) => {
             };
         }
 
-        const userData = req.user.toJSON();
-        userData.gamification = {
-            experience_points: gamification.experience_points || 0,
-            total_points: gamification.total_points || 0,
-            current_title: gamification.current_title || 'Novice'
-        };
+        const xp = gamification.experience_points || 0;
+const level = Math.floor(xp / 500) + 1;
+
+const userData = req.user.toJSON();
+userData.gamification = {
+    experience_points: xp,
+    total_points: gamification.total_points || 0,
+    current_title: gamification.current_title || 'Novice',
+    level,
+    streak: gamification.streak || 0
+};
 
         res.json(userData);
     } catch (error) {
