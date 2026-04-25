@@ -37,7 +37,7 @@
         </div>
         <div class="p-4 rounded-2xl border border-slate-200 dark:border-abyss-600 bg-white dark:bg-abyss-800/60">
           <p class="text-[10px] uppercase tracking-wider text-slate-500">Reviewed</p>
-          <p class="text-2xl font-black mt-1 text-emerald-500">{{ reviewedCount }}</p>
+          <p class="text-2xl font-black mt-1 text-emerald-500">{{ stats.reviewedCount || 0 }}</p>
         </div>
       </div>
 
@@ -140,7 +140,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import api from '@/utils/api';
 
 const loading = ref(true);
@@ -154,12 +154,6 @@ const filters = reactive({
   riskLevel: '',
   flaggedOnly: false,
   unreviewedOnly: false
-});
-
-const reviewedCount = computed(() => {
-  const total = stats.value.totalAnalyses || 0;
-  const pending = stats.value.unreviewedCount || 0;
-  return Math.max(0, total - pending);
 });
 
 const formatDate = (d) => (d ? new Date(d).toLocaleString() : '-');

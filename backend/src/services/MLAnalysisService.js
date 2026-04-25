@@ -263,6 +263,7 @@ class MLAnalysisService {
                 totalAnalyses: 0,
                 flaggedCount: 0,
                 unreviewedCount: 0,
+                reviewedCount: 0,
                 riskDistribution: {},
                 categoryDistribution: {},
                 recentFlags: []
@@ -274,6 +275,7 @@ class MLAnalysisService {
         const totalAnalyses = await MLAnalysisResult.count({ where });
         const flaggedCount = await MLAnalysisResult.count({ where: { ...where, flags_detected: true } });
         const unreviewedCount = await MLAnalysisResult.count({ where: { ...where, flags_detected: true, reviewed: false } });
+        const reviewedCount = await MLAnalysisResult.count({ where: { ...where, flags_detected: true, reviewed: true } });
 
         // Risk distribution
         const allResults = await MLAnalysisResult.findAll({
@@ -315,6 +317,7 @@ class MLAnalysisService {
             totalAnalyses,
             flaggedCount,
             unreviewedCount,
+            reviewedCount,
             riskDistribution,
             categoryDistribution,
             recentFlags
