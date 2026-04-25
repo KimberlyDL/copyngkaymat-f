@@ -7,23 +7,30 @@ class RewardsController {
      */
     async getAvailableRewards(req, res) {
         try {
-            const rewards = await Badge.findAll({
-                where: { is_active: true }
-            });
+            const [rewards, ownedEntries] = await Promise.all([
+                Badge.findAll({ where: { is_active: true } }),
+                UserInventory.findAll({
+                    where: { user_id: req.user.id },
+                    attributes: ['badge_id']
+                })
+            ]);
 
-            // Transform to match frontend field expectations
-            const transformedRewards = rewards.map(reward => ({
-                id: reward.id,
-                title: reward.name,
-                description: reward.description,
-                image_url: reward.iconPath ? `${req.protocol}://${req.get('host')}${reward.iconPath}` : null,
-                xp_required: reward.cost_xp,
-                stock_quantity: reward.total_slots > 0 
-                    ? Math.max(0, reward.total_slots - reward.claimed_count) 
-                    : 999, // Unlimited if total_slots is 0
-                total_slots: reward.total_slots,
-                claimed_count: reward.claimed_count
-            }));
+            const ownedIds = new Set(ownedEntries.map(e => e.badge_id));
+
+            const transformedRewards = rewards
+                .filter(reward => !ownedIds.has(reward.id))
+                .map(reward => ({
+                    id: reward.id,
+                    title: reward.name,
+                    description: reward.description,
+                    image_url: reward.iconPath ? `${req.protocol}://${req.get('host')}${reward.iconPath}` : null,
+                    xp_required: reward.cost_xp,
+                    stock_quantity: reward.total_slots > 0
+                        ? Math.max(0, reward.total_slots - reward.claimed_count)
+                        : 999,
+                    total_slots: reward.total_slots,
+                    claimed_count: reward.claimed_count
+                }));
 
             res.json(transformedRewards);
         } catch (error) {
