@@ -541,14 +541,14 @@ const fetchAnalytics = async () => {
     } catch (error) {
         console.error('Failed to fetch announcements:', error)
     }
-    try {
-        const [lbRes, badgeRes] = await Promise.all([
-            api.get('/api/v1/quizzes/gamification/leaderboard'),
-            api.get('/api/v1/badges/my-inventory')
-        ])
-        leaderboard.value = lbRes.data.learners || []
-        userBadgesCount.value = badgeRes.data?.inventory?.length || 0
-    } catch (error) { console.error('Analytics fetch error:', error) }
+    const [lbRes, badgeRes] = await Promise.allSettled([
+        api.get('/api/v1/quizzes/gamification/leaderboard'),
+        api.get('/api/v1/badges/my-inventory')
+    ])
+    if (lbRes.status === 'fulfilled') leaderboard.value = lbRes.value.data.learners || []
+    else console.error('Leaderboard fetch error:', lbRes.reason)
+    if (badgeRes.status === 'fulfilled') userBadgesCount.value = badgeRes.value.data?.inventory?.length || 0
+    else console.error('Badge inventory fetch error:', badgeRes.reason)
 }
 
 onMounted(() => {
