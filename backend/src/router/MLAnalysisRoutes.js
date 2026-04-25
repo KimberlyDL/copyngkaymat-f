@@ -58,4 +58,11 @@ router.patch(
     MLAnalysisController.markReviewed
 );
 
+// Reset a reviewed analysis back to pending
+router.patch(
+    '/:id/unreview',
+    requireRole(facilitatorRoles),
+    MLAnalysisController.markUnreviewed
+);
+
 module.exports = router;

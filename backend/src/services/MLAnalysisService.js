@@ -254,6 +254,22 @@ class MLAnalysisService {
     }
 
     /**
+     * Unmark a result as reviewed (reset to pending)
+     */
+    async markAsUnreviewed(resultId) {
+        const result = await MLAnalysisResult.findByPk(resultId);
+        if (!result) throw new Error('Analysis result not found');
+
+        result.reviewed = false;
+        result.reviewed_by = null;
+        result.reviewed_at = null;
+        result.facilitator_notes = null;
+        await result.save();
+
+        return result;
+    }
+
+    /**
      * Get aggregate statistics for a facilitator's dashboard
      */
     async getStatsForFacilitator(facilitatorId) {
