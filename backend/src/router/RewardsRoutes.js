@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const rewardsController = require('../controller/RewardsController');
-const { authenticate } = require('../middleware/AuthMiddleware');
+const { authenticate, requireRole } = require('../middleware/AuthMiddleware');
 
 // All routes require authentication
 router.use(authenticate);
@@ -17,16 +17,18 @@ router.get('/my-inventory', rewardsController.getMyInventory);
 router.post('/claim/:id', rewardsController.claimReward);
 
 // ===== Admin/Facilitator Routes =====
+const canManageRewards = requireRole(['educator', 'moderator', 'admin']);
+
 // Get ALL rewards (including inactive) for management
-router.get('/all', rewardsController.getAllRewardsForAdmin);
+router.get('/all', canManageRewards, rewardsController.getAllRewardsForAdmin);
 
 // Create a new reward
-router.post('/', rewardsController.createReward);
+router.post('/', canManageRewards, rewardsController.createReward);
 
 // Update a reward
-router.put('/:id', rewardsController.updateReward);
+router.put('/:id', canManageRewards, rewardsController.updateReward);
 
 // Delete a reward
-router.delete('/:id', rewardsController.deleteReward);
+router.delete('/:id', canManageRewards, rewardsController.deleteReward);
 
 module.exports = router;

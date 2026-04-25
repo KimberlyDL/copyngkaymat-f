@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const badgeController = require('../controller/badgeController');
-const { authenticate } = require('../middleware/AuthMiddleware');
+const { authenticate, requireRole } = require('../middleware/AuthMiddleware');
 
 // Lahat ng routes dito ay kailangan ng login
 router.use(authenticate);
@@ -16,8 +16,9 @@ router.get('/store', badgeController.getAllRewards);
 router.post('/claim', badgeController.claimReward);
 
 // 4. Facilitator CRUD
-router.post('/', badgeController.createReward);
-router.put('/:id', badgeController.toggleRewardSlot);
-router.delete('/:id', badgeController.deleteReward);
+const canManageBadges = requireRole(['educator', 'moderator', 'admin']);
+router.post('/', canManageBadges, badgeController.createReward);
+router.put('/:id', canManageBadges, badgeController.toggleRewardSlot);
+router.delete('/:id', canManageBadges, badgeController.deleteReward);
 
 module.exports = router;
