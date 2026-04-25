@@ -359,7 +359,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import api from '@/utils/api';
 import {
   RefreshCw as RefreshCwIcon,
@@ -386,11 +386,11 @@ const resultsMeta = reactive({ page: 1, totalPages: 1, total: 0 });
 const filters     = reactive({ riskLevel: '', flaggedOnly: false, unreviewedOnly: false });
 
 // ── Computed (preserved exactly) ──────────────────────────────
-// const reviewedCount = computed(() => {
-//   const total   = stats.value.totalAnalyses  || 0;
-//   const pending = stats.value.unreviewedCount || 0;
-//   return Math.max(0, total - pending);
-// });
+const reviewedCount = computed(() => {
+  const total   = stats.value.totalAnalyses  || 0;
+  const pending = stats.value.unreviewedCount || 0;
+  return Math.max(0, total - pending);
+});
 
 // ── Table columns ─────────────────────────────────────────────
 const columns = ['Student', 'Quiz', 'Risk', 'Category', 'Flags', 'Status', 'Date', 'Action'];
