@@ -104,6 +104,12 @@
                     </div>
                 </nav>
 
+<PWAInstallSidebarItem
+    :isFull="isFull"
+    :isIcon="isIcon"
+    :isMobileShown="isMobileShown"
+/>
+
                 <!-- Profile trigger -->
                 <div class="mt-auto p-4 relative border-t border-platinum-200 dark:border-abyss-600 container-bg">
                     <div ref="profileTriggerRef" @click="isUserMenuOpen = !isUserMenuOpen"
@@ -182,6 +188,7 @@ import {
     LayoutDashboard as LayoutDashboardIcon, ShieldCheck as ShieldCheckIcon,
     Megaphone as MegaphoneIcon
 } from 'lucide-vue-next'
+import PWAInstallSidebarItem from '@/components/nav/PWAInstallSidebarItem.vue'
 
 const route = useRoute()
 const router = useRouter()

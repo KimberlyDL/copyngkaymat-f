@@ -254,6 +254,22 @@ class MLAnalysisService {
     }
 
     /**
+     * Unmark a result as reviewed (reset to pending)
+     */
+    async markAsUnreviewed(resultId) {
+        const result = await MLAnalysisResult.findByPk(resultId);
+        if (!result) throw new Error('Analysis result not found');
+
+        result.reviewed = false;
+        result.reviewed_by = null;
+        result.reviewed_at = null;
+        result.facilitator_notes = null;
+        await result.save();
+
+        return result;
+    }
+
+    /**
      * Get aggregate statistics for a facilitator's dashboard
      */
     async getStatsForFacilitator(facilitatorId) {
@@ -263,6 +279,7 @@ class MLAnalysisService {
                 totalAnalyses: 0,
                 flaggedCount: 0,
                 unreviewedCount: 0,
+                reviewedCount: 0,
                 riskDistribution: {},
                 categoryDistribution: {},
                 recentFlags: []
@@ -274,6 +291,7 @@ class MLAnalysisService {
         const totalAnalyses = await MLAnalysisResult.count({ where });
         const flaggedCount = await MLAnalysisResult.count({ where: { ...where, flags_detected: true } });
         const unreviewedCount = await MLAnalysisResult.count({ where: { ...where, flags_detected: true, reviewed: false } });
+        const reviewedCount = await MLAnalysisResult.count({ where: { ...where, flags_detected: true, reviewed: true } });
 
         // Risk distribution
         const allResults = await MLAnalysisResult.findAll({
@@ -315,6 +333,7 @@ class MLAnalysisService {
             totalAnalyses,
             flaggedCount,
             unreviewedCount,
+            reviewedCount,
             riskDistribution,
             categoryDistribution,
             recentFlags

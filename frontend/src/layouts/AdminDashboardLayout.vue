@@ -1,6 +1,7 @@
 <!-- src/layouts/AdminDashboardLayout.vue -->
 <template>
     <div class="min-h-screen bg-gray-50 dark:bg-abyss-950">
+        <PWAInstallToast />
         <!-- Mobile Sidebar Backdrop -->
         <transition name="fade">
             <div v-if="sidebarStore.isMobileOpen" @click="sidebarStore.closeMobile"
@@ -31,6 +32,7 @@
 import { useSidebarStore } from '@/stores/stores';
 import AdminSidebar from '@/components/admin/AdminSidebar.vue';
 import AdminHeader from '@/components/admin/AdminHeader.vue';
+import PWAInstallToast from '@/components/ui/PWAInstallToast.vue';
 
 const sidebarStore = useSidebarStore();
 </script>

@@ -116,7 +116,7 @@ class BadgeController {
         try {
             const inventory = await UserInventory.findAll({
                 where: { user_id: req.user.id },
-                include: [{ model: Badge }]
+                include: [{ model: Badge, as: 'badge' }]
             });
             res.json({ success: true, inventory });
         } catch (error) {

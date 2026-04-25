@@ -17,7 +17,7 @@ const setRefreshCookie = (res, token) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'None',
-        path: '/api/refresh',
+        path: '/api/v1/auth/refresh',
         maxAge: 7 * 24 * 60 * 60 * 1000
     });
 };

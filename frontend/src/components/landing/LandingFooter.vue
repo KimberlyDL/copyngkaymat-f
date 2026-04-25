@@ -10,7 +10,7 @@
       <div class="flex flex-wrap justify-center gap-6 mb-8">
         <router-link :to="{ name: 'login' }"             class="font-averta font-semibold text-sm text-slate-500 hover:text-calm-lavender-500 transition-colors">Student Login</router-link>
         <router-link :to="{ name: 'signup' }"            class="font-averta font-semibold text-sm text-slate-500 hover:text-neon-pink-500 transition-colors">Create Account</router-link>
-        <router-link :to="{ name: 'facilitator.login' }" class="font-averta font-semibold text-sm text-slate-500 hover:text-safety-teal-500 transition-colors">Educator Portal</router-link>
+        <router-link :to="{ name: 'login' }" class="font-averta font-semibold text-sm text-slate-500 hover:text-safety-teal-500 transition-colors">Educator Portal</router-link>
       </div>
 
       <p class="font-averta text-sm text-slate-400 dark:text-abyss-400 max-w-lg mx-auto leading-relaxed">

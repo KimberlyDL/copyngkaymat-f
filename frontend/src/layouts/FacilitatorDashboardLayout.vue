@@ -1,6 +1,6 @@
 <template>
     <div class="min-h-screen bg-slate-50 dark:bg-abyss-900 text-black dark:text-white relative selection:bg-purple-500/30 transition-colors duration-500">
-        
+        <PWAInstallToast />
         
         <FacilitatorSidebar />
 
@@ -36,6 +36,7 @@
 import { useSidebarStore } from '@/stores/stores'; 
 import FacilitatorSidebar from '@/components/facilitator/FacilitatorSidebar.vue';
 import FacilitatorHeader from '@/components/facilitator/FacilitatorHeader.vue';
+import PWAInstallToast from '@/components/ui/PWAInstallToast.vue';
 
 const sidebarStore = useSidebarStore();
 </script>

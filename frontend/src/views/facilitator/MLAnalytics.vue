@@ -37,7 +37,7 @@
         </div>
         <div class="p-4 rounded-2xl border border-slate-200 dark:border-abyss-600 bg-white dark:bg-abyss-800/60">
           <p class="text-[10px] uppercase tracking-wider text-slate-500">Reviewed</p>
-          <p class="text-2xl font-black mt-1 text-emerald-500">{{ reviewedCount }}</p>
+          <p class="text-2xl font-black mt-1 text-emerald-500">{{ stats.reviewedCount || 0 }}</p>
         </div>
       </div>
 
@@ -112,7 +112,18 @@
       <div v-if="detail" class="p-4 rounded-2xl border border-slate-200 dark:border-abyss-600 bg-white dark:bg-abyss-800/60 space-y-3">
         <div class="flex items-center justify-between">
           <h2 class="font-black uppercase tracking-wide">Analysis Detail</h2>
-          <button @click="detail = null" class="text-xs text-slate-500 hover:text-slate-700">Close</button>
+          <div class="flex items-center gap-3">
+            <button
+              @click="toggleReview"
+              :class="detail.reviewed
+                ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'"
+              class="px-3 py-1 rounded-lg text-xs font-bold"
+            >
+              {{ detail.reviewed ? 'Mark as Unreviewed' : 'Mark as Reviewed' }}
+            </button>
+            <button @click="detail = null" class="text-xs text-slate-500 hover:text-slate-700">Close</button>
+          </div>
         </div>
 
         <div class="text-sm">
@@ -140,7 +151,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import api from '@/utils/api';
 
 const loading = ref(true);
@@ -154,12 +165,6 @@ const filters = reactive({
   riskLevel: '',
   flaggedOnly: false,
   unreviewedOnly: false
-});
-
-const reviewedCount = computed(() => {
-  const total = stats.value.totalAnalyses || 0;
-  const pending = stats.value.unreviewedCount || 0;
-  return Math.max(0, total - pending);
 });
 
 const formatDate = (d) => (d ? new Date(d).toLocaleString() : '-');
@@ -196,6 +201,26 @@ const openDetail = async (id) => {
   const { data } = await api.get(`/api/v1/ml-analysis/${id}`);
   if (!data.success) throw new Error(data.message || 'Failed to fetch detail');
   detail.value = data.result;
+
+  if (!data.result.reviewed) {
+    await api.patch(`/api/v1/ml-analysis/${id}/review`);
+    detail.value = { ...detail.value, reviewed: true };
+    const row = results.value.find(r => r.id === id);
+    if (row) row.reviewed = true;
+    await fetchStats();
+  }
+};
+
+const toggleReview = async () => {
+  if (!detail.value) return;
+  const id = detail.value.id;
+  const willReview = !detail.value.reviewed;
+  const endpoint = willReview ? `/api/v1/ml-analysis/${id}/review` : `/api/v1/ml-analysis/${id}/unreview`;
+  await api.patch(endpoint);
+  detail.value = { ...detail.value, reviewed: willReview };
+  const row = results.value.find(r => r.id === id);
+  if (row) row.reviewed = willReview;
+  await fetchStats();
 };
 
 const refreshAll = async () => {

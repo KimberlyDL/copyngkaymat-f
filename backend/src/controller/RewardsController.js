@@ -7,12 +7,19 @@ class RewardsController {
      */
     async getAvailableRewards(req, res) {
         try {
-            const rewards = await Badge.findAll({
-                where: { is_active: true }
-            });
+            const [rewards, ownedEntries] = await Promise.all([
+    Badge.findAll({ where: { is_active: true } }),
+    UserInventory.findAll({
+        where: { user_id: req.user.id },
+        attributes: ['badge_id']
+    })
+]);
 
-            // Transform to match frontend field expectations
-            const transformedRewards = rewards.map(reward => ({
+const ownedIds = new Set(ownedEntries.map(e => e.badge_id));
+
+const transformedRewards = rewards
+    .filter(reward => !ownedIds.has(reward.id))  // ← exclude already owned
+    .map(reward => ({
                 id: reward.id,
                 title: reward.name,
                 description: reward.description,

@@ -4,18 +4,19 @@ const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
 const sequelize = require('./config/db');
-const authRoutes = require('./router/authRoutes');
-const profileRoutes = require('./router/ProfileRoutes');
-const moduleRoutes = require('./router/ModuleRoutes');
-const badgeRoutes = require('./router/badgeRoutes');
-const rewardsRoutes = require('./router/RewardsRoutes');
-const facilitatorRoutes = require('./router/FacilitatorRoutes');
-const quizRoutes = require('./router/QuizRoutes');
-const classroomRoutes = require('./router/ClassroomRoutes');
-const notificationRoutes = require('./router/NotificationRoutes');
+
 const adminRoutes = require('./router/AdminRoutes');
+const authRoutes = require('./router/AuthRoutes');
+const badgeRoutes = require('./router/BadgeRoutes');
 const chatbotRoutes = require('./router/ChatbotRoutes');
+const classroomRoutes = require('./router/ClassroomRoutes');
+const facilitatorRoutes = require('./router/FacilitatorRoutes');
 const mlAnalysisRoutes = require('./router/MLAnalysisRoutes');
+const moduleRoutes = require('./router/ModuleRoutes');
+const notificationRoutes = require('./router/NotificationRoutes');
+const profileRoutes = require('./router/ProfileRoutes');
+const quizRoutes = require('./router/QuizRoutes');
+const rewardsRoutes = require('./router/RewardsRoutes');
 
 const app = express();
 

@@ -163,7 +163,7 @@ const handleSignUp = async () => {
       password_confirmation: form.value.confirmPassword,
     });
     if (success) {
-      authStore.setPendingEmail(email || form.value.email);
+      authStore.pendingEmail = email || form.value.email;
       toast.success('Account created successfully!');
       router.push({ name: 'verify-notice', query: { email: email || form.value.email } });
     } else {

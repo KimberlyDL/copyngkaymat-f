@@ -147,6 +147,24 @@ class MLAnalysisController {
             return res.status(500).json({ success: false, message: error.message });
         }
     }
+    /**
+     * PATCH /api/v1/ml-analysis/:id/unreview
+     * Reset a reviewed analysis result back to pending
+     */
+    async markUnreviewed(req, res) {
+        try {
+            const result = await mlAnalysisService.markAsUnreviewed(req.params.id);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Analysis marked as pending review',
+                result
+            });
+        } catch (error) {
+            console.error('MLAnalysisController.markUnreviewed error:', error);
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    }
 }
 
 module.exports = new MLAnalysisController();
