@@ -52,13 +52,17 @@
                     </div>
                 </div>
 
-                <div
+                <div v-if="isFacilitator"
                     class="mt-auto pt-3 border-t border-slate-100 dark:border-abyss-600 flex items-center justify-between">
                     <span class="text-xs font-medium text-calm-lavender-600 dark:text-calm-lavender-400 truncate">
                         {{ classroom.join_code }}
                     </span>
                     <ArrowRightIcon
                         class="w-4 h-4 text-platinum-400 group-hover:text-calm-lavender-500 group-hover:translate-x-1 transition-all shrink-0 ml-2" />
+                </div>
+                <div v-else class="mt-auto pt-3 border-t border-slate-100 dark:border-abyss-600 flex justify-end">
+                    <ArrowRightIcon
+                        class="w-4 h-4 text-platinum-400 group-hover:text-calm-lavender-500 group-hover:translate-x-1 transition-all shrink-0" />
                 </div>
             </div>
             </div>
