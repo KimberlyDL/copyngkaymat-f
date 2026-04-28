@@ -39,14 +39,19 @@
                             {{ classroom.name }}
                         </h3>
                         <p class="text-xs text-platinum-600 dark:text-platinum-500 mt-0.5">Active</p>
+                        <div class="flex items-center gap-1 mt-1.5">
+                            <UserRoundIcon class="w-3 h-3 text-calm-lavender-500 dark:text-calm-lavender-400 shrink-0" />
+                            <p class="text-xs text-calm-lavender-600 dark:text-calm-lavender-400 truncate">
+                                {{ classroom.facilitator?.name || 'Authorized Faculty' }}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
                 <div
                     class="mt-auto pt-3 border-t border-slate-100 dark:border-abyss-600 flex items-center justify-between">
                     <span class="text-xs font-medium text-calm-lavender-600 dark:text-calm-lavender-400 truncate">
-                        {{ isFacilitator ? classroom.join_code : (classroom.facilitator?.name || 'Authorized Faculty')
-                        }}
+                        {{ classroom.join_code }}
                     </span>
                     <ArrowRightIcon
                         class="w-4 h-4 text-platinum-400 group-hover:text-calm-lavender-500 group-hover:translate-x-1 transition-all shrink-0 ml-2" />
@@ -85,7 +90,7 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useClassroomStore } from '@/stores/classroom';
-import { ArrowRight as ArrowRightIcon, School as SchoolIcon, Plus as PlusIcon } from 'lucide-vue-next';
+import { ArrowRight as ArrowRightIcon, School as SchoolIcon, Plus as PlusIcon, UserRound as UserRoundIcon } from 'lucide-vue-next';
 import CreateClassroomModal from '@/components/classrooms/CreateClassroomModal.vue';
 import JoinClassroomModal from '@/components/classrooms/JoinClassroomModal.vue';
 import AppPagination from '@/components/ui/AppPagination.vue';
