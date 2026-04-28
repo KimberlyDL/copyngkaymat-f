@@ -59,7 +59,7 @@
                                 </p>
                                 <span v-if="classroom.facilitator?.role"
                                     class="shrink-0 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-calm-lavender-100 dark:bg-calm-lavender-900/30 text-calm-lavender-700 dark:text-calm-lavender-300 border border-calm-lavender-200 dark:border-calm-lavender-800/40">
-                                    {{ classroom.facilitator.role === 'educator' ? 'Educator' : classroom.facilitator.role === 'moderator' ? 'Moderator' : 'Admin' }}
+                                    {{ classroom.facilitator.role.charAt(0).toUpperCase() + classroom.facilitator.role.slice(1) }}
                                 </span>
                             </div>
                         </div>

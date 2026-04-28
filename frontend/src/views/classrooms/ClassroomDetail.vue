@@ -60,7 +60,7 @@
                   {{ classroom.facilitator.name }}
                 </p>
                 <span class="text-[10px] font-bold uppercase tracking-wide text-calm-lavender-600 dark:text-calm-lavender-400">
-                  {{ classroom.facilitator.role === 'educator' ? 'Educator' : classroom.facilitator.role === 'moderator' ? 'Moderator' : 'Admin' }}
+                  {{ classroom.facilitator.role.charAt(0).toUpperCase() + classroom.facilitator.role.slice(1) }}
                 </span>
               </div>
             </div>
@@ -215,7 +215,7 @@
                 <p class="text-xs text-platinum-500 dark:text-platinum-500">{{ classroom.facilitator.email }}</p>
               </div>
               <span class="shrink-0 text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-lg bg-calm-lavender-100 dark:bg-calm-lavender-900/40 text-calm-lavender-700 dark:text-calm-lavender-300 border border-calm-lavender-200 dark:border-calm-lavender-800/40">
-                {{ classroom.facilitator.role === 'educator' ? 'Educator' : classroom.facilitator.role === 'moderator' ? 'Moderator' : 'Admin' }}
+                {{ classroom.facilitator.role.charAt(0).toUpperCase() + classroom.facilitator.role.slice(1) }}
               </span>
             </div>
 
