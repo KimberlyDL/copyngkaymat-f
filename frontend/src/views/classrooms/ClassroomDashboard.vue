@@ -44,6 +44,10 @@
                             <p class="text-xs text-calm-lavender-600 dark:text-calm-lavender-400 truncate">
                                 {{ classroom.facilitator?.name || 'Authorized Faculty' }}
                             </p>
+                            <span v-if="classroom.facilitator?.role"
+                                class="shrink-0 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-calm-lavender-100 dark:bg-calm-lavender-900/30 text-calm-lavender-700 dark:text-calm-lavender-300">
+                                {{ classroom.facilitator.role === 'educator' ? 'Educator' : classroom.facilitator.role === 'moderator' ? 'Moderator' : 'Admin' }}
+                            </span>
                         </div>
                     </div>
                 </div>

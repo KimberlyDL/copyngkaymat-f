@@ -111,7 +111,7 @@ exports.getMyClassrooms = async (req, res, next) => {
                     {
                         model: User,
                         as: 'facilitator',
-                        attributes: ['name', 'email']
+                        attributes: ['name', 'email', 'role']
                     }
                 ],
                 order: [['created_at', 'DESC']]
@@ -119,7 +119,7 @@ exports.getMyClassrooms = async (req, res, next) => {
         } else {
             classrooms = await Classroom.findAll({
                 where: { created_by: req.user.id },
-                include: [{ model: User, as: 'facilitator', attributes: ['name'] }],
+                include: [{ model: User, as: 'facilitator', attributes: ['name', 'role'] }],
                 order: [['created_at', 'DESC']]
             });
         }
