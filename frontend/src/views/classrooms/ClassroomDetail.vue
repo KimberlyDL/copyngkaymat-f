@@ -50,14 +50,27 @@
         <div class="card">
           <h3 class="section-eyebrow mb-4">Members</h3>
           <div class="space-y-2 max-h-72 overflow-y-auto custom-scrollbar pr-1">
+            <!-- Facilitator -->
+            <div v-if="classroom?.facilitator" class="flex items-center gap-3 group py-1.5">
+              <div class="avatar-sm !bg-calm-lavender-100 dark:!bg-calm-lavender-900/30 !text-calm-lavender-700 dark:!text-calm-lavender-300 !border-calm-lavender-200 dark:!border-calm-lavender-800/40">
+                {{ classroom.facilitator.name?.[0] }}
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-slate-700 dark:text-platinum-200 truncate">
+                  {{ classroom.facilitator.name }}
+                </p>
+                <span class="text-[10px] font-bold uppercase tracking-wide text-calm-lavender-600 dark:text-calm-lavender-400">
+                  {{ classroom.facilitator.role === 'educator' ? 'Educator' : classroom.facilitator.role === 'moderator' ? 'Moderator' : 'Admin' }}
+                </span>
+              </div>
+            </div>
+            <!-- Students -->
             <div v-for="student in classroom?.students" :key="student.id" class="flex items-center gap-3 group py-1.5">
-              <div
-                class="avatar-sm group-hover:bg-calm-lavender-100 dark:group-hover:bg-calm-lavender-900/30 transition-colors">
+              <div class="avatar-sm group-hover:bg-calm-lavender-100 dark:group-hover:bg-calm-lavender-900/30 transition-colors">
                 {{ student.name?.[0] }}
               </div>
               <div class="min-w-0">
-                <p
-                  class="text-sm font-medium text-slate-700 dark:text-platinum-200 truncate group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400 transition-colors">
+                <p class="text-sm font-medium text-slate-700 dark:text-platinum-200 truncate group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400 transition-colors">
                   {{ student.name }}
                 </p>
                 <p class="text-xs text-platinum-500 dark:text-platinum-600">Active</p>
@@ -187,11 +200,34 @@
           </div>
 
           <!-- People Tab -->
-          <div v-if="activeTab === 'People'" class="animate-in space-y-2">
+          <div v-if="activeTab === 'People'" class="animate-in space-y-1">
+
+            <!-- Facilitator row -->
+            <div v-if="classroom?.facilitator"
+              class="flex items-center gap-3 p-3 rounded-xl bg-calm-lavender-50 dark:bg-calm-lavender-900/20 border border-calm-lavender-100 dark:border-calm-lavender-800/30 mb-3">
+              <div class="avatar-sm !bg-calm-lavender-100 dark:!bg-calm-lavender-900/30 !text-calm-lavender-700 dark:!text-calm-lavender-300 !border-calm-lavender-200 dark:!border-calm-lavender-800/40">
+                {{ classroom.facilitator.name?.[0] }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-slate-700 dark:text-platinum-200 truncate">
+                  {{ classroom.facilitator.name }}
+                </p>
+                <p class="text-xs text-platinum-500 dark:text-platinum-500">{{ classroom.facilitator.email }}</p>
+              </div>
+              <span class="shrink-0 text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-lg bg-calm-lavender-100 dark:bg-calm-lavender-900/40 text-calm-lavender-700 dark:text-calm-lavender-300 border border-calm-lavender-200 dark:border-calm-lavender-800/40">
+                {{ classroom.facilitator.role === 'educator' ? 'Educator' : classroom.facilitator.role === 'moderator' ? 'Moderator' : 'Admin' }}
+              </span>
+            </div>
+
+            <!-- Divider label -->
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-platinum-400 dark:text-platinum-600 px-1 pb-1">
+              Students · {{ classroom?.students?.length || 0 }}
+            </p>
+
+            <!-- Students -->
             <div v-for="student in classroom?.students" :key="student.id"
               class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-abyss-700 transition-colors group">
-              <div
-                class="avatar-sm group-hover:bg-calm-lavender-100 dark:group-hover:bg-calm-lavender-900/30 transition-colors">
+              <div class="avatar-sm group-hover:bg-calm-lavender-100 dark:group-hover:bg-calm-lavender-900/30 transition-colors">
                 {{ student.name?.[0] }}
               </div>
               <div class="flex-1 min-w-0">

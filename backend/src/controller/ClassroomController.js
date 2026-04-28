@@ -142,7 +142,7 @@ exports.getClassroomDetails = async (req, res, next) => {
 
         const classroom = await Classroom.findByPk(id, {
             include: [
-                { model: User, as: 'facilitator', attributes: ['id', 'name', 'email'] },
+                { model: User, as: 'facilitator', attributes: ['id', 'name', 'email', 'role'] },
                 { model: User, as: 'students', through: { attributes: [] }, attributes: ['id', 'name'] },
                 { 
                     model: Module, 
