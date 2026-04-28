@@ -27,42 +27,50 @@
         <div v-else-if="classroomStore.classrooms.length > 0" class="space-y-5">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <div v-for="classroom in paginatedClassrooms" :key="classroom.id"
-                @click="enterClassroom(classroom.id)" class="card card-hover cursor-pointer group">
-                <div class="flex items-start gap-4 mb-5">
-                    <div
-                        class="card-icon-wrap group-hover:bg-calm-lavender-100 dark:group-hover:bg-calm-lavender-900/30 group-hover:border-calm-lavender-300 dark:group-hover:border-calm-lavender-700/50 transition-colors">
+                @click="enterClassroom(classroom.id)" class="card card-hover cursor-pointer group flex flex-col">
+
+                <!-- Card Header: icon + status -->
+                <div class="flex items-start justify-between mb-4">
+                    <div class="card-icon-wrap group-hover:bg-calm-lavender-100 dark:group-hover:bg-calm-lavender-900/30 group-hover:border-calm-lavender-300 dark:group-hover:border-calm-lavender-700/50 transition-colors">
                         <SchoolIcon class="w-5 h-5 text-calm-lavender-600 dark:text-calm-lavender-400" />
                     </div>
-                    <div class="flex-1 min-w-0 pt-0.5">
-                        <h3
-                            class="font-semibold text-sm text-slate-800 dark:text-platinum-100 truncate leading-snug group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400 transition-colors">
-                            {{ classroom.name }}
-                        </h3>
-                        <p class="text-xs text-platinum-600 dark:text-platinum-500 mt-0.5">Active</p>
-                        <div class="flex items-center gap-1 mt-1.5">
-                            <UserRoundIcon class="w-3 h-3 text-calm-lavender-500 dark:text-calm-lavender-400 shrink-0" />
-                            <p class="text-xs text-calm-lavender-600 dark:text-calm-lavender-400 truncate">
+                    <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-1 rounded-full bg-safety-teal-50 dark:bg-safety-teal-900/20 text-safety-teal-700 dark:text-safety-teal-400 border border-safety-teal-200 dark:border-safety-teal-800/40">
+                        <span class="w-1.5 h-1.5 rounded-full bg-safety-teal-500 animate-pulse"></span>
+                        Active
+                    </span>
+                </div>
+
+                <!-- Classroom Name -->
+                <h3 class="font-bold text-base text-slate-800 dark:text-platinum-100 truncate leading-snug group-hover:text-calm-lavender-600 dark:group-hover:text-calm-lavender-400 transition-colors mb-3">
+                    {{ classroom.name }}
+                </h3>
+
+                <!-- Instructor Row -->
+                <div class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-50 dark:bg-abyss-700 border border-slate-100 dark:border-abyss-500 mb-auto">
+                    <div class="w-7 h-7 rounded-lg bg-calm-lavender-100 dark:bg-calm-lavender-900/30 border border-calm-lavender-200 dark:border-calm-lavender-800/40 flex items-center justify-center shrink-0">
+                        <UserRoundIcon class="w-3.5 h-3.5 text-calm-lavender-600 dark:text-calm-lavender-400" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[10px] font-semibold uppercase tracking-widest text-platinum-500 dark:text-platinum-600 mb-0.5">Instructor</p>
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <p class="text-xs font-medium text-slate-700 dark:text-platinum-200 truncate">
                                 {{ classroom.facilitator?.name || 'Authorized Faculty' }}
                             </p>
                             <span v-if="classroom.facilitator?.role"
-                                class="shrink-0 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-calm-lavender-100 dark:bg-calm-lavender-900/30 text-calm-lavender-700 dark:text-calm-lavender-300">
+                                class="shrink-0 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-calm-lavender-100 dark:bg-calm-lavender-900/30 text-calm-lavender-700 dark:text-calm-lavender-300 border border-calm-lavender-200 dark:border-calm-lavender-800/40">
                                 {{ classroom.facilitator.role === 'educator' ? 'Educator' : classroom.facilitator.role === 'moderator' ? 'Moderator' : 'Admin' }}
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <div v-if="isFacilitator"
-                    class="mt-auto pt-3 border-t border-slate-100 dark:border-abyss-600 flex items-center justify-between">
-                    <span class="text-xs font-medium text-calm-lavender-600 dark:text-calm-lavender-400 truncate">
+                <!-- Card Footer -->
+                <div class="mt-4 pt-3 border-t border-slate-100 dark:border-abyss-600 flex items-center justify-between">
+                    <span v-if="isFacilitator" class="inline-flex items-center gap-1.5 font-mono text-xs font-semibold px-2.5 py-1 rounded-lg bg-abyss-700/50 dark:bg-abyss-800 text-calm-lavender-500 dark:text-calm-lavender-400 border border-abyss-500 dark:border-abyss-600 tracking-widest">
                         {{ classroom.join_code }}
                     </span>
-                    <ArrowRightIcon
-                        class="w-4 h-4 text-platinum-400 group-hover:text-calm-lavender-500 group-hover:translate-x-1 transition-all shrink-0 ml-2" />
-                </div>
-                <div v-else class="mt-auto pt-3 border-t border-slate-100 dark:border-abyss-600 flex justify-end">
-                    <ArrowRightIcon
-                        class="w-4 h-4 text-platinum-400 group-hover:text-calm-lavender-500 group-hover:translate-x-1 transition-all shrink-0" />
+                    <span v-else class="text-[11px] text-platinum-500 dark:text-platinum-600 font-medium">View Classroom</span>
+                    <ArrowRightIcon class="w-4 h-4 text-platinum-400 group-hover:text-calm-lavender-500 group-hover:translate-x-1 transition-all shrink-0" />
                 </div>
             </div>
             </div>
