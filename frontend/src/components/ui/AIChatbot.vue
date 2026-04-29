@@ -312,6 +312,7 @@
 
 <script setup>
 import { ref, onMounted, nextTick, watch } from 'vue';
+import DOMPurify from 'dompurify';
 import {
     Bot,
     Maximize2,
@@ -418,7 +419,7 @@ function scrollToBottom() {
 // Format message with basic markdown
 function formatMessage(text) {
     if (!text) return '';
-    return text
+    const html = text
         .replace(/^### (.*$)/gim, '<h3 class="font-bold text-abyss-700 dark:text-platinum-100 mt-2 mb-1">$1</h3>')
         .replace(/^## (.*$)/gim,  '<h2 class="font-bold text-abyss-700 dark:text-platinum-100 mt-2 mb-1">$1</h2>')
         .replace(/\*\*(.*?)\*\*/g, '<strong class="text-abyss-900 dark:text-white font-semibold">$1</strong>')
@@ -427,6 +428,7 @@ function formatMessage(text) {
         .replace(/^• /gm,   '<div class="flex gap-2 mb-1"><span class="text-calm-lavender-400">•</span><span>')
         .replace(/\n\n/g, '</span></div><br>')
         .replace(/\n/g, '<br>');
+    return DOMPurify.sanitize(html, { ALLOWED_TAGS: ['h2', 'h3', 'strong', 'em', 'br', 'div', 'span'], ALLOWED_ATTR: ['class'] });
 }
 
 // Format timestamp
