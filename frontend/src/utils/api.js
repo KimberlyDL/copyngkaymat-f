@@ -1,5 +1,7 @@
 // src/utils/api.js
 import axios from "axios";
+import { useToast } from "@/utils/useToast";
+import router from "@/router";
 
 // ====== Config ======
 const API_ORIGIN = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "") || "http://localhost:3000";
@@ -121,12 +123,14 @@ api.interceptors.response.use(
 
                 // Security Alert: Handle specific reuse detection from backend
                 if (refreshError.response?.data?.code === 'TOKEN_REUSE_DETECTED') {
-                    alert('Security alert: Multiple login attempts detected. Please log in again.');
+                    // useToast() is safe here — Pinia is active by the time a refresh ever fails
+                    const toast = useToast();
+                    toast.error('Security alert: Multiple login attempts detected. Please log in again.', 6000);
                 }
 
                 // Only redirect to login if we aren't already there
-                if (!window.location.pathname.includes('/login')) {
-                    window.location.href = '/login';
+                if (router.currentRoute.value.name !== 'login') {
+                    router.push({ name: 'login' });
                 }
 
                 return Promise.reject(refreshError);
