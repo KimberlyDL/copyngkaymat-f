@@ -111,7 +111,7 @@ exports.getMyClassrooms = async (req, res, next) => {
                     {
                         model: User,
                         as: 'facilitator',
-                        attributes: ['name', 'email']
+                        attributes: ['name', 'email', 'role']
                     }
                 ],
                 order: [['created_at', 'DESC']]
@@ -119,7 +119,7 @@ exports.getMyClassrooms = async (req, res, next) => {
         } else {
             classrooms = await Classroom.findAll({
                 where: { created_by: req.user.id },
-                include: [{ model: User, as: 'facilitator', attributes: ['name'] }],
+                include: [{ model: User, as: 'facilitator', attributes: ['name', 'role'] }],
                 order: [['created_at', 'DESC']]
             });
         }
@@ -142,7 +142,7 @@ exports.getClassroomDetails = async (req, res, next) => {
 
         const classroom = await Classroom.findByPk(id, {
             include: [
-                { model: User, as: 'facilitator', attributes: ['id', 'name', 'email'] },
+                { model: User, as: 'facilitator', attributes: ['id', 'name', 'email', 'role'] },
                 { model: User, as: 'students', through: { attributes: [] }, attributes: ['id', 'name'] },
                 { 
                     model: Module, 

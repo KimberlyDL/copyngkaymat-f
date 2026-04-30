@@ -67,6 +67,17 @@
             </div>
         </div>
 
+        <!-- Announcements empty state -->
+        <div v-else class="card flex items-center gap-4 py-5">
+            <div class="card-icon-wrap !bg-slate-50 dark:!bg-abyss-700 !border-slate-100 dark:!border-abyss-500 shrink-0">
+                <BellRingIcon class="w-4 h-4 text-platinum-400" />
+            </div>
+            <div>
+                <p class="text-sm font-semibold text-slate-700 dark:text-platinum-200">No Announcements</p>
+                <p class="field-subtext mt-0.5">There are no active announcements at this time.</p>
+            </div>
+        </div>
+
         <!-- STATS GRID -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 

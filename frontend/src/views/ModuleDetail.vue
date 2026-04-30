@@ -137,7 +137,7 @@
           <h2 class="section-eyebrow mb-3">Module Notes</h2>
           <div
             class="prose prose-slate dark:prose-invert max-w-none prose-sm text-sm leading-relaxed text-platinum-600 dark:text-platinum-400"
-            v-html="module.content"></div>
+            v-html="sanitizedContent"></div>
         </div>
 
         <!-- Module Sidebar Details -->
@@ -170,6 +170,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import DOMPurify from 'dompurify';
 import { useRoute, useRouter } from 'vue-router';
 import {
   ArrowLeftIcon, PlusIcon, InfoIcon, Edit2Icon,
@@ -211,6 +212,7 @@ const showQuizModal = ref(false);
 const quizzes = ref([]);
 
 const module = computed(() => moduleStore.currentModule);
+const sanitizedContent = computed(() => DOMPurify.sanitize(module.value?.content || ''));
 const canEdit = computed(() => ['admin', 'educator', 'moderator'].includes(authStore.user?.role));
 const isPlayer = computed(() => authStore.user?.role === 'player');
 

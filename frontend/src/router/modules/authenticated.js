@@ -56,7 +56,10 @@ const authenticatedRoutes = [
     {
         path: '/me',
         component: () => import('@layouts/UserProfileLayout.vue'),
-        meta: { requiresAuth: true },
+        meta: {
+            requiresAuth: true,
+            requiresRole: ['admin', 'educator', 'moderator', 'player']
+        },
         children: [
             {
                 path: 'profile',

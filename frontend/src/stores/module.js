@@ -2,8 +2,11 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import api from '@/utils/api';
+import { useToast } from '@/utils/useToast';
 
 export const useModuleStore = defineStore('module', () => {
+    const toast = useToast();
+
     // ===== State =====
     const modules = ref([]);
     const featuredModules = ref([]);
@@ -242,55 +245,6 @@ export const useModuleStore = defineStore('module', () => {
     }
 
     /**
-     * Delete module
-     */
-    async function deleteModule(id) {
-        try {
-            await api.delete(`/api/modules/${id}`);
-            modules.value = modules.value.filter(m => m.id !== id);
-            return true;
-        } catch (err) {
-            error.value = err.response?.data?.message || 'Failed to delete module';
-            throw err;
-        }
-    }
-
-    /**
-     * Mark module as complete (for Players)
-     */
-    async function markComplete(id) {
-        try {
-            await api.post(`/api/modules/${id}/complete`);
-            return true;
-        } catch (err) {
-            error.value = err.response?.data?.message || 'Failed to mark as complete';
-            throw err;
-        }
-    }
-
-    /**
-     * Toggle publish status (Facilitator/Admin)
-     */
-    async function togglePublish(id) {
-        try {
-            const response = await api.patch(`/api/modules/${id}/publish`);
-
-            const module = modules.value.find(m => m.id === id);
-            if (module) {
-                module.is_published = response.data.is_published;
-            }
-            if (currentModule.value?.id === id) {
-                currentModule.value.is_published = response.data.is_published;
-            }
-
-            return response.data;
-        } catch (err) {
-            error.value = err.response?.data?.message || 'Failed to toggle publish';
-            throw err;
-        }
-    }
-
-    /**
      * Update filters and re-fetch
      */
     async function setFilters(newFilters) {
@@ -394,9 +348,5 @@ export const useModuleStore = defineStore('module', () => {
         setFilters,
         loadNextPage,
         resetFilters,
-
-        deleteModule,
-        markComplete,
-        togglePublish
     };
 });

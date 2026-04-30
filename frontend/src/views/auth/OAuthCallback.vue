@@ -109,7 +109,13 @@ onMounted(async () => {
     setAuthToken(data.token);
     auth.user = data.user;
     toast.success(`Identity Verified. Welcome!`);
-    router.replace({ name: 'user.dashboard' });
+    const redirectMap = {
+      admin: { name: 'admin.dashboard' },
+      educator: { name: 'facilitator.dashboard' },
+      moderator: { name: 'facilitator.dashboard' },
+      player: { name: 'user.dashboard' }
+    };
+    router.replace(redirectMap[data.user?.role] || { name: 'user.dashboard' });
   } catch (err) {
     error.value = err.response?.data?.message || "Google synchronization failed.";
   }
