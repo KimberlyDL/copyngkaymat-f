@@ -5,6 +5,7 @@ import { useToast } from "@/utils/useToast";
 // ====== Config ======
 const API_ORIGIN = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, "") || "http://localhost:3000";
 const TOKEN_KEY = "jwt";
+const REFRESH_TOKEN_KEY = "refresh_token";
 
 // ====== Axios base instance ======
 const api = axios.create({
@@ -38,6 +39,24 @@ export function clearAuthToken() {
     delete api.defaults.headers.common.Authorization;
 }
 
+export function getRefreshToken() {
+    try {
+        return sessionStorage.getItem(REFRESH_TOKEN_KEY) || null;
+    } catch { return null; }
+}
+
+export function setRefreshToken(token) {
+    try {
+        sessionStorage.setItem(REFRESH_TOKEN_KEY, token);
+    } catch { }
+}
+
+export function clearRefreshToken() {
+    try {
+        sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+    } catch { }
+}
+
 // Re-init access token on boot
 const bootToken = getAuthToken();
 if (bootToken) setAuthToken(bootToken);
@@ -65,14 +84,6 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// api.interceptors.request.use((config) => {
-//     const token = localStorage.getItem("jwt"); // Ensure this key matches your setAuthToken key
-//     if (token) {
-//         config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-// });
-
 // Response Interceptor: Handle 401s via Silent Refresh
 api.interceptors.response.use(
     (response) => response,
@@ -80,14 +91,12 @@ api.interceptors.response.use(
         const { config, response } = error;
         if (!response) return Promise.reject(error);
 
-        // === FIX START: Prevent redirect loop on Login page ===
-        // If the error comes from the login endpoint, reject immediately.
-        // This lets Login.vue handle the error display without reloading the page.
+        // If the error comes from a public endpoint, reject immediately
+        // so the caller (e.g. Login.vue) can handle it without a redirect loop
         const publicPaths = ['/login', '/google/redirect', '/google/exchange'];
         if (config.url && publicPaths.some(path => config.url.includes(path))) {
             return Promise.reject(error);
         }
-        // === FIX END ===
 
         // If 401 and we haven't tried to refresh yet
         if (response.status === 401 && !config[RETRY_FLAG]) {
@@ -105,7 +114,6 @@ api.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                // We send an empty body; the browser automatically attaches the HttpOnly cookie
                 const { data } = await axios.post(`${API_ORIGIN}/api/v1/auth/refresh`, {}, { withCredentials: true });
 
                 const newAccessToken = data?.token;
@@ -120,9 +128,8 @@ api.interceptors.response.use(
                 refreshSubscribers = [];
                 clearAuthToken();
 
-                // Security Alert: Handle specific reuse detection from backend
+                // useToast() called here (not at module level) — Pinia is guaranteed active by now
                 if (refreshError.response?.data?.code === 'TOKEN_REUSE_DETECTED') {
-                    // useToast() is safe here — Pinia is active by the time a refresh ever fails
                     const toast = useToast();
                     toast.error('Security alert: Multiple login attempts detected. Please log in again.', 6000);
                 }
@@ -148,24 +155,6 @@ export async function logoutEverywhere() {
 export async function logout() {
     try { await api.post("/api/v1/auth/logout"); } catch { }
     clearAuthToken();
-}
-
-export function getRefreshToken() {
-    try {
-        return sessionStorage.getItem(REFRESH_TOKEN_KEY) || null;
-    } catch { return null; }
-}
-
-export function setRefreshToken(token) {
-    try {
-        sessionStorage.setItem(REFRESH_TOKEN_KEY, token);
-    } catch { }
-}
-
-export function clearRefreshToken() {
-    try {
-        sessionStorage.removeItem(REFRESH_TOKEN_KEY);
-    } catch { }
 }
 
 export default api;
