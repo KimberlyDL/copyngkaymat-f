@@ -66,12 +66,15 @@ const RETRY_FLAG = "_retry";
 let isRefreshing = false;
 let refreshSubscribers = [];
 
-function subscribeTokenRefresh(callback) {
-    refreshSubscribers.push(callback);
-}
+const REFRESH_TIMEOUT_MS = 10_000;
 
 function onTokenRefreshed(newToken) {
-    refreshSubscribers.forEach(callback => callback(newToken));
+    refreshSubscribers.forEach(({ resolve }) => resolve(newToken));
+    refreshSubscribers = [];
+}
+
+function rejectAllSubscribers(err) {
+    refreshSubscribers.forEach(({ reject }) => reject(err));
     refreshSubscribers = [];
 }
 
@@ -101,11 +104,22 @@ api.interceptors.response.use(
         // If 401 and we haven't tried to refresh yet
         if (response.status === 401 && !config[RETRY_FLAG]) {
             if (isRefreshing) {
-                return new Promise((resolve) => {
-                    subscribeTokenRefresh((newToken) => {
-                        config.headers.Authorization = `Bearer ${newToken}`;
-                        config[RETRY_FLAG] = true;
-                        resolve(api(config));
+                return new Promise((resolve, reject) => {
+                    const timer = setTimeout(() => {
+                        reject(new Error('Token refresh timed out'));
+                    }, REFRESH_TIMEOUT_MS);
+
+                    refreshSubscribers.push({
+                        resolve: (newToken) => {
+                            clearTimeout(timer);
+                            config.headers.Authorization = `Bearer ${newToken}`;
+                            config[RETRY_FLAG] = true;
+                            resolve(api(config));
+                        },
+                        reject: (err) => {
+                            clearTimeout(timer);
+                            reject(err);
+                        }
                     });
                 });
             }
@@ -125,7 +139,7 @@ api.interceptors.response.use(
                 return api(config);
             } catch (refreshError) {
                 isRefreshing = false;
-                refreshSubscribers = [];
+                rejectAllSubscribers(refreshError);
                 clearAuthToken();
 
                 // useToast() called here (not at module level) — Pinia is guaranteed active by now
