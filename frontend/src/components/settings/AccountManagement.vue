@@ -17,7 +17,7 @@
                 {{ isCancelling ? 'Processing...' : 'Cancel Deletion' }}
             </button>
         </div>
-        
+
         <!-- Password Change -->
         <section class="space-y-6">
             <div>
@@ -28,20 +28,20 @@
             <div class="grid gap-6">
                 <div class="grid gap-2">
                     <label class="text-[10px] font-black uppercase tracking-wider text-slate-500">Current Password</label>
-                    <input v-model="passwordData.current_password" type="password" 
+                    <input v-model="passwordData.current_password" type="password"
                         class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="grid gap-2">
                         <label class="text-[10px] font-black uppercase tracking-wider text-slate-500">New Password</label>
-                        <input v-model="passwordData.password" type="password" 
+                        <input v-model="passwordData.password" type="password"
                             class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                         <p class="text-[10px] text-slate-500">Minimum 8 characters</p>
                     </div>
                     <div class="grid gap-2">
                         <label class="text-[10px] font-black uppercase tracking-wider text-slate-500">Confirm New Password</label>
-                        <input v-model="passwordData.password_confirmation" type="password" 
+                        <input v-model="passwordData.password_confirmation" type="password"
                             class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d12] text-black dark:text-white shadow-sm focus:border-purple-500 focus:ring-purple-500 text-sm px-4 py-3" />
                     </div>
                 </div>
@@ -75,7 +75,7 @@
             </div>
 
             <div v-else class="space-y-3">
-                <div v-for="session in sessions" :key="session.id" 
+                <div v-for="session in sessions" :key="session.id"
                     class="flex items-center justify-between p-5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl">
                     <div class="flex items-center gap-4">
                         <div class="p-2.5 bg-slate-100 dark:bg-white/5 rounded-xl">
@@ -143,7 +143,7 @@
                 <div class="space-y-4">
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-wider text-slate-500">Enter Password</label>
-                        <input v-model="deleteForm.password" type="password" 
+                        <input v-model="deleteForm.password" type="password"
                             class="block w-full rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-black dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500 text-sm px-4 py-3" />
                     </div>
                     <div class="space-y-2">
@@ -170,22 +170,52 @@
             </div>
         </div>
 
+        <!-- Logout All Devices Confirm -->
+        <ConfirmModal
+            :is-open="showLogoutAllModal"
+            variant="danger"
+            title="Sign Out All Devices?"
+            message="This will log you out of all devices including this one. You will need to log in again."
+            confirm-label="Sign Out All"
+            cancel-label="Cancel"
+            @confirm="handleLogoutAllConfirm"
+            @cancel="showLogoutAllModal = false"
+        />
+
+        <!-- Deactivate Account Confirm -->
+        <ConfirmModal
+            :is-open="showDeactivateModal"
+            variant="warning"
+            title="Deactivate Account?"
+            message="Your profile will be hidden. You can reactivate within 30 days by logging in again."
+            confirm-label="Deactivate"
+            cancel-label="Cancel"
+            @confirm="handleDeactivateConfirm"
+            @cancel="showDeactivateModal = false"
+        />
+
+        <!-- Cancel Deletion Confirm -->
+        <ConfirmModal
+            :is-open="showCancelDeletionModal"
+            variant="info"
+            title="Cancel Account Deletion?"
+            message="Your scheduled deletion will be cancelled and your account will remain active."
+            confirm-label="Yes, Cancel Deletion"
+            cancel-label="Go Back"
+            @confirm="handleCancelDeletionConfirm"
+            @cancel="showCancelDeletionModal = false"
+        />
     </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import {
-    AlertTriangle,
-    Monitor,
-    LogOut,
-    PauseCircle, // Keep imports if needed, though PauseCircle wasn't used in template
-    Trash2 // Keep imports if needed, though Trash2 wasn't used in template
-} from 'lucide-vue-next';
+import { AlertTriangle, Monitor, LogOut } from 'lucide-vue-next';
 import { useAuthStore } from '@/stores/auth';
 import { useProfileStore } from '@/stores/profile';
 import { useToast } from '@/utils/useToast';
+import ConfirmModal from '@/components/ui/ConfirmModal.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -194,6 +224,9 @@ const toast = useToast();
 
 // State
 const showDeleteForm = ref(false);
+const showLogoutAllModal = ref(false);
+const showDeactivateModal = ref(false);
+const showCancelDeletionModal = ref(false);
 const isDeleting = ref(false);
 const isDeactivating = ref(false);
 const isChangingPassword = ref(false);
@@ -210,7 +243,6 @@ const deleteForm = ref({
 const deletionStatus = ref(null);
 const sessions = ref([]);
 
-// Password change state
 const passwordData = ref({
     current_password: '',
     password: '',
@@ -234,23 +266,16 @@ const isPasswordFormValid = computed(() => {
 // Methods
 const formatDate = (dateString) => {
     if (!dateString) return 'Unknown';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
     });
 };
 
 const formatDateTime = (dateString) => {
     if (!dateString) return 'Unknown';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
     });
 };
 
@@ -259,14 +284,8 @@ const changePassword = async () => {
     try {
         const result = await authStore.changePassword(passwordData.value);
         if (result.ok) {
-            passwordData.value = {
-                current_password: '',
-                password: '',
-                password_confirmation: ''
-            };
-            setTimeout(() => {
-                router.push('/login');
-            }, 2000);
+            passwordData.value = { current_password: '', password: '', password_confirmation: '' };
+            setTimeout(() => router.push('/login'), 2000);
         }
     } catch (error) {
         // Error toast handled by store
@@ -287,10 +306,10 @@ const loadSessions = async () => {
     }
 };
 
-const logoutAllDevices = async () => {
-    if (!confirm('This will log you out of all devices including this one. You will need to log in again. Continue?')) {
-        return;
-    }
+const logoutAllDevices = () => { showLogoutAllModal.value = true; };
+
+const handleLogoutAllConfirm = async () => {
+    showLogoutAllModal.value = false;
     isLoggingOut.value = true;
     try {
         await authStore.logoutAll();
@@ -303,16 +322,14 @@ const logoutAllDevices = async () => {
     }
 };
 
-const confirmDeactivation = async () => {
-    if (!confirm('Are you sure you want to deactivate your account? Your profile will be hidden and you can reactivate within 30 days by logging in again.')) {
-        return;
-    }
+const confirmDeactivation = () => { showDeactivateModal.value = true; };
+
+const handleDeactivateConfirm = async () => {
+    showDeactivateModal.value = false;
     isDeactivating.value = true;
     try {
         const success = await profileStore.deactivateAccount();
-        if (success) {
-            router.push('/login');
-        }
+        if (success) router.push('/login');
     } catch (error) {
     } finally {
         isDeactivating.value = false;
@@ -329,14 +346,8 @@ const requestDeletion = async () => {
         if (success) {
             await loadDeletionStatus();
             showDeleteForm.value = false;
-            deleteForm.value = {
-                password: '',
-                confirm_text: '',
-                reason: ''
-            };
-            setTimeout(() => {
-                router.push('/login');
-            }, 3000);
+            deleteForm.value = { password: '', confirm_text: '', reason: '' };
+            setTimeout(() => router.push('/login'), 3000);
         }
     } catch (error) {
     } finally {
@@ -344,16 +355,14 @@ const requestDeletion = async () => {
     }
 };
 
-const cancelDeletion = async () => {
-    if (!confirm('Are you sure you want to cancel the account deletion? Your account will be reactivated.')) {
-        return;
-    }
+const cancelDeletion = () => { showCancelDeletionModal.value = true; };
+
+const handleCancelDeletionConfirm = async () => {
+    showCancelDeletionModal.value = false;
     isCancelling.value = true;
     try {
         const success = await profileStore.cancelAccountDeletion();
-        if (success) {
-            deletionStatus.value = null;
-        }
+        if (success) deletionStatus.value = null;
     } catch (error) {
     } finally {
         isCancelling.value = false;
@@ -362,11 +371,7 @@ const cancelDeletion = async () => {
 
 const cancelDeleteForm = () => {
     showDeleteForm.value = false;
-    deleteForm.value = {
-        password: '',
-        confirm_text: '',
-        reason: ''
-    };
+    deleteForm.value = { password: '', confirm_text: '', reason: '' };
 };
 
 const loadDeletionStatus = async () => {
@@ -379,10 +384,7 @@ const loadDeletionStatus = async () => {
 };
 
 onMounted(async () => {
-    await Promise.all([
-        loadSessions(),
-        loadDeletionStatus()
-    ]);
+    await Promise.all([loadSessions(), loadDeletionStatus()]);
 });
 </script>
 
